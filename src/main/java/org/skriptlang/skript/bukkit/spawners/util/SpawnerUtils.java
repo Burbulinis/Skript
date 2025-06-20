@@ -1,5 +1,7 @@
 package org.skriptlang.skript.bukkit.spawners.util;
 
+import ch.njol.skript.util.Timespan;
+import ch.njol.skript.util.Timespan.TimePeriod;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.TrialSpawner;
@@ -13,6 +15,13 @@ import org.bukkit.spawner.Spawner;
 public class SpawnerUtils {
 
 	public static final int DEFAULT_REQUIRED_PLAYER_RANGE = 16;
+	public static final int DEFAULT_TRIAL_REQUIRED_PLAYER_RANGE = 14;
+	public static final int DEFAULT_SPAWN_RANGE = 4;
+	public static final int DEFAULT_MAX_NEARBY_ENTITIES = 16;
+	public static final Timespan DEFAULT_MAX_SPAWN_DELAY = new Timespan(TimePeriod.TICK, 800);
+	public static final Timespan DEFAULT_MIN_SPAWN_DELAY = new Timespan(TimePeriod.TICK, 200);;
+	public static final int DEFAULT_SPAWN_COUNT = 4;
+	public static final Timespan DEFAULT_COOLDOWN_LENGTH = new Timespan(TimePeriod.TICK, 36_000);
 
 	/**
 	 * Returns whether the object is an instance of {@link BaseSpawner}. Base spawners are creature spawners,

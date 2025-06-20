@@ -1,77 +1,91 @@
 package org.skriptlang.skript.bukkit.spawners.util;
 
-import org.bukkit.block.spawner.SpawnerEntry;
-import org.bukkit.entity.EntitySnapshot;
-import org.jetbrains.annotations.NotNull;
+import ch.njol.skript.bukkitutil.EntityUtils;
+import ch.njol.skript.util.Timespan;
+import ch.njol.skript.util.Timespan.TimePeriod;
+import ch.njol.yggdrasil.YggdrasilSerializable;
+import com.google.common.base.Preconditions;
+import org.bukkit.spawner.Spawner;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+public class SkriptSpawnerData extends AbstractSpawnerData implements YggdrasilSerializable {
 
-public class SkriptSpawnerData extends BaseSpawnerData {
+	private int maxNearbyEntities = SpawnerUtils.DEFAULT_MAX_NEARBY_ENTITIES;
+	private int spawnCount = SpawnerUtils.DEFAULT_SPAWN_COUNT;
+	private Timespan maxSpawnDelay = SpawnerUtils.DEFAULT_MAX_SPAWN_DELAY;
+	private Timespan minSpawnDelay = SpawnerUtils.DEFAULT_MIN_SPAWN_DELAY;
 
-	private Set<Object> assignedSpawners;
-	private boolean autoUpdating = true;
+	public static SkriptSpawnerData fromBukkitSpawner(Spawner spawner) {
+		SkriptSpawnerData data = new SkriptSpawnerData();
 
-	private List<SpawnerEntry> spawnerEntries = new ArrayList<>();
-	private EntitySnapshot spawnerEntity;
+		data.setRequiredPlayerRange(spawner.getRequiredPlayerRange());
+		data.setSpawnRange(spawner.getSpawnRange());
 
-	public @NotNull Set<Object> getAssignedSpawners() {
-		return Set.copyOf(assignedSpawners);
+		if (spawner.getSpawnedEntity() != null)
+			data.setSpawnerEntitySnapshot(spawner.getSpawnedEntity());
+		else if (spawner.getSpawnedType() != null)
+			data.setSpawnerType(EntityUtils.toSkriptEntityData(spawner.getSpawnedType()));
+		else if (!spawner.getPotentialSpawns().isEmpty())
+			data.setSpawnerEntries(spawner.getPotentialSpawns());
+
+		data.setMaxNearbyEntities(spawner.getMaxNearbyEntities());
+		data.setSpawnCount(spawner.getSpawnCount());
+		data.setMaxSpawnDelay(new Timespan(TimePeriod.TICK, spawner.getMaxSpawnDelay()));
+		data.setMinSpawnDelay(new Timespan(TimePeriod.TICK, spawner.getMinSpawnDelay()));
+
+		return data;
 	}
 
-	public void setAssignedSpawners(@NotNull Set<Object> spawners, boolean update) {
-		this.assignedSpawners = spawners;
-		if (update)
-			updateAssignedSpawners();
+	public void applyDataToBukkitSpawner(Spawner spawner) {
+		spawner.setRequiredPlayerRange(getRequiredPlayerRange());
+		spawner.setSpawnRange(getSpawnRange());
+
+		if (getSpawnerEntitySnapshot() != null)
+			spawner.setSpawnedEntity(getSpawnerEntitySnapshot());
+		else if (getSpawnerType() != null)
+			spawner.setSpawnedType(EntityUtils.toBukkitEntityType(getSpawnerType()));
+		else if (!getSpawnerEntries().isEmpty())
+			spawner.setPotentialSpawns(getSpawnerEntries());
+
+		spawner.setMaxNearbyEntities(getMaxNearbyEntities());
+		spawner.setSpawnCount(getSpawnCount());
+		spawner.setMaxSpawnDelay(Math.clamp(getMaxSpawnDelay().getAs(TimePeriod.TICK), 0, Integer.MAX_VALUE));
+		spawner.setMinSpawnDelay(Math.clamp(getMinSpawnDelay().getAs(TimePeriod.TICK), 0, Integer.MAX_VALUE));
+
+		// todo: update spawners
 	}
 
-	public void assignSpawners(@NotNull Set<Object> spawners, boolean update) {
-		assignedSpawners.addAll(spawners);
-		if (update)
-			updateAssignedSpawners();
+	public int getMaxNearbyEntities() {
+		return maxNearbyEntities;
 	}
 
-	public void assignSpawner(@NotNull Object spawner, boolean update) {
-		assignedSpawners.add(spawner);
-		if (update)
-			updateAssignedSpawners();
+	public void setMaxNearbyEntities(int maxNearbyEntities) {
+		this.maxNearbyEntities = maxNearbyEntities;
 	}
 
-	public SpawnerEntry @NotNull [] getSpawnerEntries() {
-		return spawnerEntries.toArray(SpawnerEntry[]::new);
+	public int getSpawnCount() {
+		return spawnCount;
 	}
 
-	public void setSpawnerEntries(@NotNull List<SpawnerEntry> spawnerEntries) {
-		this.spawnerEntries = spawnerEntries;
+	public void setSpawnCount(int spawnCount) {
+		this.spawnCount = spawnCount;
 	}
 
-	public void addSpawnerEntry(@NotNull SpawnerEntry spawnerEntry) {
-		spawnerEntries.add(spawnerEntry);
+	public Timespan getMaxSpawnDelay() {
+		return maxSpawnDelay;
 	}
 
-	public void removeSpawnerEntry(@NotNull SpawnerEntry spawnerEntry) {
-		spawnerEntries.remove(spawnerEntry);
+	public void setMaxSpawnDelay(Timespan maxSpawnDelay) {
+		Preconditions.checkArgument(maxSpawnDelay.compareTo(minSpawnDelay) >= 0, "Maximum spawn delay cannot be less than minimum spawn delay");
+		this.maxSpawnDelay = maxSpawnDelay;
 	}
 
-	public EntitySnapshot getSpawnerEntity() {
-		return spawnerEntity;
+	public Timespan getMinSpawnDelay() {
+		return minSpawnDelay;
 	}
 
-	public void setSpawnerEntity(EntitySnapshot spawnerEntity) {
-
-	}
-
-	public void updateAssignedSpawners() {
-
-	}
-
-	public boolean isAutoUpdating() {
-		return autoUpdating;
-	}
-
-	public void setAutoUpdating(boolean autoUpdating) {
-		this.autoUpdating = autoUpdating;
+	public void setMinSpawnDelay(Timespan minSpawnDelay) {
+		Preconditions.checkArgument(minSpawnDelay.compareTo(maxSpawnDelay) <= 0, "Minimum spawn delay cannot be greater than the maximum spawn delay");
+		this.minSpawnDelay = minSpawnDelay;
 	}
 
 }

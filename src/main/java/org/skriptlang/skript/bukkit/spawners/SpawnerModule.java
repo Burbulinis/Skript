@@ -2,15 +2,13 @@ package org.skriptlang.skript.bukkit.spawners;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.bukkitutil.EntityUtils;
-import ch.njol.skript.classes.AnyInfo;
-import ch.njol.skript.classes.ClassInfo;
-import ch.njol.skript.classes.EnumClassInfo;
-import ch.njol.skript.classes.Parser;
+import ch.njol.skript.classes.*;
 import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.lang.ParseContext;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.registrations.EventValues;
+import ch.njol.yggdrasil.Fields;
 import com.destroystokyo.paper.event.entity.PreSpawnerSpawnEvent;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -34,6 +32,8 @@ import org.skriptlang.skript.lang.converter.Converters;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
 import java.io.IOException;
+import java.io.NotSerializableException;
+import java.io.StreamCorruptedException;
 import java.util.StringJoiner;
 
 public class SpawnerModule implements AddonModule {
@@ -242,6 +242,41 @@ public class SpawnerModule implements AddonModule {
 							+ rule.getMaxBlockLight() + ','
 							+ rule.getMinSkyLight() + ','
 							+ rule.getMaxSkyLight();
+				}
+			})
+			.serializer(new Serializer<>() {
+				@Override
+				public Fields serialize(SpawnRule spawnRule) {
+					Fields fields = new Fields();
+					fields.putPrimitive("minBlockLight", spawnRule.getMinBlockLight());
+					fields.putPrimitive("maxBlockLight", spawnRule.getMaxBlockLight());
+					fields.putPrimitive("minSkyLight", spawnRule.getMinSkyLight());
+					fields.putPrimitive("maxSkyLight", spawnRule.getMaxSkyLight());
+					return fields;
+				}
+
+				@Override
+				public void deserialize(SpawnRule o, Fields f) {
+					assert false;
+				}
+
+				@Override
+				protected SpawnRule deserialize(Fields fields) throws StreamCorruptedException {
+					int minBlockLight = fields.getPrimitive("minBlockLight", int.class);
+					int maxBlockLight = fields.getPrimitive("maxBlockLight", int.class);
+					int minSkyLight = fields.getPrimitive("minSkyLight", int.class);
+					int maxSkyLight = fields.getPrimitive("maxSkyLight", int.class);
+					return new SpawnRuleWrapper(minBlockLight, maxBlockLight, minSkyLight, maxSkyLight);
+				}
+
+				@Override
+				public boolean mustSyncDeserialization() {
+					return true;
+				}
+
+				@Override
+				protected boolean canBeInstantiated() {
+					return false;
 				}
 			})
 		);
