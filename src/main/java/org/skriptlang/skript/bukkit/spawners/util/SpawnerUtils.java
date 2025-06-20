@@ -12,6 +12,8 @@ import org.bukkit.spawner.Spawner;
  */
 public class SpawnerUtils {
 
+	public static final int DEFAULT_REQUIRED_PLAYER_RANGE = 16;
+
 	/**
 	 * Returns whether the object is an instance of {@link BaseSpawner}. Base spawners are creature spawners,
 	 * spawner minecarts and trial spawner configurations. Note that this returns true for {@link TrialSpawnerConfig}.
