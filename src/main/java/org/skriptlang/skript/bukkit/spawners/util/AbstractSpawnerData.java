@@ -24,7 +24,8 @@ public abstract class AbstractSpawnerData {
 	}
 
 	public void setRequiredPlayerRange(int requiredPlayerRange) {
-		Preconditions.checkArgument(requiredPlayerRange > 0, "Required player range must be > 0");
+		Preconditions.checkArgument(requiredPlayerRange > 0,
+			"Required player range must be > 0");
 		this.requiredPlayerRange = requiredPlayerRange;
 	}
 
@@ -62,7 +63,7 @@ public abstract class AbstractSpawnerData {
 
 	public void setSpawnerEntries(@NotNull List<SpawnerEntry> spawnerEntries) {
 		Preconditions.checkNotNull(spawnerEntries, "Spawner entries cannot be null");
-		this.spawnerEntries = spawnerEntries;
+		this.spawnerEntries = new ArrayList<>(spawnerEntries);
 		spawnerEntitySnapshot = null;
 	}
 

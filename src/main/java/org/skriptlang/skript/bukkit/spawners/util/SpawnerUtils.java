@@ -1,5 +1,6 @@
 package org.skriptlang.skript.bukkit.spawners.util;
 
+import ch.njol.skript.bukkitutil.EntityUtils;
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.Timespan.TimePeriod;
 import org.bukkit.block.Block;
@@ -8,6 +9,7 @@ import org.bukkit.block.TrialSpawner;
 import org.bukkit.entity.minecart.SpawnerMinecart;
 import org.bukkit.spawner.BaseSpawner;
 import org.bukkit.spawner.Spawner;
+import org.bukkit.spawner.TrialSpawnerConfiguration;
 
 /**
  * Utility class for spawners.
@@ -15,13 +17,50 @@ import org.bukkit.spawner.Spawner;
 public class SpawnerUtils {
 
 	public static final int DEFAULT_REQUIRED_PLAYER_RANGE = 16;
-	public static final int DEFAULT_TRIAL_REQUIRED_PLAYER_RANGE = 14;
+	public static final int DEFAULT_MAX_NEARBY_ENTITIES = 6;
 	public static final int DEFAULT_SPAWN_RANGE = 4;
-	public static final int DEFAULT_MAX_NEARBY_ENTITIES = 16;
+	public static final int DEFAULT_SPAWN_COUNT = 4;
+
 	public static final Timespan DEFAULT_MAX_SPAWN_DELAY = new Timespan(TimePeriod.TICK, 800);
 	public static final Timespan DEFAULT_MIN_SPAWN_DELAY = new Timespan(TimePeriod.TICK, 200);;
-	public static final int DEFAULT_SPAWN_COUNT = 4;
 	public static final Timespan DEFAULT_COOLDOWN_LENGTH = new Timespan(TimePeriod.TICK, 36_000);
+
+	public static final int DEFAULT_TRIAL_REQUIRED_PLAYER_RANGE = 14;
+	public static final int DEFAULT_BASE_MOB_AMOUNT = 6;
+	public static final int DEFAULT_BASE_PER_PLAYER_INCREMENT = 2;
+	public static final int DEFAULT_CONCURRENT_MOB_AMOUNT = 2;
+	public static final int DEFAULT_CONCURRENT_PER_PLAYER_INCREMENT = 1;
+
+
+	public static TrialSpawnerConfiguration getTrialSpawnerConfiguration(TrialSpawner trialSpawner, boolean ominous) {
+		if (ominous)
+			return trialSpawner.getOminousConfiguration();
+		return trialSpawner.getNormalConfiguration();
+	}
+
+	public static void applySpawnerDataToAbstractData(BaseSpawner spawner, AbstractSpawnerData data) {
+		data.setRequiredPlayerRange(spawner.getRequiredPlayerRange());
+		data.setSpawnRange(spawner.getSpawnRange());
+
+		if (!spawner.getPotentialSpawns().isEmpty())
+			data.setSpawnerEntries(spawner.getPotentialSpawns());
+		else if (spawner.getSpawnedEntity() != null)
+			data.setSpawnerEntitySnapshot(spawner.getSpawnedEntity());
+		else
+			data.setSpawnerType(EntityUtils.toSkriptEntityData(spawner.getSpawnedType()));
+	}
+
+	public static void applyAbstractDataToSpawner(AbstractSpawnerData data, BaseSpawner spawner) {
+		spawner.setRequiredPlayerRange(data.getRequiredPlayerRange());
+		spawner.setSpawnRange(data.getSpawnRange());
+
+		if (!data.getSpawnerEntries().isEmpty())
+			spawner.setPotentialSpawns(data.getSpawnerEntries());
+		else if (data.getSpawnerEntitySnapshot() != null)
+			spawner.setSpawnedEntity(data.getSpawnerEntitySnapshot());
+		else
+			spawner.setSpawnedType(EntityUtils.toBukkitEntityType(data.getSpawnerType()));
+	}
 
 	/**
 	 * Returns whether the object is an instance of {@link BaseSpawner}. Base spawners are creature spawners,
