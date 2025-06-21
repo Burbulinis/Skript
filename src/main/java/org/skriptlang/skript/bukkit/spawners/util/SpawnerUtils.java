@@ -16,7 +16,7 @@ import org.bukkit.spawner.TrialSpawnerConfiguration;
  */
 public class SpawnerUtils {
 
-	public static final int DEFAULT_REQUIRED_PLAYER_RANGE = 16;
+	public static final int DEFAULT_ACTIVATION_RANGE = 16;
 	public static final int DEFAULT_MAX_NEARBY_ENTITIES = 6;
 	public static final int DEFAULT_SPAWN_RANGE = 4;
 	public static final int DEFAULT_SPAWN_COUNT = 4;
@@ -25,21 +25,31 @@ public class SpawnerUtils {
 	public static final Timespan DEFAULT_MIN_SPAWN_DELAY = new Timespan(TimePeriod.TICK, 200);;
 	public static final Timespan DEFAULT_COOLDOWN_LENGTH = new Timespan(TimePeriod.TICK, 36_000);
 
-	public static final int DEFAULT_TRIAL_REQUIRED_PLAYER_RANGE = 14;
+	public static final int DEFAULT_TRIAL_ACTIVATION_RANGE = 14;
 	public static final int DEFAULT_BASE_MOB_AMOUNT = 6;
 	public static final int DEFAULT_BASE_PER_PLAYER_INCREMENT = 2;
 	public static final int DEFAULT_CONCURRENT_MOB_AMOUNT = 2;
 	public static final int DEFAULT_CONCURRENT_PER_PLAYER_INCREMENT = 1;
 
-
+	/**
+	 * Returns the trial spawner configuration for the given trial spawner.
+	 * @param trialSpawner the trial spawner
+	 * @param ominous whether to get the ominous configuration
+	 * @return the trial spawner configuration
+	 */
 	public static TrialSpawnerConfiguration getTrialSpawnerConfiguration(TrialSpawner trialSpawner, boolean ominous) {
 		if (ominous)
 			return trialSpawner.getOminousConfiguration();
 		return trialSpawner.getNormalConfiguration();
 	}
 
+	/**
+	 * Applies the data from the spawner to the abstract data.
+	 * @param spawner the spawner to apply the data from
+	 * @param data the abstract data to apply the data to
+	 */
 	public static void applySpawnerDataToAbstractData(BaseSpawner spawner, AbstractSpawnerData data) {
-		data.setRequiredPlayerRange(spawner.getRequiredPlayerRange());
+		data.setActivationRange(spawner.getRequiredPlayerRange());
 		data.setSpawnRange(spawner.getSpawnRange());
 
 		if (!spawner.getPotentialSpawns().isEmpty())
@@ -50,8 +60,13 @@ public class SpawnerUtils {
 			data.setSpawnerType(EntityUtils.toSkriptEntityData(spawner.getSpawnedType()));
 	}
 
+	/**
+	 * Applies the abstract data to the spawner.
+	 * @param data the abstract data to apply
+	 * @param spawner the spawner to apply the data to
+	 */
 	public static void applyAbstractDataToSpawner(AbstractSpawnerData data, BaseSpawner spawner) {
-		spawner.setRequiredPlayerRange(data.getRequiredPlayerRange());
+		spawner.setRequiredPlayerRange(data.getActivationRange());
 		spawner.setSpawnRange(data.getSpawnRange());
 
 		if (!data.getSpawnerEntries().isEmpty())
@@ -61,6 +76,8 @@ public class SpawnerUtils {
 		else
 			spawner.setSpawnedType(EntityUtils.toBukkitEntityType(data.getSpawnerType()));
 	}
+
+	// todo: discard everything below from here?
 
 	/**
 	 * Returns whether the object is an instance of {@link BaseSpawner}. Base spawners are creature spawners,
