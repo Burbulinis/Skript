@@ -102,6 +102,14 @@ public class SkriptTrialSpawnerData extends AbstractSpawnerData implements Yggdr
 		this.activationRange = activationRange;
 	}
 
+	/**
+	 * Returns whether this trial spawner data is for an ominous trial spawner.
+	 * @return true if this is an ominous trial spawner data, false otherwise
+	 */
+	public boolean isOminous() {
+		return ominous;
+	}
+
 	//public @NotNull Timespan getCooldownLength() {
 	//	return cooldownLength;
 	//}
