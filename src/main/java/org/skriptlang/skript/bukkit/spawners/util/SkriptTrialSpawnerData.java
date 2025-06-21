@@ -38,10 +38,23 @@ public class SkriptTrialSpawnerData extends AbstractSpawnerData implements Yggdr
 		this.ominous = ominous;
 	}
 
+	/**
+	 * Creates a new {@code SkriptTrialSpawnerData} instance from the given Bukkit {@link TrialSpawner}.
+	 * <p>
+	 * This is by default not ominous, meaning it will create a normal trial spawner data.
+	 * @param trialSpawner the Bukkit trial spawner to convert
+	 * @return a new {@code SkriptTrialSpawnerData} containing the data from the given {@link TrialSpawner}
+	 */
 	public static SkriptTrialSpawnerData fromBukkitTrialSpawner(@NotNull TrialSpawner trialSpawner) {
 		return fromBukkitTrialSpawner(trialSpawner, false);
 	}
 
+	/**
+	 * Creates a new {@code SkriptTrialSpawnerData} instance from the given Bukkit {@link TrialSpawner}.
+	 * @param trialSpawner the Bukkit trial spawner to convert
+	 * @param ominous whether the trial spawner is ominous
+	 * @return a new {@code SkriptTrialSpawnerData} instance containing the data from the Bukkit trial spawner
+	 */
 	public static SkriptTrialSpawnerData fromBukkitTrialSpawner(@NotNull TrialSpawner trialSpawner, boolean ominous) {
 		SkriptTrialSpawnerData data = new SkriptTrialSpawnerData(ominous);
 
