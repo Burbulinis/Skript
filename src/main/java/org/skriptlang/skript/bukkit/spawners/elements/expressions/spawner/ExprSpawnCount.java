@@ -37,7 +37,7 @@ public class ExprSpawnCount extends SimplePropertyExpression<Object, Integer> {
 	@Override
 	public @Nullable Integer convert(Object object) {
 		if (SpawnerUtils.isSpawner(object))
-			return SpawnerUtils.getAsSpawner(object).getSpawnCount();
+			return SpawnerUtils.getAsSkriptSpawner(object).getSpawnCount();
 		return null;
 	}
 
@@ -57,7 +57,7 @@ public class ExprSpawnCount extends SimplePropertyExpression<Object, Integer> {
 			if (!SpawnerUtils.isSpawner(object))
 				continue;
 
-			Spawner spawner = SpawnerUtils.getAsSpawner(object);
+			Spawner spawner = SpawnerUtils.getAsSkriptSpawner(object);
 
 			assert spawner != null;
 

@@ -39,7 +39,7 @@ public class ExprActivationRange extends SimplePropertyExpression<Object, Intege
 		if (SpawnerUtils.isBaseSpawner(object)) {
 			return SpawnerUtils.getAsBaseSpawner(object).getRequiredPlayerRange();
 		} else if (SpawnerUtils.isTrialSpawner(object)) {
-			return SpawnerUtils.getAsTrialSpawner(object).getRequiredPlayerRange();
+			return SpawnerUtils.getAsSkriptTrialSpawner(object).getRequiredPlayerRange();
 		}
 		return null;
 	}
@@ -72,7 +72,7 @@ public class ExprActivationRange extends SimplePropertyExpression<Object, Intege
 				SpawnerUtils.updateState(spawner);
 
 			} else if (SpawnerUtils.isTrialSpawner(object)) {
-				TrialSpawner spawner = SpawnerUtils.getAsTrialSpawner(object);
+				TrialSpawner spawner = SpawnerUtils.getAsSkriptTrialSpawner(object);
 
 				assert spawner != null;
 

@@ -66,7 +66,7 @@ public class ExprPotentialSpawns extends PropertyExpression<Object, SpawnerEntry
 		for (Object object : source) {
 			if (SpawnerUtils.isTrialSpawner(object)) {
 				// get current trial spawner config if a trial spawner block was specified
-				TrialSpawner trialSpawner = SpawnerUtils.getAsTrialSpawner(object);
+				TrialSpawner trialSpawner = SpawnerUtils.getAsSkriptTrialSpawner(object);
 				object = SpawnerUtils.getCurrentTrialConfig(trialSpawner);
 			}
 
@@ -99,7 +99,7 @@ public class ExprPotentialSpawns extends PropertyExpression<Object, SpawnerEntry
 		for (Object object : getExpr().getArray(event)) {
 			if (SpawnerUtils.isTrialSpawner(object)) {
 				// get current trial spawner config if a trial spawner block was specified
-				TrialSpawner trialSpawner = SpawnerUtils.getAsTrialSpawner(object);
+				TrialSpawner trialSpawner = SpawnerUtils.getAsSkriptTrialSpawner(object);
 				object = SpawnerUtils.getCurrentTrialConfig(trialSpawner);
 			}
 

@@ -29,9 +29,9 @@ public class CondIsActivated extends PropertyCondition<Object> {
 	@Override
 	public boolean check(Object object) {
 		if (SpawnerUtils.isSpawner(object)) {
-			return SpawnerUtils.getAsSpawner(object).isActivated();
+			return SpawnerUtils.getAsSkriptSpawner(object).isActivated();
 		} else if (SpawnerUtils.isTrialSpawner(object)) {
-			TrialSpawner data = ((TrialSpawner) SpawnerUtils.getAsTrialSpawner(object).getBlockData());
+			TrialSpawner data = ((TrialSpawner) SpawnerUtils.getAsSkriptTrialSpawner(object).getBlockData());
 			return data.getTrialSpawnerState() == State.ACTIVE;
 		}
 		return false;

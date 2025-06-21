@@ -57,7 +57,7 @@ public class EffTrialSpawnerTrack extends Effect {
 			if (!SpawnerUtils.isTrialSpawner(spawner))
 				continue;
 
-			TrialSpawner trialSpawner = SpawnerUtils.getAsTrialSpawner(spawner);
+			TrialSpawner trialSpawner = SpawnerUtils.getAsSkriptTrialSpawner(spawner);
 
 			for (Object object : objects.getArray(event)) {
 				if (start) {

@@ -33,7 +33,7 @@ public class ExprCooldownLength extends SimplePropertyExpression<Object, Timespa
 	@Override
 	public @Nullable Timespan convert(Object object) {
 		if (SpawnerUtils.isTrialSpawner(object))
-			return new Timespan(TimePeriod.TICK, SpawnerUtils.getAsTrialSpawner(object).getCooldownLength());
+			return new Timespan(TimePeriod.TICK, SpawnerUtils.getAsSkriptTrialSpawner(object).getCooldownLength());
 		return null;
 	}
 
@@ -61,7 +61,7 @@ public class ExprCooldownLength extends SimplePropertyExpression<Object, Timespa
 			if (!SpawnerUtils.isTrialSpawner(object))
 				continue;
 
-			TrialSpawner spawner = SpawnerUtils.getAsTrialSpawner(object);
+			TrialSpawner spawner = SpawnerUtils.getAsSkriptTrialSpawner(object);
 
 			switch (mode) {
 				case SET -> spawner.setCooldownLength(ticksAsInt);

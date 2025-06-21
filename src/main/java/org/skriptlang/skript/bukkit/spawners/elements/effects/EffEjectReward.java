@@ -49,7 +49,7 @@ public class EffEjectReward extends Effect {
 			if (!SpawnerUtils.isTrialSpawner(object))
 				continue;
 
-			org.bukkit.block.TrialSpawner state = SpawnerUtils.getAsTrialSpawner(object);
+			org.bukkit.block.TrialSpawner state = SpawnerUtils.getAsSkriptTrialSpawner(object);
 			TrialSpawner data = (TrialSpawner) state.getBlockData();
 
 			data.setTrialSpawnerState(State.EJECTING_REWARD);

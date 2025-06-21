@@ -54,7 +54,7 @@ public class ExprMinMaxDelay extends SimplePropertyExpression<Object, Timespan> 
 		if (!SpawnerUtils.isSpawner(object))
 			return null;
 
-		Spawner spawner = SpawnerUtils.getAsSpawner(object);
+		Spawner spawner = SpawnerUtils.getAsSkriptSpawner(object);
 
 		assert spawner != null;
 
@@ -87,7 +87,7 @@ public class ExprMinMaxDelay extends SimplePropertyExpression<Object, Timespan> 
 			if (!SpawnerUtils.isSpawner(object))
 				continue;
 
-			Spawner spawner = SpawnerUtils.getAsSpawner(object);
+			Spawner spawner = SpawnerUtils.getAsSkriptSpawner(object);
 
 			int minMax;
 			if (isMax) {

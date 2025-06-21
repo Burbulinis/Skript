@@ -73,7 +73,7 @@ public class CondIsTracking extends Condition {
 		if (!SpawnerUtils.isTrialSpawner(object))
 			return isNegated();
 
-		TrialSpawner spawner = SpawnerUtils.getAsTrialSpawner(object);
+		TrialSpawner spawner = SpawnerUtils.getAsSkriptTrialSpawner(object);
 
 		assert spawner != null;
 

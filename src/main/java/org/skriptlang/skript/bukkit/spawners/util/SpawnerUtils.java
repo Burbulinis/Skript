@@ -137,18 +137,26 @@ public class SpawnerUtils {
 	}
 
 	/**
-	 * Returns the object as a {@link Spawner}.
+	 * Returns the object as a {@link SkriptSpawner}, or null if the object is not a spawner.
 	 * @param object the object
 	 * @return the object as a spawner
-	 * @see #isSpawner(Object)
 	 */
-	public static Spawner getAsSpawner(Object object) {
-		if (object instanceof Block block && block.getState() instanceof Spawner spawner) {
-			return spawner;
-		} else if (object instanceof SpawnerMinecart spawner) {
-			return spawner;
+	public static SkriptSpawner getAsSkriptSpawner(Object object) {
+		Spawner spawner = null;
+		SpawnerType type = null;
+
+		if (object instanceof Block block && block.getState() instanceof Spawner spawner1) {
+			spawner = spawner1;
+			type = SpawnerType.CREATURE;
+		} else if (object instanceof SpawnerMinecart spawner1) {
+			spawner = spawner1;
+			type = SpawnerType.MINECART;
 		}
-		return null;
+
+		if (spawner == null)
+			return null;
+
+		return new SkriptSpawner(spawner, type);
 	}
 
 	/**
@@ -157,16 +165,9 @@ public class SpawnerUtils {
 	 * @return the object as a trial spawner
 	 * @see #isTrialSpawner(Object)
 	 */
-	public static TrialSpawner getAsTrialSpawner(Object object) {
-		if (object instanceof Block block)
-			object = block.getState();
-
-		if (object instanceof TrialSpawner spawner)
-			return spawner;
-
-		if (object instanceof TrialSpawnerConfig config)
-			return config.state();
-
+	public static SkriptTrialSpawner getAsSkriptTrialSpawner(Object object) {
+		if (object instanceof Block block && block.getState() instanceof TrialSpawner trialSpawner)
+			return new SkriptTrialSpawner(trialSpawner);
 		return null;
 	}
 

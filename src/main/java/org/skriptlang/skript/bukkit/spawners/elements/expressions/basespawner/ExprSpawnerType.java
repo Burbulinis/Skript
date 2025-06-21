@@ -42,7 +42,7 @@ public class ExprSpawnerType extends SimplePropertyExpression<Object, EntityData
 			return EntityUtils.toSkriptEntityData(SpawnerUtils.getAsBaseSpawner(object).getSpawnedType());
 		} else if (SpawnerUtils.isTrialSpawner(object)) {
 			// get current trial spawner config if a trial spawner block was specified
-			TrialSpawner spawner = SpawnerUtils.getAsTrialSpawner(object);
+			TrialSpawner spawner = SpawnerUtils.getAsSkriptTrialSpawner(object);
 			TrialSpawnerConfiguration config = SpawnerUtils.getCurrentTrialConfig(spawner).config();
 			return EntityUtils.toSkriptEntityData(config.getSpawnedType());
 		}
@@ -64,7 +64,7 @@ public class ExprSpawnerType extends SimplePropertyExpression<Object, EntityData
 		for (Object object : getExpr().getArray(event)) {
 			if (SpawnerUtils.isTrialSpawner(object)) {
 				// get current trial spawner config if a trial spawner block was specified
-				TrialSpawner trialSpawner = SpawnerUtils.getAsTrialSpawner(object);
+				TrialSpawner trialSpawner = SpawnerUtils.getAsSkriptTrialSpawner(object);
 				object = SpawnerUtils.getCurrentTrialConfig(trialSpawner);
 			}
 

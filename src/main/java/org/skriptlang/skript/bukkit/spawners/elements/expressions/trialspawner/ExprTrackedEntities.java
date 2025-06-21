@@ -63,7 +63,7 @@ public class ExprTrackedEntities extends PropertyExpression<Object, Entity> {
 			if (!SpawnerUtils.isTrialSpawner(object))
 				continue;
 
-			TrialSpawner spawner = SpawnerUtils.getAsTrialSpawner(object);
+			TrialSpawner spawner = SpawnerUtils.getAsSkriptTrialSpawner(object);
 
 			if (players) {
 				values.addAll(spawner.getTrackedPlayers());

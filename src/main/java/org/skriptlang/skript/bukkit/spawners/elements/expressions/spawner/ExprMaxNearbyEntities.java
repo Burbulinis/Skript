@@ -35,7 +35,7 @@ public class ExprMaxNearbyEntities extends SimplePropertyExpression<Object, Inte
 	@Override
 	public @Nullable Integer convert(Object object) {
 		if (SpawnerUtils.isSpawner(object))
-			return SpawnerUtils.getAsSpawner(object).getMaxNearbyEntities();
+			return SpawnerUtils.getAsSkriptSpawner(object).getMaxNearbyEntities();
 		return null;
 	}
 
@@ -55,7 +55,7 @@ public class ExprMaxNearbyEntities extends SimplePropertyExpression<Object, Inte
 			if (!SpawnerUtils.isSpawner(object))
 				continue;
 
-			Spawner spawner = SpawnerUtils.getAsSpawner(object);
+			Spawner spawner = SpawnerUtils.getAsSkriptSpawner(object);
 
 			assert spawner != null;
 
