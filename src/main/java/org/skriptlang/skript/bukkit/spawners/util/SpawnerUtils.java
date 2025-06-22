@@ -32,23 +32,11 @@ public class SpawnerUtils {
 	public static final int DEFAULT_CONCURRENT_PER_PLAYER_INCREMENT = 1;
 
 	/**
-	 * Returns the trial spawner configuration for the given trial spawner.
-	 * @param trialSpawner the trial spawner
-	 * @param ominous whether to get the ominous configuration
-	 * @return the trial spawner configuration
-	 */
-	public static TrialSpawnerConfiguration getTrialSpawnerConfiguration(TrialSpawner trialSpawner, boolean ominous) {
-		if (ominous)
-			return trialSpawner.getOminousConfiguration();
-		return trialSpawner.getNormalConfiguration();
-	}
-
-	/**
 	 * Applies the data from the spawner to the abstract data.
 	 * @param spawner the spawner to apply the data from
 	 * @param data the abstract data to apply the data to
 	 */
-	public static void applySpawnerDataToAbstractData(BaseSpawner spawner, AbstractSpawnerData data) {
+	public static void applySpawnerDataToSpawnerData(BaseSpawner spawner, SkriptSpawnerData data) {
 		data.setActivationRange(spawner.getRequiredPlayerRange());
 		data.setSpawnRange(spawner.getSpawnRange());
 
@@ -65,7 +53,7 @@ public class SpawnerUtils {
 	 * @param data the abstract data to apply
 	 * @param spawner the spawner to apply the data to
 	 */
-	public static void applyAbstractDataToSpawner(AbstractSpawnerData data, BaseSpawner spawner) {
+	public static void applySpawnerDataToSpawner(SkriptSpawnerData data, BaseSpawner spawner) {
 		spawner.setRequiredPlayerRange(data.getActivationRange());
 		spawner.setSpawnRange(data.getSpawnRange());
 
@@ -75,6 +63,52 @@ public class SpawnerUtils {
 			spawner.setSpawnedEntity(data.getSpawnerEntitySnapshot());
 		else
 			spawner.setSpawnedType(EntityUtils.toBukkitEntityType(data.getSpawnerType()));
+	}
+
+	/**
+	 * Returns the trial spawner configuration for the given trial spawner.
+	 * @param trialSpawner the trial spawner
+	 * @param ominous whether to get the ominous configuration
+	 * @return the trial spawner configuration
+	 */
+	public static TrialSpawnerConfiguration getTrialSpawnerConfiguration(TrialSpawner trialSpawner, boolean ominous) {
+		if (ominous)
+			return trialSpawner.getOminousConfiguration();
+		return trialSpawner.getNormalConfiguration();
+	}
+
+	/**
+	 * Returns the object as a {@link SkriptMobSpawner}, or null if the object is not a spawner.
+	 * @param object the object
+	 * @return the object as a {@link SkriptMobSpawner}
+	 */
+	public static SkriptMobSpawner getAsSkriptSpawner(Object object) {
+		Spawner spawner = null;
+		SpawnerType type = null;
+
+		if (object instanceof Block block && block.getState() instanceof Spawner spawner1) {
+			spawner = spawner1;
+			type = SpawnerType.CREATURE;
+		} else if (object instanceof SpawnerMinecart spawner1) {
+			spawner = spawner1;
+			type = SpawnerType.MINECART;
+		}
+
+		if (spawner == null)
+			return null;
+
+		return new SkriptMobSpawner(spawner, type);
+	}
+
+	/**
+	 * Returns the object as a {@link SkriptTrialSpawner}, OR null if the object is not a trial spawner.
+	 * @param object the object
+	 * @return the object as a {@link SkriptTrialSpawner}
+	 */
+	public static SkriptTrialSpawner getAsSkriptTrialSpawner(Object object) {
+		if (object instanceof Block block && block.getState() instanceof TrialSpawner trialSpawner)
+			return new SkriptTrialSpawner(trialSpawner);
+		return null;
 	}
 
 	// todo: discard everything below from here?
@@ -133,41 +167,6 @@ public class SpawnerUtils {
 		} else if (object instanceof TrialSpawnerConfig config) {
 			return config.config();
 		}
-		return null;
-	}
-
-	/**
-	 * Returns the object as a {@link SkriptSpawner}, or null if the object is not a spawner.
-	 * @param object the object
-	 * @return the object as a spawner
-	 */
-	public static SkriptSpawner getAsSkriptSpawner(Object object) {
-		Spawner spawner = null;
-		SpawnerType type = null;
-
-		if (object instanceof Block block && block.getState() instanceof Spawner spawner1) {
-			spawner = spawner1;
-			type = SpawnerType.CREATURE;
-		} else if (object instanceof SpawnerMinecart spawner1) {
-			spawner = spawner1;
-			type = SpawnerType.MINECART;
-		}
-
-		if (spawner == null)
-			return null;
-
-		return new SkriptSpawner(spawner, type);
-	}
-
-	/**
-	 * Returns the object as a {@link TrialSpawner}. This also gets the state of a {@link TrialSpawnerConfig}.
-	 * @param object the object
-	 * @return the object as a trial spawner
-	 * @see #isTrialSpawner(Object)
-	 */
-	public static SkriptTrialSpawner getAsSkriptTrialSpawner(Object object) {
-		if (object instanceof Block block && block.getState() instanceof TrialSpawner trialSpawner)
-			return new SkriptTrialSpawner(trialSpawner);
 		return null;
 	}
 

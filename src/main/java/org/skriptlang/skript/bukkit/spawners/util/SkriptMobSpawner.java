@@ -9,9 +9,9 @@ import org.jetbrains.annotations.NotNull;
  * @param spawner the Bukkit spawner
  * @param type the type of the spawner, which can be either a minecart or a creature spawner
  */
-public record SkriptSpawner(@NotNull Spawner spawner, @NotNull SpawnerType type) {
+public record SkriptMobSpawner(@NotNull Spawner spawner, @NotNull SpawnerType type) {
 
-	public SkriptSpawner {
+	public SkriptMobSpawner {
 		Preconditions.checkNotNull(spawner, "spawner cannot be null");
 		Preconditions.checkNotNull(type, "type cannot be null");
 	}

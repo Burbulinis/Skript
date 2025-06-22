@@ -14,10 +14,10 @@ import java.util.Map;
 /**
  * Represents the data of a {@link TrialSpawner} and its configuration.
  *
+ * @see SkriptMobSpawnerData
  * @see SkriptSpawnerData
- * @see AbstractSpawnerData
  */
-public class SkriptTrialSpawnerData extends AbstractSpawnerData implements YggdrasilSerializable {
+public class SkriptTrialSpawnerData extends SkriptSpawnerData implements YggdrasilSerializable {
 
 	private int activationRange = SpawnerUtils.DEFAULT_TRIAL_ACTIVATION_RANGE;
 	//private @NotNull Timespan cooldownLength = SpawnerUtils.DEFAULT_COOLDOWN_LENGTH;
@@ -60,7 +60,7 @@ public class SkriptTrialSpawnerData extends AbstractSpawnerData implements Yggdr
 
 		//data.setCooldownLength(new Timespan(TimePeriod.TICK, trialSpawner.getCooldownLength()));
 		var config = SpawnerUtils.getTrialSpawnerConfiguration(trialSpawner, ominous);
-		SpawnerUtils.applySpawnerDataToAbstractData(config, data);
+		SpawnerUtils.applySpawnerDataToSpawnerData(config, data);
 
 		List<TrialSpawnerRewardEntry> rewardEntries = config.getPossibleRewards().entrySet().stream()
 				.map(entry ->
@@ -89,7 +89,7 @@ public class SkriptTrialSpawnerData extends AbstractSpawnerData implements Yggdr
 		//trialSpawner.setCooldownLength(Math.clamp(getCooldownLength().getAs(TimePeriod.TICK), 0 , Integer.MAX_VALUE));
 
 		var config = SpawnerUtils.getTrialSpawnerConfiguration(trialSpawner, ominous);
-		SpawnerUtils.applyAbstractDataToSpawner(this, config);
+		SpawnerUtils.applySpawnerDataToSpawner(this, config);
 
 		Map<LootTable, Integer> weightedMap = new HashMap<>();
 		for (TrialSpawnerRewardEntry entry : rewardEntries) {

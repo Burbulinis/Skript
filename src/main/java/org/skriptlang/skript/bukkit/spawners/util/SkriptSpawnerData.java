@@ -1,179 +1,185 @@
 package org.skriptlang.skript.bukkit.spawners.util;
 
-import ch.njol.skript.util.Timespan;
-import ch.njol.skript.util.Timespan.TimePeriod;
+import ch.njol.skript.entity.EntityData;
 import ch.njol.yggdrasil.YggdrasilSerializable;
 import com.google.common.base.Preconditions;
-import org.bukkit.block.CreatureSpawner;
-import org.bukkit.entity.minecart.SpawnerMinecart;
-import org.bukkit.spawner.Spawner;
+import org.bukkit.block.spawner.SpawnerEntry;
+import org.bukkit.entity.EntitySnapshot;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Represents the data of a {@link Spawner}, which may be a {@link CreatureSpawner} or a {@link SpawnerMinecart}
- *
- * @see SkriptTrialSpawnerData
- * @see AbstractSpawnerData
+ * Abstract class representing the data of a trial spawner or a regular spawner.
  */
-public class SkriptSpawnerData extends AbstractSpawnerData implements YggdrasilSerializable {
+public abstract class SkriptSpawnerData implements YggdrasilSerializable {
 
-	private int maxNearbyEntities = SpawnerUtils.DEFAULT_MAX_NEARBY_ENTITIES;
-	private int spawnCount = SpawnerUtils.DEFAULT_SPAWN_COUNT;
-	private @NotNull Timespan maxSpawnDelay = SpawnerUtils.DEFAULT_MAX_SPAWN_DELAY;
-	private @NotNull Timespan minSpawnDelay = SpawnerUtils.DEFAULT_MIN_SPAWN_DELAY;
+	private int activationRange = SpawnerUtils.DEFAULT_ACTIVATION_RANGE;
+	private int spawnRange = SpawnerUtils.DEFAULT_SPAWN_RANGE;
+
+	private @Nullable EntitySnapshot spawnerEntitySnapshot = null;
+	private @Nullable EntityData<?> spawnerType = null;
+	private @NotNull List<SpawnerEntry> spawnerEntries = new ArrayList<>();
 
 	/**
-	 * Creates a new SkriptSpawnerData instance from the given Bukkit {@link Spawner}.
-	 *
-	 * @param spawner the Bukkit spawner to convert
-	 * @return a new SkriptSpawnerData instance containing the data from the Bukkit spawner
+	 * The distance a player must be from the spawner for it to be activated.
+	 * <p>
+	 * If the value is less than or equal to 0, the spawner will always be active (given that there are players online).
+	 * <p>
+	 * The default value is 16.
+	 * @return the activation range
 	 */
-	public static SkriptSpawnerData fromBukkitSpawner(@NotNull Spawner spawner) {
-		SkriptSpawnerData data = new SkriptSpawnerData();
-
-		SpawnerUtils.applySpawnerDataToAbstractData(spawner, data);
-		data.setMaxNearbyEntities(spawner.getMaxNearbyEntities());
-		data.setSpawnCount(spawner.getSpawnCount());
-		data.setMaxSpawnDelay(new Timespan(TimePeriod.TICK, spawner.getMaxSpawnDelay()));
-		data.setMinSpawnDelay(new Timespan(TimePeriod.TICK, spawner.getMinSpawnDelay()));
-
-		return data;
+	public int getActivationRange() {
+		return activationRange;
 	}
 
 	/**
-	 * Applies this SkriptSpawnerData to the given Bukkit spawners.
-	 *
-	 * @param spawners the Bukkit spawners to apply the data to
+	 * Sets the distance a player must be from the spawner for it to be activated.
+	 * <p>
+	 * If the value is less than or equal to 0, the spawner will always be active (given that there are players online).
+	 * <p>
+	 * The default value is 16.
+	 * @param activationRange the activation range
 	 */
-	public void applyDataToBukkitSpawners(@NotNull Spawner[] spawners) {
-		Preconditions.checkNotNull(spawners, "spawners cannot be null");
-		for (Spawner spawner : spawners) {
-			applyDataToBukkitSpawner(spawner);
+	public void setActivationRange(int activationRange) {
+		this.activationRange = activationRange;
+	}
+
+	/**
+	 * Gets the radius around which the spawner will attempt to spawn mobs.
+	 * <p>
+	 * This area is square, includes the block the spawner is in, and is centered on the spawner's x, z coordinates - not the spawner itself.
+	 * <p>
+	 * The default value is 4.
+	 * @return the spawn range
+	 */
+	public int getSpawnRange() {
+		return spawnRange;
+	}
+
+	/**
+	 * Sets the radius around which the spawner will attempt to spawn mobs.
+	 * <p>
+	 * This area is square, includes the block the spawner is in, and is centered on the spawner's x, z coordinates - not the spawner itself.
+	 * <p>
+	 * The default value is 4.
+	 * @param spawnRange the spawn range
+	 */
+	public void setSpawnRange(int spawnRange) {
+		Preconditions.checkArgument(spawnRange > 0, "Spawn range must be > 0");
+		this.spawnRange = spawnRange;
+	}
+
+	/**
+	 * Gets the entity snapshot of the spawner entity, if it exists.
+	 * <p>
+	 * If this is not null, the spawner will spawn the entity represented by this snapshot.
+	 * @return the spawner entity snapshot, or null if not set
+	 */
+	public @Nullable EntitySnapshot getSpawnerEntitySnapshot() {
+		return spawnerEntitySnapshot;
+	}
+
+	/**
+	 * Sets the entity snapshot of the spawner entity.
+	 * <p>
+	 * If this is not null, the spawner will spawn the entity represented by this snapshot.
+	 * <p>
+	 * This will override any existing entity data or spawner entries.
+	 * @param entitySnapshot the spawner entity snapshot to set, or null to clear
+	 */
+	public void setSpawnerEntitySnapshot(@Nullable EntitySnapshot entitySnapshot) {
+		spawnerEntitySnapshot = entitySnapshot;
+		if (spawnerEntitySnapshot != null) {
+			spawnerType = null;
+			spawnerEntries.clear();
 		}
 	}
 
 	/**
-	 * Applies this SkriptSpawnerData to the given Bukkit spawner.
-	 *
-	 * @param spawner the Bukkit spawner to apply the data to
+	 * Gets the type of entity that the spawner will spawn.
+	 * <p>
+	 * If this is not null, the spawner will spawn entities of the type represented by this EntityData.
+	 * @return the spawner type, or null if not set
 	 */
-	public void applyDataToBukkitSpawner(@NotNull Spawner spawner) {
-		Preconditions.checkNotNull(spawner, "spawner cannot be null");
-		SpawnerUtils.applyAbstractDataToSpawner(this, spawner);
-
-		spawner.setMaxNearbyEntities(getMaxNearbyEntities());
-		spawner.setSpawnCount(getSpawnCount());
-		spawner.setMaxSpawnDelay(Math.clamp(getMaxSpawnDelay().getAs(TimePeriod.TICK), 0, Integer.MAX_VALUE));
-		spawner.setMinSpawnDelay(Math.clamp(getMinSpawnDelay().getAs(TimePeriod.TICK), 0, Integer.MAX_VALUE));
-
-		if (spawner instanceof CreatureSpawner creatureSpawner)
-			creatureSpawner.update(true, false);
+	public @Nullable EntityData<?> getSpawnerType() {
+		return spawnerType;
 	}
 
 	/**
-	 * Returns the maximum number of nearby similar entities that can be spawned by this spawner.
+	 * Sets the type of entity that the spawner will spawn.
 	 * <p>
-	 * The default value is 6.
-	 * @return the maximum number of nearby entities
+	 * If this is not null, the spawner will spawn entities of the type represented by this EntityData.
+	 * <p>
+	 * This will override any existing entity snapshot or spawner entries.
+	 * @param spawnerType the spawner type to set, or null to clear
 	 */
-	public int getMaxNearbyEntities() {
-		return maxNearbyEntities;
+	public void setSpawnerType(@Nullable EntityData<?> spawnerType) {
+		this.spawnerType = spawnerType;
+		if (spawnerType != null) {
+			spawnerEntitySnapshot = null;
+			spawnerEntries.clear();
+		}
 	}
 
 	/**
-	 * Sets the maximum number of nearby similar entities that can be spawned by this spawner.
+	 * Gets the list of spawner entries that the spawner will use to spawn entities.
 	 * <p>
-	 * The default value is 6.
-	 * @param maxNearbyEntities the maximum number of nearby entities
+	 * If this is not empty, the spawner will use these entries to determine what entities to spawn.
+	 * @return a list of spawner entries, or an empty list
 	 */
-	public void setMaxNearbyEntities(int maxNearbyEntities) {
-		this.maxNearbyEntities = maxNearbyEntities;
+	public @NotNull List<SpawnerEntry> getSpawnerEntries() {
+		return List.copyOf(spawnerEntries);
 	}
 
 	/**
-	 * Returns the number of entities that the spawner will attempt to spawn each spawn attempt.
+	 * Sets the list of spawner entries that the spawner will use to spawn entities.
 	 * <p>
-	 * The default value is 4.
-	 * @return the spawn count
+	 * If this is not empty, the spawner will use these entries to determine what entities to spawn.
+	 * <p>
+	 * This will override any existing entity snapshot or spawner type.
+	 * @param spawnerEntries the list of spawner entries to set, or an empty list to clear
 	 */
-	public int getSpawnCount() {
-		return spawnCount;
+	public void setSpawnerEntries(@NotNull List<SpawnerEntry> spawnerEntries) {
+		Preconditions.checkNotNull(spawnerEntries, "spawnerEntries cannot be null");
+		this.spawnerEntries = new ArrayList<>(spawnerEntries);
+
+		spawnerEntitySnapshot = null;
+		spawnerType = null;
 	}
 
 	/**
-	 * Sets the number of entities that the spawner will attempt to spawn each spawn attempt.
+	 * Adds a specific spawner entry to the list of spawner entries.
 	 * <p>
-	 * The default value is 4.
-	 * @param spawnCount the spawn count
+	 * This will override any existing entity snapshot or spawner type.
+	 * @param spawnerEntry the spawner entry to add
 	 */
-	public void setSpawnCount(int spawnCount) {
-		this.spawnCount = spawnCount;
+	public void addSpawnerEntry(@NotNull SpawnerEntry spawnerEntry) {
+		Preconditions.checkNotNull(spawnerEntry, "spawnerEntry cannot be null");
+		spawnerEntries.add(spawnerEntry);
+
+		spawnerEntitySnapshot = null;
+		spawnerType = null;
 	}
 
 	/**
-	 * Returns the maximum spawn delay of the spawner.
-	 * <br>
-	 * The spawn delay is chosen randomly between the minimum and maximum spawn delays,
-	 * which determines how long the spawner will wait before attempting to spawn entities again.
-	 * <p>
-	 * The maximum spawn delay is always greater than or equal to the minimum spawn delay,
-	 * <p>
-	 * The default value is 40 seconds (800 ticks).
-	 * @return the maximum spawn delay
+	 * Removes a specific spawner entry from the list of spawner entries.
+	 * @param spawnerEntry the spawner entry to remove
 	 */
-	public @NotNull Timespan getMaxSpawnDelay() {
-		return maxSpawnDelay;
+	public void removeSpawnerEntry(@NotNull SpawnerEntry spawnerEntry) {
+		Preconditions.checkNotNull(spawnerEntry, "spawnerEntry cannot be null");
+		spawnerEntries.remove(spawnerEntry);
 	}
 
 	/**
-	 * Sets the maximum spawn delay of the spawner.
-	 * <br>
-	 * The spawn delay is chosen randomly between the minimum and maximum spawn delays,
-	 * which determines how long the spawner will wait before attempting to spawn entities again.
+	 * Clears the list of spawner entries.
 	 * <p>
-	 * The maximum spawn delay must be greater than the minimum spawn delay.
-	 * <p>
-	 * The default value is 40 seconds (800 ticks).
-	 * @param maxSpawnDelay the maximum spawn delay to set
+	 * This will remove all entries and set the spawner to not use any entries for spawning.
 	 */
-	public void setMaxSpawnDelay(@NotNull Timespan maxSpawnDelay) {
-		Preconditions.checkNotNull(maxSpawnDelay, "Maximum spawn delay cannot be null");
-		Preconditions.checkArgument(maxSpawnDelay.compareTo(minSpawnDelay) >= 0,
-				"Maximum spawn delay cannot be less than minimum spawn delay");
-		this.maxSpawnDelay = maxSpawnDelay;
-	}
-
-	/**
-	 * Returns the minimum spawn delay of the spawner.
-	 * <br>
-	 * The spawn delay is chosen randomly between the minimum and maximum spawn delays,
-	 * which determines how long the spawner will wait before attempting to spawn entities again.
-	 * <p>
-	 * The minimum spawn delay is always less than or equal to the maximum spawn delay,
-	 * <p>
-	 * The default value is 10 seconds (200 ticks).
-	 * @return the minimum spawn delay
-	 */
-	public @NotNull Timespan getMinSpawnDelay() {
-		return minSpawnDelay;
-	}
-
-	/**
-	 * Sets the minimum spawn delay of the spawner.
-	 * <br>
-	 * The spawn delay is chosen randomly between the minimum and maximum spawn delays,
-	 * which determines how long the spawner will wait before attempting to spawn entities again.
-	 * <p>
-	 * The minimum spawn delay must not be greater than the maximum spawn delay.
-	 * <p>
-	 * The default value is 10 seconds (200 ticks).
-	 * @param minSpawnDelay the minimum spawn delay to set
-	 */
-	public void setMinSpawnDelay(@NotNull Timespan minSpawnDelay) {
-		Preconditions.checkNotNull(minSpawnDelay, "Minimum spawn delay cannot be null");
-		Preconditions.checkArgument(minSpawnDelay.compareTo(maxSpawnDelay) <= 0,
-				"Minimum spawn delay cannot be greater than the maximum spawn delay");
-		this.minSpawnDelay = minSpawnDelay;
+	public void clearSpawnerEntries() {
+		spawnerEntries.clear();
 	}
 
 }

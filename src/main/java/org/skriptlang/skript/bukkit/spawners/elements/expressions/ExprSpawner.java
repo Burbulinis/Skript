@@ -7,12 +7,10 @@ import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
-import org.skriptlang.skript.addon.SkriptAddon;
-import org.skriptlang.skript.bukkit.spawners.util.SkriptSpawner;
+import org.skriptlang.skript.bukkit.spawners.util.SkriptMobSpawner;
 import org.skriptlang.skript.bukkit.spawners.util.SkriptTrialSpawner;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.registration.SyntaxInfo;
-import org.skriptlang.skript.registration.SyntaxOrigin;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
 import java.util.ArrayList;
@@ -20,9 +18,8 @@ import java.util.List;
 
 public class ExprSpawner extends SimpleExpression<Object> {
 
-	public static void register(SyntaxRegistry registry, SkriptAddon addon) {
+	public static void register(SyntaxRegistry registry) {
 		registry.register(SyntaxRegistry.EXPRESSION, SyntaxInfo.Expression.builder(ExprSpawner.class, Object.class)
-			.origin(SyntaxOrigin.of(addon))
 			.supplier(ExprSpawner::new)
 			.priority(SyntaxInfo.COMBINED)
 			.addPatterns(
@@ -67,7 +64,7 @@ public class ExprSpawner extends SimpleExpression<Object> {
 			//noinspection SuspiciousToArrayCall
 			return spawners.toArray(SkriptTrialSpawner[]::new);
 		//noinspection SuspiciousToArrayCall
-		return spawners.toArray(SkriptSpawner[]::new);
+		return spawners.toArray(SkriptMobSpawner[]::new);
 	}
 
 	@Override
@@ -79,7 +76,7 @@ public class ExprSpawner extends SimpleExpression<Object> {
 	public Class<?> getReturnType() {
 		if (trial)
 			return SkriptTrialSpawner.class;
-		return SkriptSpawner.class;
+		return SkriptMobSpawner.class;
 	}
 
 	@Override
