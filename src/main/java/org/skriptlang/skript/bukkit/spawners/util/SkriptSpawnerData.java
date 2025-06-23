@@ -79,6 +79,11 @@ public abstract class SkriptSpawnerData implements YggdrasilSerializable {
 	 * @return the spawner entity snapshot, or null if not set
 	 */
 	public @Nullable EntitySnapshot getSpawnerEntitySnapshot() {
+		if (!SpawnerUtils.IS_RUNNING_1_20_3)
+			throw new UnsupportedOperationException(
+				"Entity snapshots are only supported for Minecraft versions 1.20.3 and later"
+			);
+
 		return spawnerEntitySnapshot;
 	}
 
@@ -91,6 +96,7 @@ public abstract class SkriptSpawnerData implements YggdrasilSerializable {
 	 * @param entitySnapshot the spawner entity snapshot to set, or null to clear
 	 */
 	public void setSpawnerEntitySnapshot(@Nullable EntitySnapshot entitySnapshot) {
+		SpawnerUtils.ensureSupportsEntitySnapshots();
 		spawnerEntitySnapshot = entitySnapshot;
 		if (spawnerEntitySnapshot != null) {
 			spawnerType = null;
@@ -131,6 +137,7 @@ public abstract class SkriptSpawnerData implements YggdrasilSerializable {
 	 * @return a list of spawner entries, or an empty list
 	 */
 	public @NotNull List<SpawnerEntry> getSpawnerEntries() {
+		SpawnerUtils.ensureSupportsSpawnerEntries();
 		return List.copyOf(spawnerEntries);
 	}
 
@@ -143,6 +150,7 @@ public abstract class SkriptSpawnerData implements YggdrasilSerializable {
 	 * @param spawnerEntries the list of spawner entries to set, or an empty list to clear
 	 */
 	public void setSpawnerEntries(@NotNull List<SpawnerEntry> spawnerEntries) {
+		SpawnerUtils.ensureSupportsSpawnerEntries();
 		Preconditions.checkNotNull(spawnerEntries, "spawnerEntries cannot be null");
 		this.spawnerEntries = new ArrayList<>(spawnerEntries);
 
@@ -157,6 +165,7 @@ public abstract class SkriptSpawnerData implements YggdrasilSerializable {
 	 * @param spawnerEntry the spawner entry to add
 	 */
 	public void addSpawnerEntry(@NotNull SpawnerEntry spawnerEntry) {
+		SpawnerUtils.ensureSupportsSpawnerEntries();
 		Preconditions.checkNotNull(spawnerEntry, "spawnerEntry cannot be null");
 		spawnerEntries.add(spawnerEntry);
 
@@ -169,6 +178,7 @@ public abstract class SkriptSpawnerData implements YggdrasilSerializable {
 	 * @param spawnerEntry the spawner entry to remove
 	 */
 	public void removeSpawnerEntry(@NotNull SpawnerEntry spawnerEntry) {
+		SpawnerUtils.ensureSupportsSpawnerEntries();
 		Preconditions.checkNotNull(spawnerEntry, "spawnerEntry cannot be null");
 		spawnerEntries.remove(spawnerEntry);
 	}
@@ -179,6 +189,7 @@ public abstract class SkriptSpawnerData implements YggdrasilSerializable {
 	 * This will remove all entries and set the spawner to not use any entries for spawning.
 	 */
 	public void clearSpawnerEntries() {
+		SpawnerUtils.ensureSupportsSpawnerEntries();
 		spawnerEntries.clear();
 	}
 

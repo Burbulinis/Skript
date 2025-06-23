@@ -5,15 +5,34 @@ import org.bukkit.spawner.Spawner;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Represents a Skript spawner, which is a wrapper around a Bukkit {@link Spawner} and its type.
- * @param spawner the Bukkit spawner
- * @param type the type of the spawner, which can be either a minecart or a creature spawner
+ * Represents a Skript mob spawner, which is a wrapper around {@link Spawner} and it can be either a minecart or a creature spawner.
  */
-public record SkriptMobSpawner(@NotNull Spawner spawner, @NotNull SpawnerType type) {
+public class SkriptMobSpawner implements SkriptSpawner {
 
-	public SkriptMobSpawner {
+	private final @NotNull Spawner spawner;
+	private final @NotNull SpawnerType type;
+
+	/**
+	 * Constructs a SkriptMobSpawner from a Bukkit spawner and a type.
+	 * @param spawner the Bukkit spawner
+	 * @param type the type of the spawner, which can be either a minecart or a creature spawner
+	 */
+	public SkriptMobSpawner(@NotNull Spawner spawner, @NotNull SpawnerType type) {
 		Preconditions.checkNotNull(spawner, "spawner cannot be null");
 		Preconditions.checkNotNull(type, "type cannot be null");
+		Preconditions.checkArgument(type != SpawnerType.TRIAL, "type cannot be TRIAL");
+
+		this.spawner = spawner;
+		this.type = type;
+	}
+
+	public @NotNull Spawner getBukkitSpawner() {
+		return spawner;
+	}
+
+	@Override
+	public @NotNull SpawnerType getType() {
+		return type;
 	}
 
 }

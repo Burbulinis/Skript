@@ -1,4 +1,4 @@
-package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner;
+package org.skriptlang.skript.bukkit.spawners.elements.expressions.mobspawner;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.*;

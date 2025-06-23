@@ -1,5 +1,6 @@
 package org.skriptlang.skript.bukkit.spawners.util;
 
+import ch.njol.skript.bukkitutil.EntityUtils;
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.Timespan.TimePeriod;
 import ch.njol.yggdrasil.YggdrasilSerializable;
@@ -8,6 +9,7 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.minecart.SpawnerMinecart;
 import org.bukkit.spawner.Spawner;
 import org.jetbrains.annotations.NotNull;
+import org.skriptlang.skript.bukkit.spawners.util.legacy.LegacySkriptMobSpawner;
 
 /**
  * Represents the data of a {@link Spawner}, which may be a {@link CreatureSpawner} or a {@link SpawnerMinecart}
@@ -22,13 +24,18 @@ public class SkriptMobSpawnerData extends SkriptSpawnerData implements Yggdrasil
 	private @NotNull Timespan maxSpawnDelay = SpawnerUtils.DEFAULT_MAX_SPAWN_DELAY;
 	private @NotNull Timespan minSpawnDelay = SpawnerUtils.DEFAULT_MIN_SPAWN_DELAY;
 
+	// todo: add support to make the spawner spawn items
+
 	/**
 	 * Creates a new SkriptSpawnerData instance from the given Bukkit {@link Spawner}.
 	 *
-	 * @param spawner the Bukkit spawner to convert
+	 * @param skriptSpawner the Bukkit spawner to convert
 	 * @return a new SkriptSpawnerData instance containing the data from the Bukkit spawner
 	 */
-	public static SkriptMobSpawnerData fromBukkitSpawner(@NotNull Spawner spawner) {
+	public static SkriptMobSpawnerData fromSpawner(@NotNull SkriptMobSpawner skriptSpawner) {
+		Preconditions.checkNotNull(skriptSpawner, "skriptMobSpawner cannot be null");
+
+		Spawner spawner = skriptSpawner.getBukkitSpawner();
 		SkriptMobSpawnerData data = new SkriptMobSpawnerData();
 
 		SpawnerUtils.applySpawnerDataToSpawnerData(spawner, data);
@@ -40,25 +47,60 @@ public class SkriptMobSpawnerData extends SkriptSpawnerData implements Yggdrasil
 		return data;
 	}
 
+	//<editor-fold desc="Legacy spawner handling" defaultstate="collapsed">
 	/**
-	 * Applies this SkriptSpawnerData to the given Bukkit spawners.
-	 *
-	 * @param spawners the Bukkit spawners to apply the data to
+	 * Creates a new SkriptSpawnerData instance from the given legacy SkriptMobSpawner.
+	 * @param legacySpawner the legacy SkriptMobSpawner to convert
+	 * @return a new SkriptSpawnerData instance containing the data from the legacy spawner
 	 */
-	public void applyDataToBukkitSpawners(@NotNull Spawner[] spawners) {
-		Preconditions.checkNotNull(spawners, "spawners cannot be null");
-		for (Spawner spawner : spawners) {
-			applyDataToBukkitSpawner(spawner);
+	public static SkriptMobSpawnerData fromLegacySpawner(@NotNull LegacySkriptMobSpawner legacySpawner) {
+		Preconditions.checkNotNull(legacySpawner, "legacySpawner cannot be null");
+
+		CreatureSpawner spawner = legacySpawner.getBukkitSpawner();
+		SkriptMobSpawnerData data = new SkriptMobSpawnerData();
+
+		data.setActivationRange(spawner.getRequiredPlayerRange());
+		data.setSpawnRange(spawner.getSpawnRange());
+		if (SpawnerUtils.IS_RUNNING_1_20_3) {
+			if (!spawner.getPotentialSpawns().isEmpty())
+				data.setSpawnerEntries(spawner.getPotentialSpawns());
+			else if (spawner.getSpawnedEntity() != null)
+				data.setSpawnerEntitySnapshot(spawner.getSpawnedEntity());
+		}
+
+		if (spawner.getSpawnedType() != null)
+			data.setSpawnerType(EntityUtils.toSkriptEntityData(spawner.getSpawnedType()));
+
+		data.setMaxNearbyEntities(spawner.getMaxNearbyEntities());
+		data.setSpawnCount(spawner.getSpawnCount());
+		data.setMaxSpawnDelay(new Timespan(TimePeriod.TICK, spawner.getMaxSpawnDelay()));
+		data.setMinSpawnDelay(new Timespan(TimePeriod.TICK, spawner.getMinSpawnDelay()));
+
+		return data;
+	}
+	//</editor-fold>
+
+	/**
+	 * Applies this SkriptSpawnerData to the given spawners.
+	 *
+	 * @param skriptSpawners the spawners to apply the data to
+	 */
+	public void applyDataToSpawner(@NotNull SkriptMobSpawner[] skriptSpawners) {
+		Preconditions.checkNotNull(skriptSpawners, "skriptSpawners cannot be null");
+		for (SkriptMobSpawner skriptSpawner : skriptSpawners) {
+			applyDataToSpawner(skriptSpawner);
 		}
 	}
 
 	/**
-	 * Applies this SkriptSpawnerData to the given Bukkit spawner.
+	 * Applies this SkriptSpawnerData to the given spawner.
 	 *
-	 * @param spawner the Bukkit spawner to apply the data to
+	 * @param skriptSpawner the spawner to apply the data to
 	 */
-	public void applyDataToBukkitSpawner(@NotNull Spawner spawner) {
-		Preconditions.checkNotNull(spawner, "spawner cannot be null");
+	public void applyDataToSpawner(@NotNull SkriptMobSpawner skriptSpawner) {
+		Preconditions.checkNotNull(skriptSpawner, "skriptSpawner cannot be null");
+
+		Spawner spawner = skriptSpawner.getBukkitSpawner();
 		SpawnerUtils.applySpawnerDataToSpawner(this, spawner);
 
 		spawner.setMaxNearbyEntities(getMaxNearbyEntities());
@@ -69,6 +111,47 @@ public class SkriptMobSpawnerData extends SkriptSpawnerData implements Yggdrasil
 		if (spawner instanceof CreatureSpawner creatureSpawner)
 			creatureSpawner.update(true, false);
 	}
+
+	//<editor-fold desc="Legacy spawner handling" defaultstate="collapsed">
+	/**
+	 * Applies this SkriptSpawnerData to the given legacy spawners.
+	 * @param legacySpawners the legacy spawners to apply the data to
+	 */
+	public void applyDataToLegacySpawners(@NotNull LegacySkriptMobSpawner[] legacySpawners) {
+		Preconditions.checkNotNull(legacySpawners, "legacySpawners cannot be null");
+		for (LegacySkriptMobSpawner legacySpawner : legacySpawners) {
+			applyDataToLegacySpawner(legacySpawner);
+		}
+	}
+
+	/**
+	 * Applies this SkriptSpawnerData to the given legacy spawner.
+	 *
+	 * @param legacySpawner the legacy spawner to apply the data to
+	 */
+	public void applyDataToLegacySpawner(@NotNull LegacySkriptMobSpawner legacySpawner) {
+		Preconditions.checkNotNull(legacySpawner, "legacySpawner cannot be null");
+
+		CreatureSpawner spawner = legacySpawner.getBukkitSpawner();
+
+		spawner.setRequiredPlayerRange(getActivationRange());
+		spawner.setSpawnRange(getSpawnRange());
+
+		if (!getSpawnerEntries().isEmpty())
+			spawner.setPotentialSpawns(getSpawnerEntries());
+		else if (getSpawnerEntitySnapshot() != null)
+			spawner.setSpawnedEntity(getSpawnerEntitySnapshot());
+		else
+			spawner.setSpawnedType(EntityUtils.toBukkitEntityType(getSpawnerType()));
+
+		spawner.setMaxNearbyEntities(getMaxNearbyEntities());
+		spawner.setSpawnCount(getSpawnCount());
+		spawner.setMaxSpawnDelay(Math.clamp(getMaxSpawnDelay().getAs(TimePeriod.TICK), 0, Integer.MAX_VALUE));
+		spawner.setMinSpawnDelay(Math.clamp(getMinSpawnDelay().getAs(TimePeriod.TICK), 0, Integer.MAX_VALUE));
+
+		spawner.update(true, false);
+	}
+	//</editor-fold>
 
 	/**
 	 * Returns the maximum number of nearby similar entities that can be spawned by this spawner.
@@ -116,7 +199,7 @@ public class SkriptMobSpawnerData extends SkriptSpawnerData implements Yggdrasil
 	 * The spawn delay is chosen randomly between the minimum and maximum spawn delays,
 	 * which determines how long the spawner will wait before attempting to spawn entities again.
 	 * <p>
-	 * The maximum spawn delay is always greater than or equal to the minimum spawn delay,
+	 * The maximum spawn delay is always greater than or equal to the minimum spawn delay.
 	 * <p>
 	 * The default value is 40 seconds (800 ticks).
 	 * @return the maximum spawn delay
@@ -131,7 +214,7 @@ public class SkriptMobSpawnerData extends SkriptSpawnerData implements Yggdrasil
 	 * The spawn delay is chosen randomly between the minimum and maximum spawn delays,
 	 * which determines how long the spawner will wait before attempting to spawn entities again.
 	 * <p>
-	 * The maximum spawn delay must be greater than the minimum spawn delay.
+	 * The maximum spawn delay must be greater than or equal to the minimum spawn delay.
 	 * <p>
 	 * The default value is 40 seconds (800 ticks).
 	 * @param maxSpawnDelay the maximum spawn delay to set
@@ -149,7 +232,7 @@ public class SkriptMobSpawnerData extends SkriptSpawnerData implements Yggdrasil
 	 * The spawn delay is chosen randomly between the minimum and maximum spawn delays,
 	 * which determines how long the spawner will wait before attempting to spawn entities again.
 	 * <p>
-	 * The minimum spawn delay is always less than or equal to the maximum spawn delay,
+	 * The minimum spawn delay is always less than or equal to the maximum spawn delay.
 	 * <p>
 	 * The default value is 10 seconds (200 ticks).
 	 * @return the minimum spawn delay

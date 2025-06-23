@@ -1,5 +1,6 @@
 package org.skriptlang.skript.bukkit.spawners.util;
 
+import ch.njol.skript.Skript;
 import ch.njol.skript.bukkitutil.EntityUtils;
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.Timespan.TimePeriod;
@@ -10,11 +11,16 @@ import org.bukkit.entity.minecart.SpawnerMinecart;
 import org.bukkit.spawner.BaseSpawner;
 import org.bukkit.spawner.Spawner;
 import org.bukkit.spawner.TrialSpawnerConfiguration;
+import org.skriptlang.skript.bukkit.spawners.util.legacy.LegacySkriptMobSpawner;
 
 /**
  * Utility class for spawners.
  */
 public class SpawnerUtils {
+
+	public static boolean IS_RUNNING_1_20_3 = Skript.isRunningMinecraft(1, 20, 3);
+	public static boolean IS_RUNNING_1_21 = Skript.isRunningMinecraft(1, 21);
+	public static boolean IS_RUNNING_1_21_4 = Skript.isRunningMinecraft(1, 20, 4);
 
 	public static final int DEFAULT_ACTIVATION_RANGE = 16;
 	public static final int DEFAULT_MAX_NEARBY_ENTITIES = 6;
@@ -110,6 +116,43 @@ public class SpawnerUtils {
 			return new SkriptTrialSpawner(trialSpawner);
 		return null;
 	}
+
+	/**
+	 * Ensures that the current Minecraft version supports spawner entries by throwing an exception if not.
+	 * This is only supported for Minecraft 1.20.3 and later.
+	 */
+	public static void ensureSupportsSpawnerEntries() {
+		if (!SpawnerUtils.IS_RUNNING_1_20_3) {
+			throw new UnsupportedOperationException(
+				"Spawner entries are only supported for Minecraft 1.20.3 and later"
+			);
+		}
+	}
+
+	/**
+	 * Ensures that the current Minecraft version supports entity snapshots by throwing an exception if not.
+	 * This is only supported for Minecraft 1.20.3 and later.
+	 */
+	public static void ensureSupportsEntitySnapshots() {
+		if (!SpawnerUtils.IS_RUNNING_1_20_3) {
+			throw new UnsupportedOperationException(
+				"Entity snapshots are only supported for Minecraft 1.20.3 and later"
+			);
+		}
+	}
+
+	//<editor-fold desc="Legacy spawner handling" defaultstate="collapsed">
+	/**
+	 * Returns the object as a {@link LegacySkriptMobSpawner}, or null if the object is not a legacy spawner.
+	 * @param object the object
+	 * @return the object as a {@link LegacySkriptMobSpawner}
+	 */
+	public static LegacySkriptMobSpawner getAsLegacySkriptSpawner(Object object) {
+		if (object instanceof Block block && block.getState() instanceof CreatureSpawner spawner)
+			return new LegacySkriptMobSpawner(spawner);
+		return null;
+	}
+	//</editor-fold>
 
 	// todo: discard everything below from here?
 

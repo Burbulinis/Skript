@@ -3,7 +3,8 @@ package org.skriptlang.skript.bukkit.spawners.util;
 public enum SpawnerType {
 
 	MINECART,
-	CREATURE;
+	CREATURE,
+	TRIAL;
 
 	boolean isMinecart() {
 		return this == MINECART;
@@ -11,6 +12,10 @@ public enum SpawnerType {
 
 	boolean isCreature() {
 		return this == CREATURE;
+	}
+
+	boolean isTrial() {
+		return this == TRIAL;
 	}
 
 }
