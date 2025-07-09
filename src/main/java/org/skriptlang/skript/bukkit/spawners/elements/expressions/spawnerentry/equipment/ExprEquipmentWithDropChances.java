@@ -1,0 +1,101 @@
+package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawnerentry.equipment;
+
+import ch.njol.skript.classes.Changer.ChangeMode;
+import ch.njol.skript.doc.*;
+import ch.njol.skript.expressions.base.PropertyExpression;
+import ch.njol.skript.lang.Expression;
+import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.util.Kleenean;
+import ch.njol.util.coll.CollectionUtils;
+import org.bukkit.event.Event;
+import org.bukkit.inventory.EquipmentSlot;
+import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.bukkit.spawners.SpawnerModule;
+import org.skriptlang.skript.bukkit.spawners.util.SpawnerEntryEquipment;
+import org.skriptlang.skript.bukkit.spawners.util.SpawnerEntryEquipment.DropChance;
+import org.skriptlang.skript.registration.SyntaxInfo;
+import org.skriptlang.skript.registration.SyntaxOrigin;
+import org.skriptlang.skript.registration.SyntaxRegistry;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Name("Spawner Entry - Equipment with DropChance")
+@Description("Returns the drops of a spawner entry equipment.")
+@Examples("set {_chances::*} to spawner drop chances of {_equipment}")
+@Since("INSERT VERSION")
+@RequiredPlugins("MC 1.21+")
+public class ExprEquipmentWithDropChances extends PropertyExpression<SpawnerEntryEquipment, DropChance> {
+
+	static {
+		var info = SyntaxInfo.Expression.builder(ExprEquipmentWithDropChances.class, DropChance.class)
+			.origin(SyntaxOrigin.of(SpawnerModule.ADDON))
+			.supplier(ExprEquipmentWithDropChances::new)
+			.priority(PropertyExpression.DEFAULT_PRIORITY)
+			.addPatterns(
+				"[the] spawner drop chance[s] (from|of) %spawnerentryequipments%",
+				"%spawnerentryequipments%'[s] spawner drop chance[s]")
+			.build();
+
+		SpawnerModule.SYNTAX_REGISTRY.register(SyntaxRegistry.EXPRESSION, info);
+	}
+
+	@Override
+	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
+		//noinspection unchecked
+		setExpr((Expression<? extends SpawnerEntryEquipment>) exprs[0]);
+		return true;
+	}
+
+	@Override
+	protected DropChance[] get(Event event, SpawnerEntryEquipment[] source) {
+		List<DropChance> drops = new ArrayList<>();
+		for (SpawnerEntryEquipment equipment : source) {
+			drops.addAll(equipment.getDropChances());
+		}
+		return drops.toArray(DropChance[]::new);
+	}
+
+	@Override
+	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
+		return switch (mode) {
+			case SET, REMOVE, ADD -> CollectionUtils.array(DropChance[].class, EquipmentSlot[].class);
+			default -> null;
+		};
+	}
+
+	@Override
+	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
+		assert delta != null;
+
+		for (var entry : getExpr().getArray(event)) {
+			if (mode == ChangeMode.SET)
+				entry.setDropChances(new ArrayList<>());
+
+			for (Object object : delta) {
+				if (object instanceof DropChance chance) {
+					switch (mode) {
+						case SET, ADD -> entry.addDropChance(chance);
+						case REMOVE -> entry.removeDropChance(chance);
+					}
+				} else if (object instanceof EquipmentSlot slot) {
+					switch (mode) {
+						case SET, ADD -> entry.addDropChance(new DropChance(slot, 1));
+						case REMOVE -> entry.removeDropChance(new DropChance(slot, 1));
+					}
+				}
+			}
+		}
+	}
+
+	@Override
+	public Class<? extends DropChance> getReturnType() {
+		return DropChance.class;
+	}
+
+	@Override
+	public String toString(@Nullable Event event, boolean debug) {
+		return "spawner entry drop chances of " + getExpr().toString(event, debug);
+	}
+
+}
