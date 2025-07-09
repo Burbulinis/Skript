@@ -31,9 +31,10 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 public class ExprMaxNearbyEntities extends SimplePropertyExpression<SkriptMobSpawnerData, Integer> {
 
 	public static void register(SyntaxRegistry registry) {
-		registerDefault(registry, ExprMaxNearbyEntities.class, Integer.class,
-			"max[imum] nearby entity (count|amount|cap)", "mobspawnerdatas"
-		);
+		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(
+			ExprMaxNearbyEntities.class, Integer.class,
+			"max[imum] nearby entity (count|amount|cap)", "mobspawnerdatas", true
+		).build());
 	}
 
 	@Override

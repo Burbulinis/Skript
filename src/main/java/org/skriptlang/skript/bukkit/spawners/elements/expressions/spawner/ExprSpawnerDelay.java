@@ -43,6 +43,10 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 public class ExprSpawnerDelay extends SimplePropertyExpression<Object, Timespan> {
 
 	public static void register(SyntaxRegistry registry) {
+		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(
+			ExprSpawnerDelay.class, Timespan.class,
+			"spawn delay", "spawners", true
+		).build());
 		registerDefault(registry, ExprSpawnerDelay.class, Timespan.class,
 			"spawn delay", SpawnerUtils.spawnerPropertyType
 		);

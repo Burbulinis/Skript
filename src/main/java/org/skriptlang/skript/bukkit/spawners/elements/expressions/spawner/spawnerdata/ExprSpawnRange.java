@@ -31,9 +31,10 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 public class ExprSpawnRange extends SimplePropertyExpression<SkriptSpawnerData, Integer> {
 
 	public static void register(SyntaxRegistry registry) {
-		registerDefault(registry, ExprSpawnRange.class, Integer.class,
-			"spawn (radius|range)", "spawnerdatas"
-		);
+		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(
+			ExprSpawnRange.class, Integer.class,
+			"spawn (radius|range)", "spawnerdatas", true
+		).build());
 	}
 
 	@Override

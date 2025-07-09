@@ -6,6 +6,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.Trigger;
 import ch.njol.skript.lang.TriggerItem;
+import ch.njol.skript.lang.util.SectionUtils;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
@@ -35,9 +36,11 @@ public class ExprSecMobSpawnerData extends SectionExpression<SkriptMobSpawnerDat
 		Expression<?>[] exprs, int pattern, Kleenean delayed, ParseResult result,
 		@Nullable SectionNode node, @Nullable List<TriggerItem> triggerItems
 	) {
-		if (node != null)
-			//noinspection unchecked
-			trigger = loadCode(node, "mob spawner data", null, MobSpawnerDataEvent.class);
+		if (node != null) {
+			trigger = SectionUtils.loadLinkedCode("mob spawner data", (beforeLoading, afterLoading) ->
+				loadCode(node, "mob spawner data", beforeLoading, afterLoading, MobSpawnerDataEvent.class));
+			return trigger != null;
+		}
 		return true;
 	}
 

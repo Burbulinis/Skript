@@ -38,9 +38,10 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 public class ExprMinMaxDelay extends SimplePropertyExpression<SkriptMobSpawnerData, Timespan> {
 
 	public static void register(SyntaxRegistry registry) {
-		registerDefault(registry, ExprMinMaxDelay.class, Timespan.class,
-			"(:max|min)[imum] spawn delay", "mobspawnerdatas"
-		);
+		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(
+			ExprMinMaxDelay.class, Timespan.class,
+			"(:max|min)[imum] spawn delay", "mobspawnerdatas", true
+		).build());
 	}
 
 	private boolean max;
