@@ -1,4 +1,4 @@
-package org.skriptlang.skript.bukkit.spawners.elements.expressions.trialspawner.trialspawnerdata;
+package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.trialspawnerdata;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.*;
@@ -41,9 +41,10 @@ public class ExprBaseEntityCount extends SimplePropertyExpression<SkriptTrialSpa
 	public static void register(SyntaxRegistry registry) {
 		if (!SpawnerUtils.IS_RUNNING_1_21)
 			return;
-		registerDefault(registry, ExprBaseEntityCount.class, Integer.class,
-			"base [concurrent:(concurrent|simultaneous)] (mob|entity) [spawn] (count|amount)",
-			"trialspawnerdatas"
+		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprBaseEntityCount.class, Integer.class,
+			"base [concurrent:(concurrent|simultaneous)] (mob|entity) [spawn] (count|amount)", "trialspawnerdatas", true)
+				.supplier(ExprBaseEntityCount::new)
+				.build()
 		);
 	}
 

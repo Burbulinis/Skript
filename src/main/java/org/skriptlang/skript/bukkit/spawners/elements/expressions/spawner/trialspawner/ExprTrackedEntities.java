@@ -1,4 +1,4 @@
-package org.skriptlang.skript.bukkit.spawners.elements.expressions.trialspawner;
+package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.trialspawner;
 
 import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.PropertyExpression;
@@ -6,8 +6,10 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.SyntaxStringBuilder;
 import ch.njol.util.Kleenean;
+import org.bukkit.block.Block;
 import org.bukkit.block.TrialSpawner;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.spawners.SpawnerModule;
@@ -30,40 +32,40 @@ import java.util.List;
 		"\tsend \"You're being tracked by %event-block%\" to loop-player"
 })
 @Since("INSERT VERSION")
-@RequiredPlugins("MC 1.21+")
-public class ExprTrackedEntities extends PropertyExpression<Object, Entity> {
+@RequiredPlugins("Minecraft 1.21+")
+public class ExprTrackedEntities extends PropertyExpression<Block, Entity> {
 
-	static {
-		var info = SyntaxInfo.Expression.builder(ExprTrackedEntities.class, Entity.class)
-			.origin(SyntaxOrigin.of(SpawnerModule.ADDON))
+	public static void register(SyntaxRegistry registry) {
+		if (!SpawnerUtils.IS_RUNNING_1_21)
+			return;
+		registry.register(SyntaxRegistry.EXPRESSION, SyntaxInfo.Expression.builder(ExprTrackedEntities.class, Entity.class)
 			.supplier(ExprTrackedEntities::new)
 			.priority(PropertyExpression.DEFAULT_PRIORITY)
-			.addPatterns(
-				"[the] tracked (1:player[s]|entit(y|ies)) (from|of) %blocks/trialspawnerconfigs%",
-				"%blocks/trialspawnerconfigs%'[s] tracked (1:player[s]|entit(y|ies))")
-			.build();
-
-		SpawnerModule.SYNTAX_REGISTRY.register(SyntaxRegistry.EXPRESSION, info);
+			.addPatterns(getPatterns("tracked player[s]", "blocks"))
+			.addPatterns(getPatterns("tracked entit(y|ies)", "blocks"))
+			.build()
+		);
 	}
 
 	private boolean players;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		setExpr(exprs[0]);
-		players = parseResult.mark == 1;
+		//noinspection unchecked
+		setExpr((Expression<? extends Block>) exprs[0]);
+		players = matchedPattern < 2;
 		return true;
 	}
 
 	@Override
-	protected Entity[] get(Event event, Object[] source) {
+	protected Entity[] get(Event event, Block[] source) {
 		List<Entity> values = new ArrayList<>();
 
-		for (Object object : source) {
-			if (!SpawnerUtils.isTrialSpawner(object))
+		for (Block block : source) {
+			if (!SpawnerUtils.isTrialSpawner(block))
 				continue;
 
-			TrialSpawner spawner = SpawnerUtils.getAsSkriptTrialSpawner(object);
+			TrialSpawner spawner = SpawnerUtils.getTrialSpawner(block);
 
 			if (players) {
 				values.addAll(spawner.getTrackedPlayers());
@@ -77,6 +79,8 @@ public class ExprTrackedEntities extends PropertyExpression<Object, Entity> {
 
 	@Override
 	public Class<? extends Entity> getReturnType() {
+		if (players)
+			return Player.class;
 		return Entity.class;
 	}
 
@@ -84,7 +88,7 @@ public class ExprTrackedEntities extends PropertyExpression<Object, Entity> {
 	public String toString(@Nullable Event event, boolean debug) {
 		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
 
-		builder.append("tracked ");
+		builder.append("tracked");
 		if (players) {
 			builder.append("players");
 		} else {

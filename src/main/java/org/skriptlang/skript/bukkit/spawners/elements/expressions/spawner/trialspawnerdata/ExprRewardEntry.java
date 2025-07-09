@@ -1,4 +1,4 @@
-package org.skriptlang.skript.bukkit.spawners.elements.expressions.trialspawner.trialspawnerdata;
+package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.trialspawnerdata;
 
 import ch.njol.skript.doc.*;
 import ch.njol.skript.lang.Expression;
@@ -9,6 +9,7 @@ import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
 import org.bukkit.loot.LootTable;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.bukkit.spawners.util.TrialSpawnerRewardEntry;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
@@ -29,6 +30,8 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 public class ExprRewardEntry extends SimpleExpression<TrialSpawnerRewardEntry> {
 
 	public static void register(SyntaxRegistry registry) {
+		if (!SpawnerUtils.IS_RUNNING_1_21)
+			return;
 		registry.register(SyntaxRegistry.EXPRESSION, SyntaxInfo.Expression.builder(ExprRewardEntry.class, TrialSpawnerRewardEntry.class)
 			.supplier(ExprRewardEntry::new)
 			.priority(SyntaxInfo.COMBINED)

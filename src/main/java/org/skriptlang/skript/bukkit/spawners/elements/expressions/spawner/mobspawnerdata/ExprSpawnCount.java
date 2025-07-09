@@ -32,10 +32,11 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 public class ExprSpawnCount extends SimplePropertyExpression<SkriptMobSpawnerData, Integer> {
 
 	public static void register(SyntaxRegistry registry) {
-		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(
-			ExprSpawnCount.class, Integer.class,
-			"spawn (count|amount)", "mobspawnerdatas", true
-		).build());
+		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprSpawnCount.class, Integer.class,
+			"spawn (count|amount)", "mobspawnerdatas", true)
+				.supplier(ExprSpawnCount::new)
+				.build()
+		);
 	}
 
 	@Override

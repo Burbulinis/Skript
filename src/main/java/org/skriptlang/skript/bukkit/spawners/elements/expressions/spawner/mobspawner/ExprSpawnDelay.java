@@ -1,4 +1,4 @@
-package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner;
+package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.mobspawner;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
@@ -40,15 +40,13 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 	"reset the spawner delay of the target block"
 })
 @Since("INSERT VERSION")
-public class ExprSpawnerDelay extends SimplePropertyExpression<Object, Timespan> {
+public class ExprSpawnDelay extends SimplePropertyExpression<Object, Timespan> {
 
 	public static void register(SyntaxRegistry registry) {
-		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(
-			ExprSpawnerDelay.class, Timespan.class,
-			"spawn delay", "spawners", true
-		).build());
-		registerDefault(registry, ExprSpawnerDelay.class, Timespan.class,
-			"spawn delay", SpawnerUtils.spawnerPropertyType
+		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprSpawnDelay.class, Timespan.class,
+			"spawn delay", SpawnerUtils.spawnerPropertyType, true)
+				.supplier(ExprSpawnDelay::new)
+				.build()
 		);
 	}
 
@@ -101,9 +99,7 @@ public class ExprSpawnerDelay extends SimplePropertyExpression<Object, Timespan>
 					case SET -> config.setDelay(ticks);
 					case ADD -> config.setDelay(Math.clamp(config.getDelay() + ticks, 0, Integer.MAX_VALUE));
 					case REMOVE -> config.setDelay(Math.clamp(config.getDelay() - ticks, 0, Integer.MAX_VALUE));
-					case RESET -> config.setDelay(
-						Math.clamp(SpawnerUtils.DEFAULT_TRIAL_SPAWN_DELAY.getAs(TimePeriod.TICK), 0, Integer.MAX_VALUE)
-					);
+					case RESET -> config.setDelay((int) SpawnerUtils.DEFAULT_TRIAL_SPAWN_DELAY.getAs(TimePeriod.TICK));
 				}
 				trialSpawner.update(true, false);
 			} else if (SpawnerUtils.isSpawnerMinecart(object)) {

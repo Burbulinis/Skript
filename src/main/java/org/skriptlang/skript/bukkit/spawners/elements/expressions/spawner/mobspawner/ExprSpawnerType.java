@@ -1,4 +1,4 @@
-package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner;
+package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.mobspawner;
 
 import ch.njol.skript.bukkitutil.EntityUtils;
 import ch.njol.skript.classes.Changer.ChangeMode;
@@ -11,6 +11,7 @@ import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.TrialSpawner;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.minecart.SpawnerMinecart;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
@@ -28,8 +29,10 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 public class ExprSpawnerType extends SimplePropertyExpression<Object, EntityData> {
 
 	public static void register(SyntaxRegistry registry) {
-		registerDefault(registry, ExprSpawnerType.class, EntityData.class,
-			"(spawner|entity|creature) type[s]", SpawnerUtils.spawnerPropertyType
+		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprSpawnerType.class, EntityData.class,
+			"(spawner|entity|creature) type[s]", SpawnerUtils.spawnerPropertyType, true)
+				.supplier(ExprSpawnerType::new)
+				.build()
 		);
 	}
 
@@ -68,31 +71,23 @@ public class ExprSpawnerType extends SimplePropertyExpression<Object, EntityData
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-		//noinspection ConstantConditions
-		EntityData<?> entityData = (EntityData<?>) delta[0];
+		EntityType type = null;
+		if (delta != null)
+			type = EntityUtils.toBukkitEntityType((EntityData<?>) delta[0]);
 
 		for (Object object : getExpr().getArray(event)) {
 			if (SpawnerUtils.isCreatureSpawner(object)) {
 				CreatureSpawner creatureSpawner = SpawnerUtils.getCreatureSpawner(object);
-				switch (mode) {
-					case SET -> creatureSpawner.setSpawnedType(EntityUtils.toBukkitEntityType(entityData));
-					case DELETE, RESET -> creatureSpawner.setSpawnedType(null);
-				}
+				creatureSpawner.setSpawnedType(type);
 				creatureSpawner.update(true, false);
 			} else if (SpawnerUtils.isTrialSpawner(object)) {
 				TrialSpawner trialSpawner = SpawnerUtils.getTrialSpawner(object);
 				var config = SpawnerUtils.getTrialSpawnerConfiguration(trialSpawner);
-				switch (mode) {
-					case SET -> config.setSpawnedType(EntityUtils.toBukkitEntityType(entityData));
-					case DELETE, RESET -> config.setSpawnedType(null);
-				}
+				config.setSpawnedType(type);
 				trialSpawner.update(true, false);
 			} else if (SpawnerUtils.isSpawnerMinecart(object)) {
 				SpawnerMinecart spawnerMinecart = SpawnerUtils.getSpawnerMinecart(object);
-				switch (mode) {
-					case SET -> spawnerMinecart.setSpawnedType(EntityUtils.toBukkitEntityType(entityData));
-					case DELETE, RESET -> spawnerMinecart.setSpawnedType(null);
-				}
+				spawnerMinecart.setSpawnedType(type);
 			}
 		}
 	}

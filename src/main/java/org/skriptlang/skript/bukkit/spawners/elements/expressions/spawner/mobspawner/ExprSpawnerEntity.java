@@ -1,4 +1,4 @@
-package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner;
+package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.mobspawner;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
@@ -42,8 +42,10 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 public class ExprSpawnerEntity extends SimplePropertyExpression<Object, EntitySnapshot> {
 
 	public static void register(SyntaxRegistry registry) {
-		register(registry, ExprSpawnerEntity.class, EntitySnapshot.class,
-			"spawner entity snapshot", SpawnerUtils.spawnerPropertyType
+		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprSpawnerEntity.class, EntitySnapshot.class,
+			"spawner entity snapshot", SpawnerUtils.spawnerPropertyType, true)
+				.supplier(ExprSpawnerEntity::new)
+				.build()
 		);
 	}
 
@@ -82,25 +84,16 @@ public class ExprSpawnerEntity extends SimplePropertyExpression<Object, EntitySn
 		for (Object object : getExpr().getArray(event)) {
 			if (SpawnerUtils.isCreatureSpawner(object)) {
 				CreatureSpawner creatureSpawner = SpawnerUtils.getCreatureSpawner(object);
-				switch (mode) {
-					case SET -> creatureSpawner.setSpawnedEntity(entitySnapshot);
-					case DELETE, RESET -> creatureSpawner.setSpawnedEntity((EntitySnapshot) null);
-				}
+				creatureSpawner.setSpawnedEntity(entitySnapshot);
 				creatureSpawner.update(true, false);
 			} else if (SpawnerUtils.isTrialSpawner(object)) {
 				TrialSpawner trialSpawner = SpawnerUtils.getTrialSpawner(object);
 				var config = SpawnerUtils.getTrialSpawnerConfiguration(trialSpawner);
-				switch (mode) {
-					case SET -> config.setSpawnedEntity(entitySnapshot);
-					case DELETE, RESET -> config.setSpawnedEntity((EntitySnapshot) null);
-				}
+				config.setSpawnedEntity(entitySnapshot);
 				trialSpawner.update(true, false);
 			} else if (SpawnerUtils.isSpawnerMinecart(object)) {
 				SpawnerMinecart spawnerMinecart = SpawnerUtils.getSpawnerMinecart(object);
-				switch (mode) {
-					case SET -> spawnerMinecart.setSpawnedEntity(entitySnapshot);
-					case DELETE, RESET -> spawnerMinecart.setSpawnedEntity((EntitySnapshot) null);
-				}
+				spawnerMinecart.setSpawnedEntity(entitySnapshot);
 			}
 		}
 	}

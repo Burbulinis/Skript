@@ -1,4 +1,4 @@
-package org.skriptlang.skript.bukkit.spawners.elements.expressions.trialspawner.trialspawnerdata;
+package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.trialspawnerdata;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
@@ -15,9 +15,10 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 public class ExprIncrementalEntityCount extends SimplePropertyExpression<SkriptTrialSpawnerData, Integer> {
 
 	public static void register(SyntaxRegistry registry) {
-		registerDefault(registry, ExprIncrementalEntityCount.class, Integer.class,
-			"(incremental|additional) [concurrent:(concurrent|simultaneous)] (mob|entity) [spawn] (count|amount)",
-			"trialspawnerdatas"
+		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprIncrementalEntityCount.class, Integer.class,
+			"(incremental|additional) [concurrent:(concurrent|simultaneous)] (mob|entity) [spawn] (count|amount)", "trialspawnerdatas", true)
+				.supplier(ExprIncrementalEntityCount::new)
+				.build()
 		);
 	}
 
