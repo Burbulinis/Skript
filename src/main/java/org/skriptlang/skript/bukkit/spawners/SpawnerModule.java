@@ -19,6 +19,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.event.entity.TrialSpawnerSpawnEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.loot.LootTable;
 import org.jetbrains.annotations.NotNull;
 import org.skriptlang.skript.addon.AddonModule;
 import org.skriptlang.skript.addon.SkriptAddon;
@@ -33,6 +34,7 @@ import org.skriptlang.skript.lang.converter.Converter;
 import org.skriptlang.skript.lang.converter.Converters;
 
 import java.io.IOException;
+import java.io.NotSerializableException;
 import java.io.StreamCorruptedException;
 import java.util.StringJoiner;
 
@@ -120,6 +122,37 @@ public class SpawnerModule implements AddonModule {
 				@Override
 				public String toVariableNameString(TrialSpawnerRewardEntry rewardEntry) {
 					return "reward_entry:" + rewardEntry.weight() + ',' + rewardEntry.lootTable().getKey().getKey();
+				}
+			})
+			.serializer(new Serializer<>() {
+				@Override
+				public Fields serialize(TrialSpawnerRewardEntry rewardEntry) {
+					Fields fields = new Fields();
+					fields.putObject("loot_table", rewardEntry.lootTable());
+					fields.putPrimitive("weight", rewardEntry.weight());
+					return fields;
+				}
+
+				@Override
+				public void deserialize(TrialSpawnerRewardEntry rewardEntry, Fields fields) {
+					assert false;
+				}
+
+				@Override
+				protected TrialSpawnerRewardEntry deserialize(Fields fields) throws StreamCorruptedException {
+					LootTable lootTable = fields.getObject("loot_table", LootTable.class);
+					int weight = fields.getPrimitive("weight", int.class);
+					return new TrialSpawnerRewardEntry(lootTable, weight);
+				}
+
+				@Override
+				public boolean mustSyncDeserialization() {
+					return true;
+				}
+
+				@Override
+				protected boolean canBeInstantiated() {
+					return false;
 				}
 			})
 		);

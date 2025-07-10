@@ -1,4 +1,4 @@
-package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.mobspawnerdata;
+package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.spawnerdata;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
@@ -14,7 +14,7 @@ import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
-import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptMobSpawnerData;
+import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptSpawnerData;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Spawner - Min/Max Spawn Delay")
@@ -35,11 +35,11 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 	"reset min spawner delay of target block"
 })
 @Since("INSERT VERSION")
-public class ExprMinMaxDelay extends SimplePropertyExpression<SkriptMobSpawnerData, Timespan> {
+public class ExprMinMaxDelay extends SimplePropertyExpression<SkriptSpawnerData, Timespan> {
 
 	public static void register(SyntaxRegistry registry) {
 		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprMinMaxDelay.class, Timespan.class,
-			"(:max|min)[imum] spawn delay[s]", "mobspawnerdatas", true)
+			"(:max|min)[imum] spawn delay[s]", "spawnerdatas", true)
 				.supplier(ExprMinMaxDelay::new)
 				.build()
 		);
@@ -54,7 +54,7 @@ public class ExprMinMaxDelay extends SimplePropertyExpression<SkriptMobSpawnerDa
 	}
 
 	@Override
-	public Timespan convert(SkriptMobSpawnerData data) {
+	public Timespan convert(SkriptSpawnerData data) {
 		if (max)
 			return data.getMaxSpawnDelay();
 		return data.getMinSpawnDelay();
@@ -72,7 +72,7 @@ public class ExprMinMaxDelay extends SimplePropertyExpression<SkriptMobSpawnerDa
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		Timespan timespan = delta != null ? (Timespan) delta[0] : null;
 
-		for (SkriptMobSpawnerData data : getExpr().getArray(event)) {
+		for (SkriptSpawnerData data : getExpr().getArray(event)) {
 			Timespan minMax;
 			if (max) {
 				minMax = data.getMaxSpawnDelay();

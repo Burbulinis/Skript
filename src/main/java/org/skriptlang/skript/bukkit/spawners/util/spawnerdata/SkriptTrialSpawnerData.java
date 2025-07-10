@@ -1,5 +1,7 @@
 package org.skriptlang.skript.bukkit.spawners.util.spawnerdata;
 
+import ch.njol.skript.util.Timespan;
+import ch.njol.skript.util.Timespan.TimePeriod;
 import ch.njol.yggdrasil.YggdrasilSerializable;
 import com.google.common.base.Preconditions;
 import org.bukkit.block.TrialSpawner;
@@ -22,12 +24,12 @@ import java.util.Map;
 public class SkriptTrialSpawnerData extends SkriptSpawnerData implements YggdrasilSerializable {
 
 	private int activationRange = SpawnerUtils.DEFAULT_TRIAL_ACTIVATION_RANGE;
-	//private @NotNull Timespan cooldownLength = SpawnerUtils.DEFAULT_COOLDOWN_LENGTH;
 	private int baseMobAmount = SpawnerUtils.DEFAULT_BASE_MOB_AMOUNT;
 	private int baseMobAmountIncrement = SpawnerUtils.DEFAULT_BASE_PER_PLAYER_INCREMENT;
 	private int concurrentMobAmount = SpawnerUtils.DEFAULT_CONCURRENT_MOB_AMOUNT;
 	private int concurrentMobAmountIncrement = SpawnerUtils.DEFAULT_CONCURRENT_PER_PLAYER_INCREMENT;
 
+	private Timespan spawnDelay = SpawnerUtils.DEFAULT_TRIAL_SPAWN_DELAY;
 	private @NotNull List<TrialSpawnerRewardEntry> rewardEntries = new ArrayList<>();
 
 	private final boolean ominous;
@@ -63,6 +65,7 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 		//data.setCooldownLength(new Timespan(TimePeriod.TICK, trialSpawner.getCooldownLength()));
 		var config = SpawnerUtils.getTrialSpawnerConfiguration(trialSpawner, ominous);
 		SkriptSpawnerData.applyToSpawnerData(config, data);
+		data.setMaxSpawnDelay(new Timespan(TimePeriod.TICK, config.getDelay()));
 
 		List<TrialSpawnerRewardEntry> rewardEntries = config.getPossibleRewards().entrySet().stream()
 				.map(entry ->
@@ -111,18 +114,9 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 		config.setAdditionalSpawnsBeforeCooldown(getBaseMobAmountIncrement());
 		config.setBaseSimultaneousEntities(getConcurrentMobAmount());
 		config.setAdditionalSimultaneousEntities(getConcurrentMobAmountIncrement());
+		config.setDelay(Math.clamp(spawnDelay.getAs(TimePeriod.TICK), 0, Integer.MAX_VALUE));
 
 		trialSpawner.update(true, false);
-	}
-
-	@Override
-	public int getActivationRange() {
-		return activationRange;
-	}
-
-	@Override
-	public void setActivationRange(int activationRange) {
-		this.activationRange = activationRange;
 	}
 
 	/**
@@ -133,14 +127,53 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 		return ominous;
 	}
 
-	//public @NotNull Timespan getCooldownLength() {
-	//	return cooldownLength;
-	//}
+	/**
+	 * @inheritDoc
+	 */
+	@Override
+	public int getActivationRange() {
+		return activationRange;
+	}
 
-	//public void setCooldownLength(@NotNull Timespan cooldownLength) {
-	//	Preconditions.checkNotNull(cooldownLength, "Cooldown length cannot be null");
-	//	this.cooldownLength = cooldownLength;
-	//}
+	/**
+	 * @inheritDoc
+	 */
+	@Override
+	public void setActivationRange(int activationRange) {
+		this.activationRange = activationRange;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public @NotNull Timespan getMaxSpawnDelay() {
+		return spawnDelay;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	@Override
+	public void setMaxSpawnDelay(@NotNull Timespan maxSpawnDelay) {
+		this.spawnDelay = maxSpawnDelay;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	@Override
+	public @NotNull Timespan getMinSpawnDelay() {
+		return spawnDelay;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	@Override
+	public void setMinSpawnDelay(@NotNull Timespan minSpawnDelay) {
+		this.spawnDelay = minSpawnDelay;
+	}
 
 	/**
 	 * Returns a list of reward entries this trial spawner can choose during reward ejection.

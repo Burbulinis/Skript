@@ -1,5 +1,6 @@
 package org.skriptlang.skript.bukkit.spawners.util.spawnerdata;
 
+import ch.njol.skript.util.Timespan;
 import ch.njol.yggdrasil.YggdrasilSerializable;
 import com.google.common.base.Preconditions;
 import org.bukkit.block.spawner.SpawnerEntry;
@@ -18,8 +19,9 @@ public abstract class SkriptSpawnerData implements YggdrasilSerializable {
 	private int activationRange = SpawnerUtils.DEFAULT_ACTIVATION_RANGE;
 	private int spawnRange = SpawnerUtils.DEFAULT_SPAWN_RANGE;
 
-	//private @Nullable EntitySnapshot spawnerEntitySnapshot = null;
-	//private @Nullable EntityData<?> spawnerType = null;
+	private Timespan minSpawnDelay = SpawnerUtils.DEFAULT_MIN_SPAWN_DELAY;
+	private Timespan maxSpawnDelay = SpawnerUtils.DEFAULT_MAX_SPAWN_DELAY;
+
 	private @NotNull List<SpawnerEntry> spawnerEntries = new ArrayList<>();
 
 	/**
@@ -99,50 +101,90 @@ public abstract class SkriptSpawnerData implements YggdrasilSerializable {
 	}
 
 	/**
-	 * Gets the entity snapshot of the spawner entity, if it exists.
+	 * Returns the maximum spawn delay of the spawner.
+	 * <br>
+	 * The spawn delay for regular spawners is chosen randomly between the minimum and maximum spawn delays,
+	 * which determines how long the spawner will wait before attempting to spawn entities again.
 	 * <p>
-	 * If this is not null, the spawner will spawn the entity represented by this snapshot.
-	 * @return the spawner entity snapshot, or null if not set
+	 * The maximum spawn delay is always greater than or equal to the minimum spawn delay.
+	 * <p>
+	 * The default value for regular spawners is 40 seconds (800 ticks).
+	 * <p>
+	 * For trial spawners, the minimum and maximum spawn delays are always identical. This results in a fixed delay,
+	 * rather than a random range.
+	 * <p>
+	 * The default value for trial spawners is 2 seconds (40 ticks).
+	 * @return the maximum spawn delay
 	 */
-	//public @Nullable EntitySnapshot getSpawnerEntitySnapshot() {
-	//	SpawnerUtils.ensureSupportsEntitySnapshots();
-	//	return spawnerEntitySnapshot;
-	//}
+	public @NotNull Timespan getMaxSpawnDelay() {
+		return maxSpawnDelay;
+	}
 
 	/**
-	 * Sets the entity snapshot of the spawner entity.
+	 * Sets the maximum spawn delay of the spawner.
+	 * <br>
+	 * The spawn delay for regular spawners is chosen randomly between the minimum and maximum spawn delays,
+	 * which determines how long the spawner will wait before attempting to spawn entities again.
 	 * <p>
-	 * If this is not null, the spawner will spawn the entity represented by this snapshot.
-	 * @param entitySnapshot the spawner entity snapshot to set, or null to clear
+	 * The maximum spawn delay must be greater than or equal to the minimum spawn delay.
+	 * <p>
+	 * The default value for regular spawners is 40 seconds (800 ticks).
+	 * <p>
+	 * For trial spawners, the minimum and maximum spawn delays are always identical. This results in a fixed delay,
+	 * rather than a random range.
+	 * <p>
+	 * The default value for trial spawners is 2 seconds (40 ticks).
+	 * @param maxSpawnDelay the maximum spawn delay to set
 	 */
-	//public void setSpawnerEntitySnapshot(@Nullable EntitySnapshot entitySnapshot) {
-	//	SpawnerUtils.ensureSupportsEntitySnapshots();
-	//	spawnerEntitySnapshot = entitySnapshot;
-	//}
+	public void setMaxSpawnDelay(@NotNull Timespan maxSpawnDelay) {
+		Preconditions.checkNotNull(maxSpawnDelay, "Maximum spawn delay cannot be null");
+		Preconditions.checkArgument(maxSpawnDelay.compareTo(minSpawnDelay) >= 0,
+			"Maximum spawn delay cannot be less than minimum spawn delay");
+		this.maxSpawnDelay = maxSpawnDelay;
+	}
 
 	/**
-	 * Gets the type of entity that the spawner will spawn.
+	 * Returns the minimum spawn delay of the spawner.
+	 * <br>
+	 * The spawn delay for regular spawners is chosen randomly between the minimum and maximum spawn delays,
+	 * which determines how long the spawner will wait before attempting to spawn entities again.
 	 * <p>
-	 * If this is not null, the spawner will spawn entities of the type represented by this EntityData.
-	 * @return the spawner type, or null if not set
+	 * The minimum spawn delay is always less than or equal to the maximum spawn delay.
+	 * <p>
+	 * The default value for regular spawners is 10 seconds (200 ticks).
+	 * <p>
+	 * For trial spawners, the minimum and maximum spawn delays are always identical. This results in a fixed delay,
+	 * rather than a random range.
+	 * <p>
+	 * The default value for trial spawners is 2 seconds (40 ticks).
+	 * @return the minimum spawn delay
 	 */
-	//public @Nullable EntityData<?> getSpawnerType() {
-	//	return spawnerType;
-	//}
+	public @NotNull Timespan getMinSpawnDelay() {
+		return minSpawnDelay;
+	}
 
 	/**
-	 * Sets the type of entity that the spawner will spawn.
+	 * Sets the minimum spawn delay of the spawner.
+	 * <br>
+	 * The spawn delay for regular spawners is chosen randomly between the minimum and maximum spawn delays,
+	 * which determines how long the spawner will wait before attempting to spawn entities again.
 	 * <p>
-	 * If this is not null, the spawner will spawn entities of the type represented by this EntityData.
+	 * The minimum spawn delay must not be greater than the maximum spawn delay.
 	 * <p>
-	 * This will override any existing spawner entries.
-	 * @param spawnerType the spawner type to set, or null to clear
+	 * The default value for regular spawners is 10 seconds (200 ticks).
+	 * <p>
+	 * For trial spawners, the minimum and maximum spawn delays are always identical. This results in a fixed delay,
+	 * rather than a random range.
+	 * <p>
+	 * The default value for trial spawners is 2 seconds (40 ticks).
+	 * @param minSpawnDelay the minimum spawn delay to set
 	 */
-//	public void setSpawnerType(@Nullable EntityData<?> spawnerType) {
-//		this.spawnerType = spawnerType;
-//		if (spawnerType != null)
-//			spawnerEntries.clear();
-//	}
+	public void setMinSpawnDelay(@NotNull Timespan minSpawnDelay) {
+		Preconditions.checkNotNull(minSpawnDelay, "Minimum spawn delay cannot be null");
+		Preconditions.checkArgument(minSpawnDelay.compareTo(maxSpawnDelay) <= 0,
+			"Minimum spawn delay cannot be greater than the maximum spawn delay");
+		this.minSpawnDelay = minSpawnDelay;
+	}
 
 	/**
 	 * Gets the list of spawner entries that the spawner will use to spawn entities.

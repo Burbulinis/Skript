@@ -20,8 +20,6 @@ public class SkriptMobSpawnerData extends SkriptSpawnerData implements Yggdrasil
 
 	private int maxNearbyEntityCap = SpawnerUtils.DEFAULT_MAX_NEARBY_ENTITIES;
 	private int spawnCount = SpawnerUtils.DEFAULT_SPAWN_COUNT;
-	private @NotNull Timespan maxSpawnDelay = SpawnerUtils.DEFAULT_MAX_SPAWN_DELAY;
-	private @NotNull Timespan minSpawnDelay = SpawnerUtils.DEFAULT_MIN_SPAWN_DELAY;
 
 	/**
 	 * Creates a new SkriptSpawnerData instance from the given Bukkit {@link Spawner}.
@@ -169,72 +167,6 @@ public class SkriptMobSpawnerData extends SkriptSpawnerData implements Yggdrasil
 	 */
 	public void setSpawnCount(int spawnCount) {
 		this.spawnCount = spawnCount;
-	}
-
-	/**
-	 * Returns the maximum spawn delay of the spawner.
-	 * <br>
-	 * The spawn delay is chosen randomly between the minimum and maximum spawn delays,
-	 * which determines how long the spawner will wait before attempting to spawn entities again.
-	 * <p>
-	 * The maximum spawn delay is always greater than or equal to the minimum spawn delay.
-	 * <p>
-	 * The default value is 40 seconds (800 ticks).
-	 * @return the maximum spawn delay
-	 */
-	public @NotNull Timespan getMaxSpawnDelay() {
-		return maxSpawnDelay;
-	}
-
-	/**
-	 * Sets the maximum spawn delay of the spawner.
-	 * <br>
-	 * The spawn delay is chosen randomly between the minimum and maximum spawn delays,
-	 * which determines how long the spawner will wait before attempting to spawn entities again.
-	 * <p>
-	 * The maximum spawn delay must be greater than or equal to the minimum spawn delay.
-	 * <p>
-	 * The default value is 40 seconds (800 ticks).
-	 * @param maxSpawnDelay the maximum spawn delay to set
-	 */
-	public void setMaxSpawnDelay(@NotNull Timespan maxSpawnDelay) {
-		Preconditions.checkNotNull(maxSpawnDelay, "Maximum spawn delay cannot be null");
-		Preconditions.checkArgument(maxSpawnDelay.compareTo(minSpawnDelay) >= 0,
-				"Maximum spawn delay cannot be less than minimum spawn delay");
-		this.maxSpawnDelay = maxSpawnDelay;
-	}
-
-	/**
-	 * Returns the minimum spawn delay of the spawner.
-	 * <br>
-	 * The spawn delay is chosen randomly between the minimum and maximum spawn delays,
-	 * which determines how long the spawner will wait before attempting to spawn entities again.
-	 * <p>
-	 * The minimum spawn delay is always less than or equal to the maximum spawn delay.
-	 * <p>
-	 * The default value is 10 seconds (200 ticks).
-	 * @return the minimum spawn delay
-	 */
-	public @NotNull Timespan getMinSpawnDelay() {
-		return minSpawnDelay;
-	}
-
-	/**
-	 * Sets the minimum spawn delay of the spawner.
-	 * <br>
-	 * The spawn delay is chosen randomly between the minimum and maximum spawn delays,
-	 * which determines how long the spawner will wait before attempting to spawn entities again.
-	 * <p>
-	 * The minimum spawn delay must not be greater than the maximum spawn delay.
-	 * <p>
-	 * The default value is 10 seconds (200 ticks).
-	 * @param minSpawnDelay the minimum spawn delay to set
-	 */
-	public void setMinSpawnDelay(@NotNull Timespan minSpawnDelay) {
-		Preconditions.checkNotNull(minSpawnDelay, "Minimum spawn delay cannot be null");
-		Preconditions.checkArgument(minSpawnDelay.compareTo(maxSpawnDelay) <= 0,
-				"Minimum spawn delay cannot be greater than the maximum spawn delay");
-		this.minSpawnDelay = minSpawnDelay;
 	}
 
 }
