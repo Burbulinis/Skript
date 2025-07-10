@@ -1,18 +1,17 @@
 package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.mobspawner;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Examples;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.Since;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.Timespan.TimePeriod;
+import ch.njol.util.Math2;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.TrialSpawner;
 import org.bukkit.entity.minecart.SpawnerMinecart;
 import org.bukkit.event.Event;
+import org.bukkit.spawner.TrialSpawnerConfiguration;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.registration.SyntaxRegistry;
@@ -40,11 +39,12 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 	"reset the spawner delay of the target block"
 })
 @Since("INSERT VERSION")
+@RequiredPlugins("Minecraft 1.21.4+ (for trial spawners)")
 public class ExprSpawnDelay extends SimplePropertyExpression<Object, Timespan> {
 
 	public static void register(SyntaxRegistry registry) {
 		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprSpawnDelay.class, Timespan.class,
-			"spawn delay", SpawnerUtils.spawnerPropertyType, true)
+			"spawn delay[s]", SpawnerUtils.spawnerPropertyType, false	)
 				.supplier(ExprSpawnDelay::new)
 				.build()
 		);
@@ -55,9 +55,10 @@ public class ExprSpawnDelay extends SimplePropertyExpression<Object, Timespan> {
 		if (SpawnerUtils.isCreatureSpawner(object)) {
 			CreatureSpawner creatureSpawner = SpawnerUtils.getCreatureSpawner(object);
 			return new Timespan(TimePeriod.TICK, creatureSpawner.getDelay());
-		} else if (SpawnerUtils.isTrialSpawner(object)) {
-			var config = SpawnerUtils.getTrialSpawnerConfiguration(SpawnerUtils.getTrialSpawner(object));
-			return new Timespan(TimePeriod.TICK, config.getDelay());
+		} else if (SpawnerUtils.isTrialSpawner(object) && SpawnerUtils.IS_RUNNING_1_21_4) {
+			TrialSpawner spawner = SpawnerUtils.getTrialSpawner(object);
+			long ticks = Math2.fit(0, spawner.getNextSpawnAttempt() - spawner.getWorld().getGameTime(), Long.MAX_VALUE);
+			return new Timespan(TimePeriod.TICK, ticks);
 		} else if (SpawnerUtils.isSpawnerMinecart(object)) {
 			SpawnerMinecart spawnerMinecart = SpawnerUtils.getSpawnerMinecart(object);
 			return new Timespan(TimePeriod.TICK, spawnerMinecart.getDelay());
@@ -85,33 +86,37 @@ public class ExprSpawnDelay extends SimplePropertyExpression<Object, Timespan> {
 		for (Object object : getExpr().getArray(event)) {
 			if (SpawnerUtils.isCreatureSpawner(object)) {
 				CreatureSpawner creatureSpawner = SpawnerUtils.getCreatureSpawner(object);
-				switch (mode) {
-					case SET -> creatureSpawner.setDelay(ticks);
-					case ADD -> creatureSpawner.setDelay(Math.clamp(creatureSpawner.getDelay() + ticks, 0, Integer.MAX_VALUE));
-					case REMOVE -> creatureSpawner.setDelay(Math.clamp(creatureSpawner.getDelay() - ticks, 0, Integer.MAX_VALUE));
-					case RESET -> creatureSpawner.setDelay(-1);
-				}
+				creatureSpawner.setDelay(getNewDelay(mode, creatureSpawner.getDelay(), ticks));
+
 				creatureSpawner.update(true, false);
-			} else if (SpawnerUtils.isTrialSpawner(object)) {
+			} else if (SpawnerUtils.isTrialSpawner(object) && SpawnerUtils.IS_RUNNING_1_21_4) {
 				TrialSpawner trialSpawner = SpawnerUtils.getTrialSpawner(object);
-				var config = SpawnerUtils.getTrialSpawnerConfiguration(trialSpawner);
-				switch (mode) {
-					case SET -> config.setDelay(ticks);
-					case ADD -> config.setDelay(Math.clamp(config.getDelay() + ticks, 0, Integer.MAX_VALUE));
-					case REMOVE -> config.setDelay(Math.clamp(config.getDelay() - ticks, 0, Integer.MAX_VALUE));
-					case RESET -> config.setDelay((int) SpawnerUtils.DEFAULT_TRIAL_SPAWN_DELAY.getAs(TimePeriod.TICK));
+				long gameTime = trialSpawner.getWorld().getGameTime();
+
+				if (mode == ChangeMode.RESET) {
+					long delay = SpawnerUtils.getTrialSpawnerConfiguration(trialSpawner).getDelay();
+					trialSpawner.setNextSpawnAttempt(gameTime + delay);
+				} else {
+					long offset = mode == ChangeMode.REMOVE ? -ticks : ticks;
+					trialSpawner.setNextSpawnAttempt(gameTime + offset);
 				}
+
 				trialSpawner.update(true, false);
 			} else if (SpawnerUtils.isSpawnerMinecart(object)) {
 				SpawnerMinecart spawnerMinecart = SpawnerUtils.getSpawnerMinecart(object);
-				switch (mode) {
-					case SET -> spawnerMinecart.setDelay(ticks);
-					case ADD -> spawnerMinecart.setDelay(Math.clamp(spawnerMinecart.getDelay() + ticks, 0, Integer.MAX_VALUE));
-					case REMOVE -> spawnerMinecart.setDelay(Math.clamp(spawnerMinecart.getDelay() - ticks, 0, Integer.MAX_VALUE));
-					case RESET -> spawnerMinecart.setDelay(-1);
-				}
+				spawnerMinecart.setDelay(getNewDelay(mode, spawnerMinecart.getDelay(), ticks));
 			}
 		}
+	}
+
+	private int getNewDelay(ChangeMode mode, int current, int delta) {
+		return switch (mode) {
+			case SET -> delta;
+			case ADD -> Math.clamp(current + delta, 0, Integer.MAX_VALUE);
+			case REMOVE -> Math.clamp(current - delta, 0, Integer.MAX_VALUE);
+			case RESET -> -1;
+			default -> current;
+		};
 	}
 
 	@Override

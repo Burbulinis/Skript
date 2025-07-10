@@ -43,7 +43,7 @@ public class ExprSpawnerEntity extends SimplePropertyExpression<Object, EntitySn
 
 	public static void register(SyntaxRegistry registry) {
 		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprSpawnerEntity.class, EntitySnapshot.class,
-			"spawner entity snapshot", SpawnerUtils.spawnerPropertyType, true)
+			"spawner entity snapshot[s]", SpawnerUtils.spawnerPropertyType, false)
 				.supplier(ExprSpawnerEntity::new)
 				.build()
 		);

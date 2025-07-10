@@ -34,7 +34,7 @@ public class ExprActivationRange extends SimplePropertyExpression<SkriptSpawnerD
 
 	public static void register(SyntaxRegistry registry) {
 		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprActivationRange.class, Integer.class,
-			"activation (radius|range)", "spawnerdatas", true)
+			"activation (radi(us[es]|i)|range[s])", "spawnerdatas", true)
 				.supplier(ExprActivationRange::new)
 				.build()
 		);
@@ -56,18 +56,17 @@ public class ExprActivationRange extends SimplePropertyExpression<SkriptSpawnerD
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		int count = delta != null ? ((int) delta[0]) : 0;
+
 		for (SkriptSpawnerData data : getExpr().getArray(event)) {
-			switch (mode) {
-				case SET -> data.setActivationRange(count);
-				case ADD -> data.setActivationRange(data.getActivationRange() + count);
-				case REMOVE -> data.setActivationRange(data.getActivationRange() - count);
-				case RESET -> {
-					int defaultValue = data instanceof SkriptTrialSpawnerData
-						? SpawnerUtils.DEFAULT_TRIAL_ACTIVATION_RANGE
-						: SpawnerUtils.DEFAULT_ACTIVATION_RANGE;
-					data.setActivationRange(defaultValue);
-				}
-			}
+			int base = data.getActivationRange();
+			data.setActivationRange(switch (mode) {
+				case ADD -> base + count;
+				case REMOVE -> base - count;
+				case RESET -> data instanceof SkriptTrialSpawnerData
+					? SpawnerUtils.DEFAULT_TRIAL_ACTIVATION_RANGE
+					: SpawnerUtils.DEFAULT_ACTIVATION_RANGE;
+				default -> count;
+			});
 		}
 	}
 

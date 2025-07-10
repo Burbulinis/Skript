@@ -6,6 +6,7 @@ import ch.njol.skript.classes.*;
 import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.lang.ParseContext;
+import ch.njol.skript.lang.util.common.AnyWeighted;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.yggdrasil.Fields;
@@ -23,6 +24,7 @@ import org.skriptlang.skript.addon.AddonModule;
 import org.skriptlang.skript.addon.SkriptAddon;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerEntryEquipment;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerEntryEquipment.DropChance;
+import org.skriptlang.skript.bukkit.spawners.util.TrialSpawnerRewardEntry;
 import org.skriptlang.skript.bukkit.spawners.util.lang.AnySpawnerWeighted;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptMobSpawnerData;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptSpawnerData;
@@ -43,22 +45,6 @@ public class SpawnerModule implements AddonModule {
 			.name("Spawner Data")
 			.description("todo")
 			.since("INSERT VERSION")
-			.parser(new Parser<>() {
-				@Override
-				public boolean canParse(ParseContext context) {
-					return false;
-				}
-
-				@Override
-				public String toString(SkriptSpawnerData data, int flags) {
-					return data.toString();
-				}
-
-				@Override
-				public String toVariableNameString(SkriptSpawnerData data) {
-					return "spawner_data:" + data.hashCode();
-				}
-			})
 			.serializer(new YggdrasilSerializer<>())
 		);
 
@@ -110,6 +96,36 @@ public class SpawnerModule implements AddonModule {
 				}
 			})
 			.serializer(new YggdrasilSerializer<>())
+		);
+
+		Classes.registerClass(new ClassInfo<>(TrialSpawnerRewardEntry.class, "rewardentry")
+			.user("reward ?entr(y|ies)")
+			.name("Reward Entry")
+			.description("todo")
+			.since("INSERT VERSION")
+			.parser(new Parser<>() {
+				@Override
+				public boolean canParse(ParseContext context) {
+					return false;
+				}
+
+				@Override
+				public String toString(TrialSpawnerRewardEntry rewardEntry, int flags) {
+					return "reward entry of " +
+						Classes.toString(rewardEntry.lootTable()) +
+						" with weight " +
+						rewardEntry.weight();
+				}
+
+				@Override
+				public String toVariableNameString(TrialSpawnerRewardEntry rewardEntry) {
+					return "reward_entry:" + rewardEntry.weight() + ',' + rewardEntry.lootTable().getKey().getKey();
+				}
+			})
+		);
+
+		Converters.registerConverter(TrialSpawnerRewardEntry.class, AnyWeighted.class,
+			reward -> reward::weight, Converter.NO_RIGHT_CHAINING
 		);
 	}
 

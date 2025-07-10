@@ -30,7 +30,7 @@ public class ExprSpawnerType extends SimplePropertyExpression<Object, EntityData
 
 	public static void register(SyntaxRegistry registry) {
 		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprSpawnerType.class, EntityData.class,
-			"(spawner|entity|creature) type[s]", SpawnerUtils.spawnerPropertyType, true)
+			"(spawner|entity|creature) type[s]", SpawnerUtils.spawnerPropertyType, false)
 				.supplier(ExprSpawnerType::new)
 				.build()
 		);

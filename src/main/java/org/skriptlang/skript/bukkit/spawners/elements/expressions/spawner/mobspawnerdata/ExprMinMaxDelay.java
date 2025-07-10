@@ -39,7 +39,7 @@ public class ExprMinMaxDelay extends SimplePropertyExpression<SkriptMobSpawnerDa
 
 	public static void register(SyntaxRegistry registry) {
 		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprMinMaxDelay.class, Timespan.class,
-			"(:max|min)[imum] spawn delay", "mobspawnerdatas", true)
+			"(:max|min)[imum] spawn delay[s]", "mobspawnerdatas", true)
 				.supplier(ExprMinMaxDelay::new)
 				.build()
 		);

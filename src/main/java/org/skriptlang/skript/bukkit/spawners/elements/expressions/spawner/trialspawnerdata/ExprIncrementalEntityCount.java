@@ -15,8 +15,10 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 public class ExprIncrementalEntityCount extends SimplePropertyExpression<SkriptTrialSpawnerData, Integer> {
 
 	public static void register(SyntaxRegistry registry) {
+		if (!SpawnerUtils.IS_RUNNING_1_21)
+			return;
 		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprIncrementalEntityCount.class, Integer.class,
-			"(incremental|additional) [concurrent:(concurrent|simultaneous)] (mob|entity) [spawn] (count|amount)", "trialspawnerdatas", true)
+			"(incremental|additional) [concurrent:(concurrent|simultaneous)] (mob|entity) [spawn] (count|amount)[s]", "trialspawnerdatas", true)
 				.supplier(ExprIncrementalEntityCount::new)
 				.build()
 		);
@@ -48,21 +50,19 @@ public class ExprIncrementalEntityCount extends SimplePropertyExpression<SkriptT
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		int count = delta != null ? ((int) delta[0]) : 0;
+
 		for (SkriptTrialSpawnerData data : getExpr().getArray(event)) {
+			int base = concurrent ? data.getConcurrentMobAmountIncrement() : data.getBaseMobAmountIncrement();
+			int value = switch (mode) {
+				case ADD -> base + count;
+				case REMOVE -> base - count;
+				case RESET -> concurrent ? SpawnerUtils.DEFAULT_CONCURRENT_PER_PLAYER_INCREMENT : SpawnerUtils.DEFAULT_BASE_PER_PLAYER_INCREMENT;
+				default -> count;
+			};
 			if (concurrent) {
-				switch (mode) {
-					case SET -> data.setConcurrentMobAmountIncrement(count);
-					case ADD -> data.setConcurrentMobAmountIncrement(data.getConcurrentMobAmountIncrement() + count);
-					case REMOVE -> data.setConcurrentMobAmountIncrement(data.getConcurrentMobAmountIncrement() - count);
-					case RESET -> data.setConcurrentMobAmountIncrement(SpawnerUtils.DEFAULT_CONCURRENT_PER_PLAYER_INCREMENT);
-				}
+				data.setConcurrentMobAmountIncrement(value);
 			} else {
-				switch (mode) {
-					case SET -> data.setBaseMobAmountIncrement(count);
-					case ADD -> data.setBaseMobAmountIncrement(data.getBaseMobAmountIncrement() + count);
-					case REMOVE -> data.setBaseMobAmountIncrement(data.getBaseMobAmountIncrement() - count);
-					case RESET -> data.setBaseMobAmountIncrement(SpawnerUtils.DEFAULT_BASE_PER_PLAYER_INCREMENT);
-				}
+				data.setBaseMobAmountIncrement(value);
 			}
 		}
 	}

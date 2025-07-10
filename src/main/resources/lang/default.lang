@@ -2826,6 +2826,11 @@ types:
 	numbered: numbered thing¦s @a
 	valued: valued thing¦s @a
 	containing: container¦s @a
+	weighted: weighted thing¦s @a
+	spawnerdata: spawner data¦s @a
+	mobspawnerdata: mob spawner data¦s @a
+	trialspawnerdata: trial spawner data¦s @a
+	rewardentry: reward entr¦y¦ies @a
 
 	# Hooks
 	money: money

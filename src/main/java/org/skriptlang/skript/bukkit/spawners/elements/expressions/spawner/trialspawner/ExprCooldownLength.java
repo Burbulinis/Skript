@@ -31,7 +31,7 @@ public class ExprCooldownLength extends SimplePropertyExpression<Block, Timespan
 		if (!SpawnerUtils.IS_RUNNING_1_21)
 			return;
 		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprCooldownLength.class, Timespan.class,
-			"trial cool[ ]down [length]", "blocks", false)
+			"trial [spawner] cool[ ]down length[s]", "blocks", false)
 				.supplier(ExprCooldownLength::new)
 				.build()
 		);
@@ -39,12 +39,11 @@ public class ExprCooldownLength extends SimplePropertyExpression<Block, Timespan
 
 	@Override
 	public @Nullable Timespan convert(Block block) {
-		if (SpawnerUtils.isTrialSpawner(block)) {
-			TrialSpawner spawner = SpawnerUtils.getTrialSpawner(block);
-			return new Timespan(TimePeriod.TICK, spawner.getCooldownLength());
-		}
+		if (!SpawnerUtils.isTrialSpawner(block))
+			return null;
 
-		return null;
+		TrialSpawner spawner = SpawnerUtils.getTrialSpawner(block);
+		return new Timespan(TimePeriod.TICK, spawner.getCooldownLength());
 	}
 
 	@Override
@@ -68,13 +67,15 @@ public class ExprCooldownLength extends SimplePropertyExpression<Block, Timespan
 				continue;
 
 			TrialSpawner spawner = SpawnerUtils.getTrialSpawner(block);
+			assert spawner != null;
 
-			switch (mode) {
-				case SET -> spawner.setCooldownLength(ticks);
-				case ADD -> spawner.setCooldownLength(spawner.getCooldownLength() + ticks);
-				case REMOVE -> spawner.setCooldownLength(spawner.getCooldownLength() - ticks);
-				case RESET -> spawner.setCooldownLength((int) SpawnerUtils.DEFAULT_COOLDOWN_LENGTH.getAs(TimePeriod.TICK));
-			}
+			int base = spawner.getCooldownLength();
+			spawner.setCooldownLength(switch (mode) {
+				case ADD -> base + ticks;
+				case REMOVE -> base - ticks;
+				case RESET -> Math.clamp(SpawnerUtils.DEFAULT_COOLDOWN_LENGTH.getAs(TimePeriod.TICK), 0, Integer.MAX_VALUE);
+				default -> ticks;
+			});
 
 			spawner.update(true, false);
 		}

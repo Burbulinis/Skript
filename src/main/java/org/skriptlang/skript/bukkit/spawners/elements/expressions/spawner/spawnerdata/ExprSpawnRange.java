@@ -32,7 +32,7 @@ public class ExprSpawnRange extends SimplePropertyExpression<SkriptSpawnerData, 
 
 	public static void register(SyntaxRegistry registry) {
 		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprSpawnRange.class, Integer.class,
-			"spawn (radius|range)", "spawnerdatas", true)
+			"spawn (radi(us[es]|i)|range[s])", "spawnerdatas", true)
 				.supplier(ExprSpawnRange::new)
 				.build()
 		);
@@ -53,16 +53,16 @@ public class ExprSpawnRange extends SimplePropertyExpression<SkriptSpawnerData, 
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-		//noinspection ConstantConditions
-		int range = (int) delta[0];
+		int range = delta != null ? ((int) delta[0]) : 0;
 
 		for (SkriptSpawnerData data : getExpr().getArray(event)) {
-			switch (mode) {
-				case SET -> data.setSpawnRange(range);
-				case ADD -> data.setSpawnRange(data.getSpawnRange() + range);
-				case REMOVE -> data.setSpawnRange(data.getSpawnRange() - range);
-				case RESET -> data.setSpawnRange(SpawnerUtils.DEFAULT_SPAWN_RANGE);
-			}
+			int base = data.getSpawnRange();
+			data.setSpawnRange(switch (mode) {
+				case ADD -> base + range;
+				case REMOVE -> base - range;
+				case RESET -> SpawnerUtils.DEFAULT_SPAWN_RANGE;
+				default -> range;
+			});
 		}
 	}
 

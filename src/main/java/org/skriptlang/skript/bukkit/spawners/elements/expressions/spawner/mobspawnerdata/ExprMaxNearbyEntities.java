@@ -32,7 +32,7 @@ public class ExprMaxNearbyEntities extends SimplePropertyExpression<SkriptMobSpa
 
 	public static void register(SyntaxRegistry registry) {
 		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprMaxNearbyEntities.class, Integer.class,
-			"max[imum] nearby entity (count|amount|cap)", "mobspawnerdatas", true)
+			"max[imum] nearby entity (count|amount|cap)[s]", "mobspawnerdatas", true)
 				.supplier(ExprMaxNearbyEntities::new)
 				.build()
 		);
@@ -56,12 +56,13 @@ public class ExprMaxNearbyEntities extends SimplePropertyExpression<SkriptMobSpa
 		int count = delta != null ? ((int) delta[0]) : 0;
 
 		for (SkriptMobSpawnerData data: getExpr().getArray(event)) {
-			switch (mode) {
-				case SET -> data.setMaxNearbyEntityCap(count);
-				case ADD -> data.setMaxNearbyEntityCap(data.getMaxNearbyEntityCap() + count);
-				case REMOVE -> data.setMaxNearbyEntityCap(data.getMaxNearbyEntityCap() - count);
-				case RESET -> data.setMaxNearbyEntityCap(SpawnerUtils.DEFAULT_MAX_NEARBY_ENTITIES);
-			}
+			int base = data.getMaxNearbyEntityCap();
+			data.setMaxNearbyEntityCap(switch (mode) {
+				case ADD -> base + count;
+				case REMOVE -> base - count;
+				case RESET -> SpawnerUtils.DEFAULT_MAX_NEARBY_ENTITIES;
+				default -> count;
+			});
 		}
 	}
 

@@ -42,7 +42,7 @@ public class ExprBaseEntityCount extends SimplePropertyExpression<SkriptTrialSpa
 		if (!SpawnerUtils.IS_RUNNING_1_21)
 			return;
 		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprBaseEntityCount.class, Integer.class,
-			"base [concurrent:(concurrent|simultaneous)] (mob|entity) [spawn] (count|amount)", "trialspawnerdatas", true)
+			"base [concurrent:(concurrent|simultaneous)] (mob|entity) [spawn] (count|amount)[s]", "trialspawnerdatas", true)
 				.supplier(ExprBaseEntityCount::new)
 				.build()
 		);
@@ -74,21 +74,19 @@ public class ExprBaseEntityCount extends SimplePropertyExpression<SkriptTrialSpa
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		int count = delta != null ? ((int) delta[0]) : 0;
+
 		for (SkriptTrialSpawnerData data : getExpr().getArray(event)) {
+			int base = concurrent ? data.getConcurrentMobAmount() : data.getBaseMobAmount();
+			int value = switch (mode) {
+				case ADD -> base + count;
+				case REMOVE -> base - count;
+				case RESET -> concurrent ? SpawnerUtils.DEFAULT_CONCURRENT_MOB_AMOUNT : SpawnerUtils.DEFAULT_BASE_MOB_AMOUNT;
+				default -> count;
+			};
 			if (concurrent) {
-				switch (mode) {
-					case SET -> data.setConcurrentMobAmount(count);
-					case ADD -> data.setConcurrentMobAmount(data.getConcurrentMobAmount() + count);
-					case REMOVE -> data.setConcurrentMobAmount(data.getConcurrentMobAmount() - count);
-					case RESET -> data.setConcurrentMobAmount(SpawnerUtils.DEFAULT_CONCURRENT_MOB_AMOUNT);
-				}
+				data.setConcurrentMobAmount(value);
 			} else {
-				switch (mode) {
-					case SET -> data.setBaseMobAmount(count);
-					case ADD -> data.setBaseMobAmount(data.getBaseMobAmount() + count);
-					case REMOVE -> data.setBaseMobAmount(data.getBaseMobAmount() - count);
-					case RESET -> data.setBaseMobAmount(SpawnerUtils.DEFAULT_BASE_MOB_AMOUNT);
-				}
+				data.setBaseMobAmount(value);
 			}
 		}
 	}

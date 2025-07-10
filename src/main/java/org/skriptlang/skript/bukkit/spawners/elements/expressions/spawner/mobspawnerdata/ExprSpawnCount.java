@@ -33,7 +33,7 @@ public class ExprSpawnCount extends SimplePropertyExpression<SkriptMobSpawnerDat
 
 	public static void register(SyntaxRegistry registry) {
 		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprSpawnCount.class, Integer.class,
-			"spawn (count|amount)", "mobspawnerdatas", true)
+			"spawn (count|amount)[s]", "mobspawnerdatas", true)
 				.supplier(ExprSpawnCount::new)
 				.build()
 		);
@@ -57,12 +57,13 @@ public class ExprSpawnCount extends SimplePropertyExpression<SkriptMobSpawnerDat
 		int count = delta != null ? ((int) delta[0]) : 0;
 
 		for (SkriptMobSpawnerData data : getExpr().getArray(event)) {
-			switch (mode) {
-				case SET -> data.setSpawnCount(count);
-				case ADD -> data.setSpawnCount(data.getSpawnCount() + count);
-				case REMOVE -> data.setSpawnCount(data.getSpawnCount() - count);
-				case RESET -> data.setSpawnCount(SpawnerUtils.DEFAULT_SPAWN_RANGE);
-			}
+			int base = data.getSpawnCount();
+			data.setSpawnCount(switch (mode) {
+				case ADD -> base + count;
+				case REMOVE -> base - count;
+				case RESET -> SpawnerUtils.DEFAULT_SPAWN_RANGE;
+				default -> count;
+			});
 		}
 	}
 
