@@ -8,9 +8,6 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.TrialSpawner;
 import org.bukkit.entity.minecart.SpawnerMinecart;
 import org.bukkit.spawner.TrialSpawnerConfiguration;
-import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptMobSpawnerData;
-import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptSpawnerData;
-import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptTrialSpawnerData;
 
 /**
  * Utility class for spawners.

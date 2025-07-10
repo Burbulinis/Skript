@@ -11,7 +11,6 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.TrialSpawner;
 import org.bukkit.entity.minecart.SpawnerMinecart;
 import org.bukkit.event.Event;
-import org.bukkit.spawner.TrialSpawnerConfiguration;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.registration.SyntaxRegistry;

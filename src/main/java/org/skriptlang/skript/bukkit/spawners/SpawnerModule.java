@@ -36,7 +36,6 @@ import org.skriptlang.skript.lang.converter.Converter;
 import org.skriptlang.skript.lang.converter.Converters;
 
 import java.io.IOException;
-import java.io.NotSerializableException;
 import java.io.StreamCorruptedException;
 import java.util.StringJoiner;
 
