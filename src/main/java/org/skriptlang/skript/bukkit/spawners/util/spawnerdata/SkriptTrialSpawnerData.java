@@ -36,7 +36,7 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 
 	/**
 	 * Creates a new SkriptTrialSpawnerData instance
-	 * @param ominous whether the data
+	 * @param ominous whether the data should be ominous
 	 */
 	public SkriptTrialSpawnerData(boolean ominous) {
 		this.ominous = ominous;
@@ -49,8 +49,8 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 	 * @param trialSpawner the Bukkit trial spawner to convert
 	 * @return a new {@code SkriptTrialSpawnerData} containing the data from the given {@link TrialSpawner}
 	 */
-	public static SkriptTrialSpawnerData fromBukkitTrialSpawner(@NotNull TrialSpawner trialSpawner) {
-		return fromBukkitTrialSpawner(trialSpawner, false);
+	public static SkriptTrialSpawnerData fromTrialSpawner(@NotNull TrialSpawner trialSpawner) {
+		return fromTrialSpawner(trialSpawner, false);
 	}
 
 	/**
@@ -59,7 +59,7 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 	 * @param ominous whether the trial spawner is ominous
 	 * @return a new {@code SkriptTrialSpawnerData} instance containing the data from the Bukkit trial spawner
 	 */
-	public static SkriptTrialSpawnerData fromBukkitTrialSpawner(@NotNull TrialSpawner trialSpawner, boolean ominous) {
+	public static SkriptTrialSpawnerData fromTrialSpawner(@NotNull TrialSpawner trialSpawner, boolean ominous) {
 		SkriptTrialSpawnerData data = new SkriptTrialSpawnerData(ominous);
 
 		//data.setCooldownLength(new Timespan(TimePeriod.TICK, trialSpawner.getCooldownLength()));
@@ -68,10 +68,10 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 		data.setMaxSpawnDelay(new Timespan(TimePeriod.TICK, config.getDelay()));
 
 		List<TrialSpawnerRewardEntry> rewardEntries = config.getPossibleRewards().entrySet().stream()
-				.map(entry ->
-						new TrialSpawnerRewardEntry(entry.getKey(), entry.getValue())
-				)
-				.toList();
+			.map(entry ->
+				new TrialSpawnerRewardEntry(entry.getKey(), entry.getValue())
+			)
+			.toList();
 		data.setRewardEntries(rewardEntries);
 
 		data.setBaseMobAmount((int) config.getBaseSpawnsBeforeCooldown());
@@ -86,10 +86,10 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 	 * Applies this SkriptTrialSpawnerData to the given Bukkit trial spawners.
 	 * @param trialSpawners the array of Bukkit trial spawners to apply the data to
 	 */
-	public void applyDataToBukkitTrialSpawners(@NotNull TrialSpawner[] trialSpawners) {
+	public void applyDataToTrialSpawners(@NotNull TrialSpawner[] trialSpawners) {
 		Preconditions.checkNotNull(trialSpawners, "trialSpawners cannot be null");
 		for (TrialSpawner trialSpawner : trialSpawners) {
-			applyDataToBukkitTrialSpawner(trialSpawner);
+			applyDataToTrialSpawner(trialSpawner);
 		}
 	}
 
@@ -97,7 +97,7 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 	 * Applies this SkriptTrialSpawnerData to the given Bukkit trial spawner.
 	 * @param trialSpawner the Bukkit trial spawner to apply the data to
 	 */
-	public void applyDataToBukkitTrialSpawner(@NotNull TrialSpawner trialSpawner) {
+	public void applyDataToTrialSpawner(@NotNull TrialSpawner trialSpawner) {
 		Preconditions.checkNotNull(trialSpawner, "trialSpawner cannot be null");
 		//trialSpawner.setCooldownLength(Math.clamp(getCooldownLength().getAs(TimePeriod.TICK), 0 , Integer.MAX_VALUE));
 

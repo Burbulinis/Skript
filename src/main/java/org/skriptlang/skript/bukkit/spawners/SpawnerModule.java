@@ -26,6 +26,8 @@ import org.skriptlang.skript.addon.SkriptAddon;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerEntryEquipment;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerEntryEquipment.DropChance;
 import org.skriptlang.skript.bukkit.spawners.util.TrialSpawnerRewardEntry;
+import org.skriptlang.skript.bukkit.spawners.util.events.MobSpawnerDataEvent;
+import org.skriptlang.skript.bukkit.spawners.util.events.TrialSpawnerDataEvent;
 import org.skriptlang.skript.bukkit.spawners.util.lang.AnySpawnerWeighted;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptMobSpawnerData;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptSpawnerData;
@@ -160,6 +162,9 @@ public class SpawnerModule implements AddonModule {
 		Converters.registerConverter(TrialSpawnerRewardEntry.class, AnyWeighted.class,
 			reward -> reward::weight, Converter.NO_RIGHT_CHAINING
 		);
+
+		EventValues.registerEventValue(TrialSpawnerDataEvent.class, SkriptTrialSpawnerData.class, TrialSpawnerDataEvent::getSpawnerData);
+		EventValues.registerEventValue(MobSpawnerDataEvent.class, SkriptMobSpawnerData.class, MobSpawnerDataEvent::getSpawnerData);
 	}
 
 	@Override

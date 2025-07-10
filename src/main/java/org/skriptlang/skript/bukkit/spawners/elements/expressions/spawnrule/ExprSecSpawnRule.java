@@ -15,7 +15,6 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.spawners.SpawnerModule;
-import org.skriptlang.skript.bukkit.spawners.util.SpawnRuleWrapper;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxOrigin;
 import org.skriptlang.skript.registration.SyntaxRegistry;
@@ -39,7 +38,6 @@ import java.util.List;
 	"add {_entry} to potential spawns of target block"
 })
 @Since("INSERT VERSION")
-@RequiredPlugins("MC 1.21+")
 public class ExprSecSpawnRule extends SectionExpression<SpawnRule> {
 
 	static {

@@ -1,11 +1,8 @@
 package org.skriptlang.skript.bukkit.spawners.util.events;
 
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
-import org.jetbrains.annotations.NotNull;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptTrialSpawnerData;
 
-public class TrialSpawnerDataEvent extends Event {
+public class TrialSpawnerDataEvent extends SpawnerDataEvent {
 
 	private final SkriptTrialSpawnerData data;
 
@@ -13,13 +10,9 @@ public class TrialSpawnerDataEvent extends Event {
 		this.data = data;
 	}
 
-	public SkriptTrialSpawnerData getTrialSpawnerData() {
-		return data;
-	}
-
 	@Override
-	public @NotNull HandlerList getHandlers() {
-		throw new UnsupportedOperationException();
+	public SkriptTrialSpawnerData getSpawnerData() {
+		return data;
 	}
 
 }

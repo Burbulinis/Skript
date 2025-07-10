@@ -12,6 +12,7 @@ import ch.njol.skript.variables.Variables;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.bukkit.spawners.util.events.MobSpawnerDataEvent;
 import org.skriptlang.skript.bukkit.spawners.util.events.TrialSpawnerDataEvent;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptMobSpawnerData;
@@ -26,14 +27,15 @@ import java.util.Locale;
 public class ExprSecSpawnerData extends SectionExpression<SkriptSpawnerData> {
 
 	public static void register(SyntaxRegistry registry) {
-		registry.register(SyntaxRegistry.EXPRESSION, SyntaxInfo.Expression.builder(ExprSecSpawnerData.class, SkriptSpawnerData.class)
+		var info = SyntaxInfo.Expression.builder(ExprSecSpawnerData.class, SkriptSpawnerData.class)
 			.supplier(ExprSecSpawnerData::new)
 			.priority(SyntaxInfo.SIMPLE)
-			.addPatterns(
-				"[the] mob spawner data",
-				"[the] [:ominous] trial spawner data")
-			.build()
-		);
+			.addPattern("[the] mob spawner data");
+
+		if (SpawnerUtils.IS_RUNNING_1_21)
+			info.addPattern("[the] [:ominous] trial spawner data");
+
+		registry.register(SyntaxRegistry.EXPRESSION, info.build());
 	}
 
 	private enum DataType {
