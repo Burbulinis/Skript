@@ -29,7 +29,9 @@ public class ExprSecSpawnerData extends SectionExpression<SkriptSpawnerData> {
 		registry.register(SyntaxRegistry.EXPRESSION, SyntaxInfo.Expression.builder(ExprSecSpawnerData.class, SkriptSpawnerData.class)
 			.supplier(ExprSecSpawnerData::new)
 			.priority(SyntaxInfo.SIMPLE)
-			.addPattern("[the] (mob|1:[:ominous] trial) spawner data")
+			.addPatterns(
+				"[the] mob spawner data",
+				"[the] [:ominous] trial spawner data")
 			.build()
 		);
 	}
@@ -47,7 +49,7 @@ public class ExprSecSpawnerData extends SectionExpression<SkriptSpawnerData> {
 		Expression<?>[] exprs, int pattern, Kleenean delayed, ParseResult result,
 		@Nullable SectionNode node, @Nullable List<TriggerItem> triggerItems
 	) {
-		type = DataType.values()[result.mark];
+		type = DataType.values()[pattern];
 		ominous = result.hasTag("ominous");
 		if (node != null) {
 			String name = type.name().toLowerCase(Locale.ENGLISH) + " spawner data";

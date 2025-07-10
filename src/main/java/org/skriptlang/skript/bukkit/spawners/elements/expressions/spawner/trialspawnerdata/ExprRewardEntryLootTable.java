@@ -10,7 +10,7 @@ public class ExprRewardEntryLootTable extends SimplePropertyExpression<TrialSpaw
 
 	public static void register(SyntaxRegistry registry) {
 		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprRewardEntryLootTable.class, LootTable.class,
-			"reward [entry] loot table[s]", "trialspawnerrewardentries", true)
+			"reward [entry] loot table[s]", "rewardentries", false)
 				.supplier(ExprRewardEntryLootTable::new)
 				.build()
 		);
