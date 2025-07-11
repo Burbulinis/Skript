@@ -14,10 +14,10 @@ import org.skriptlang.skript.bukkit.spawners.util.SpawnerEntryEquipment.DropChan
 @Examples("set {_chance} to spawner drop chance of {_equipment drop chance}")
 @Since("INSERT VERSION")
 @RequiredPlugins("MC 1.21+")
-public class ExprEquipmentDropsWithChance extends SimplePropertyExpression<DropChance, Float> {
+public class ExprChanceOfDropChance extends SimplePropertyExpression<DropChance, Float> {
 
 	static {
-		registerDefault(SpawnerModule.SYNTAX_REGISTRY, ExprEquipmentDropsWithChance.class, Float.class,
+		registerDefault(SpawnerModule.SYNTAX_REGISTRY, ExprChanceOfDropChance.class, Float.class,
 				"spawner drop chance", "equipmentdropchances");
 	}
 

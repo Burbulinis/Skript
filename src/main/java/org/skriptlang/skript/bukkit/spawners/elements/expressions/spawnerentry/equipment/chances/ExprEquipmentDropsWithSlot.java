@@ -15,7 +15,6 @@ import org.skriptlang.skript.bukkit.spawners.util.SpawnerEntryEquipment.DropChan
 @Description("Returns the equipment slot of an already existing equipment drop.")
 @Examples("set {_slot} to spawner equipment slot of {_equipment drop chance}")
 @Since("INSERT VERSION")
-@RequiredPlugins("MC 1.21+")
 public class ExprEquipmentDropsWithSlot extends SimplePropertyExpression<DropChance, EquipmentSlot> {
 
 	static {

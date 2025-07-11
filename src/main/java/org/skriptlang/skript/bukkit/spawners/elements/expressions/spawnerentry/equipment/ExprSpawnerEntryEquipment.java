@@ -35,7 +35,7 @@ public class ExprSpawnerEntryEquipment extends SimpleExpression<SpawnerEntryEqui
 		registry.register(SyntaxRegistry.EXPRESSION, SyntaxInfo.Expression.builder(ExprSpawnerEntryEquipment.class, SpawnerEntryEquipment.class)
 			.supplier(ExprSpawnerEntryEquipment::new)
 			.priority(SyntaxInfo.COMBINED)
-			.addPattern("%loottable% with equipment drop chance[s] %equipmentdropchances%")
+			.addPattern("%loottable% with [equipment] drop chance[s] %equipmentdropchances%")
 			.build()
 		);
 	}

@@ -62,7 +62,7 @@ public class ExprRewardEntry extends SimpleExpression<TrialSpawnerRewardEntry> {
 		if (weight == null)
 			weight = 1;
 
-		return new TrialSpawnerRewardEntry[]{new TrialSpawnerRewardEntry(lootTable, weight)};
+		return new TrialSpawnerRewardEntry[]{new TrialSpawnerRewardEntry(lootTable, Math.max(0, weight))};
 	}
 
 	@Override

@@ -38,7 +38,7 @@ public class ExprSpawnRuleSkyLight extends SimplePropertyExpression<SpawnRule, I
 
 	public static void register(SyntaxRegistry registry) {
 		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprSpawnRuleBlockLight.class, Integer.class,
-			"(1:max|min)[imum] sky light [entity] spawn [rule] (level|value)[s]", "spawnrules", true)
+			"(1:max|min)[imum] sky light [entity] spawn (level|value)[s]", "spawnrules", true)
 			.supplier(ExprSpawnRuleBlockLight::new)
 			.build()
 		);

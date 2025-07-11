@@ -5,6 +5,7 @@ import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.Timespan.TimePeriod;
+import ch.njol.util.Math2;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.block.Block;
 import org.bukkit.block.TrialSpawner;
@@ -60,7 +61,7 @@ public class ExprCooldownLength extends SimplePropertyExpression<Block, Timespan
 
 		int ticks = 0;
 		if (timespan != null)
-			ticks = Math.clamp(timespan.getAs(TimePeriod.TICK), 0, Integer.MAX_VALUE);
+			ticks = (int) Math2.fit(0, timespan.getAs(TimePeriod.TICK), Integer.MAX_VALUE);
 
 		for (Block block : getExpr().getArray(event)) {
 			if (!SpawnerUtils.isTrialSpawner(block))
@@ -73,7 +74,7 @@ public class ExprCooldownLength extends SimplePropertyExpression<Block, Timespan
 			spawner.setCooldownLength(switch (mode) {
 				case ADD -> base + ticks;
 				case REMOVE -> base - ticks;
-				case RESET -> Math.clamp(SpawnerUtils.DEFAULT_COOLDOWN_LENGTH.getAs(TimePeriod.TICK), 0, Integer.MAX_VALUE);
+				case RESET -> (int) Math2.fit(0, SpawnerUtils.DEFAULT_COOLDOWN_LENGTH.getAs(TimePeriod.TICK), Integer.MAX_VALUE);
 				default -> ticks;
 			});
 

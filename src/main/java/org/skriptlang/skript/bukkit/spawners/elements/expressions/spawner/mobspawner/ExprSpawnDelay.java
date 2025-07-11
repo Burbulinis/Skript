@@ -56,7 +56,7 @@ public class ExprSpawnDelay extends SimplePropertyExpression<Object, Timespan> {
 			return new Timespan(TimePeriod.TICK, creatureSpawner.getDelay());
 		} else if (SpawnerUtils.isTrialSpawner(object) && SpawnerUtils.IS_RUNNING_1_21_4) {
 			TrialSpawner spawner = SpawnerUtils.getTrialSpawner(object);
-			long ticks = Math2.fit(0, spawner.getNextSpawnAttempt() - spawner.getWorld().getGameTime(), Long.MAX_VALUE);
+			long ticks = Math.max(0, spawner.getNextSpawnAttempt() - spawner.getWorld().getGameTime());
 			return new Timespan(TimePeriod.TICK, ticks);
 		} else if (SpawnerUtils.isSpawnerMinecart(object)) {
 			SpawnerMinecart spawnerMinecart = SpawnerUtils.getSpawnerMinecart(object);
@@ -80,7 +80,7 @@ public class ExprSpawnDelay extends SimplePropertyExpression<Object, Timespan> {
 
 		int ticks = 0;
 		if (timespan != null)
-			ticks = Math.clamp(timespan.getAs(TimePeriod.TICK), 0, Integer.MAX_VALUE);
+			ticks = (int) Math2.fit(0, timespan.getAs(TimePeriod.TICK), Integer.MAX_VALUE);
 
 		for (Object object : getExpr().getArray(event)) {
 			if (SpawnerUtils.isCreatureSpawner(object)) {
@@ -111,8 +111,8 @@ public class ExprSpawnDelay extends SimplePropertyExpression<Object, Timespan> {
 	private int getNewDelay(ChangeMode mode, int current, int delta) {
 		return switch (mode) {
 			case SET -> delta;
-			case ADD -> Math.clamp(current + delta, 0, Integer.MAX_VALUE);
-			case REMOVE -> Math.clamp(current - delta, 0, Integer.MAX_VALUE);
+			case ADD -> Math2.fit(0, current + delta, Integer.MAX_VALUE);
+			case REMOVE -> Math2.fit(0, current - delta, Integer.MAX_VALUE);
 			case RESET -> -1;
 			default -> current;
 		};
