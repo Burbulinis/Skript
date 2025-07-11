@@ -24,6 +24,14 @@ public class SpawnerEntryEquipment {
 		this.drops = drops;
 	}
 
+	public static SpawnerEntryEquipment fromBukkitEquipment(Equipment equipment) {
+		LootTable lootTable = equipment.getEquipmentLootTable();
+		List<DropChance> dropChances = equipment.getDropChances().entrySet().stream()
+			.map(entry -> new DropChance(entry.getKey(), entry.getValue()))
+			.toList();
+		return new SpawnerEntryEquipment(lootTable, dropChances);
+	}
+
 	public Equipment getAsBukkitEquipment() {
 		if (cachedBukkitEquipment == null) {
 			// conversion to map for bukkit's Equipment constructor
@@ -40,13 +48,13 @@ public class SpawnerEntryEquipment {
 		return lootTable;
 	}
 
-	public @NotNull List<DropChance> getDropChances() {
-		return drops;
-	}
-
 	public void setLootTable(@NotNull LootTable lootTable) {
 		cachedBukkitEquipment = null;
 		this.lootTable = lootTable;
+	}
+
+	public @NotNull List<DropChance> getDropChances() {
+		return List.copyOf(drops);
 	}
 
 	public void setDropChances(@NotNull List<DropChance> drops) {
@@ -54,12 +62,12 @@ public class SpawnerEntryEquipment {
 		this.drops = drops;
 	}
 
-	public void addDropChance(@NotNull SpawnerEntryEquipment.DropChance dropChance) {
+	public void addDropChance(@NotNull DropChance dropChance) {
 		cachedBukkitEquipment = null;
 		this.drops.add(dropChance);
 	}
 
-	public void removeDropChance(@NotNull SpawnerEntryEquipment.DropChance dropChance) {
+	public void removeDropChance(@NotNull DropChance dropChance) {
 		cachedBukkitEquipment = null;
 		this.drops.remove(dropChance);
 	}

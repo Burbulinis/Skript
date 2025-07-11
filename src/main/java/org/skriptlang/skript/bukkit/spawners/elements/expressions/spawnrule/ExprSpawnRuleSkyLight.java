@@ -34,7 +34,6 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 	"set spawner entity of event-block to {_entry}"
 })
 @Since("INSERT VERSION")
-@RequiredPlugins("MC 1.21+")
 public class ExprSpawnRuleSkyLight extends SimplePropertyExpression<SpawnRule, Integer> {
 
 	public static void register(SyntaxRegistry registry) {

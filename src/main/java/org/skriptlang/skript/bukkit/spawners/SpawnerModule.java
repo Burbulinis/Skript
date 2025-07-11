@@ -28,6 +28,7 @@ import org.skriptlang.skript.bukkit.spawners.util.SpawnerEntryEquipment.DropChan
 import org.skriptlang.skript.bukkit.spawners.util.TrialSpawnerRewardEntry;
 import org.skriptlang.skript.bukkit.spawners.util.events.MobSpawnerDataEvent;
 import org.skriptlang.skript.bukkit.spawners.util.events.SpawnRuleEvent;
+import org.skriptlang.skript.bukkit.spawners.util.events.SpawnerEntryEvent;
 import org.skriptlang.skript.bukkit.spawners.util.events.TrialSpawnerDataEvent;
 import org.skriptlang.skript.bukkit.spawners.util.lang.AnySpawnerWeighted;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptMobSpawnerData;
@@ -165,6 +166,7 @@ public class SpawnerModule implements AddonModule {
 
 		EventValues.registerEventValue(TrialSpawnerDataEvent.class, SkriptTrialSpawnerData.class, TrialSpawnerDataEvent::getSpawnerData);
 		EventValues.registerEventValue(MobSpawnerDataEvent.class, SkriptMobSpawnerData.class, MobSpawnerDataEvent::getSpawnerData);
+		EventValues.registerEventValue(SpawnerEntryEvent.class, SpawnerEntry.class, SpawnerEntryEvent::getSpawnerEntry);
 		EventValues.registerEventValue(SpawnRuleEvent.class, SpawnRule.class, SpawnRuleEvent::getSpawnRule);
 	}
 

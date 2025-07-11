@@ -4,18 +4,21 @@ import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.EventValueExpression;
 import org.bukkit.block.spawner.SpawnerEntry;
 import org.skriptlang.skript.bukkit.spawners.SpawnerModule;
+import org.skriptlang.skript.bukkit.spawners.elements.expressions.spawnrule.ExprSpawnRule;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Spawner Entry")
 @Description("The spawner entry used in the create spawner entry section.")
 @Examples("the spawner entry")
 @Since("INSERT VERSION")
-@RequiredPlugins("MC 1.21+")
 public class ExprSpawnerEntry extends EventValueExpression<SpawnerEntry> {
 
-    static {
-        register(SpawnerModule.SYNTAX_REGISTRY, ExprSpawnerEntry.class, SpawnerEntry.class,
-	        "[the] spawner entry");
-    }
+   public static void register(SyntaxRegistry registry) {
+	   registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprSpawnerEntry.class, SpawnerEntry.class, "[the] spawner entry")
+		   .supplier(ExprSpawnerEntry::new)
+		   .build()
+	   );
+   }
 
     public ExprSpawnerEntry() {
         super(SpawnerEntry.class);

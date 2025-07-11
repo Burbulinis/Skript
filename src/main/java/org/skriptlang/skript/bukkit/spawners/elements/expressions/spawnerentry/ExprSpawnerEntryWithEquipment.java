@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.spawners.SpawnerModule;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerEntryEquipment;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerEntryEquipment.DropChance;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,23 +24,20 @@ import java.util.List;
 	"set spawner entity of event-block to {_entry}"
 })
 @Since("INSERT VERSION")
-@RequiredPlugins("MC 1.21+")
 public class ExprSpawnerEntryWithEquipment extends SimplePropertyExpression<SpawnerEntry, SpawnerEntryEquipment> {
 
-	static {
-		registerDefault(SpawnerModule.SYNTAX_REGISTRY, ExprSpawnerEntryWithEquipment.class, SpawnerEntryEquipment.class,
-			"spawner entry equipment", "spawnerentries");
+	public static void register(SyntaxRegistry registry) {
+		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprSpawnerEntryWithEquipment.class, SpawnerEntryEquipment.class,
+			"spawner entry equipment[s]", "spawnerentries", true)
+			.supplier(ExprSpawnerEntryWithEquipment::new)
+			.build()
+		);
 	}
 
 	@Override
 	public @Nullable SpawnerEntryEquipment convert(SpawnerEntry entry) {
-		if (entry.getEquipment() != null) {
-			List<DropChance> equipment = new ArrayList<>();
-			entry.getEquipment().getDropChances().forEach(
-				(slot, chance) -> equipment.add(new DropChance(slot, chance))
-			);
-			return new SpawnerEntryEquipment(entry.getEquipment().getEquipmentLootTable(), equipment);
-		}
+		if (entry.getEquipment() != null)
+			return SpawnerEntryEquipment.fromBukkitEquipment(entry.getEquipment());
 		return null;
 	}
 

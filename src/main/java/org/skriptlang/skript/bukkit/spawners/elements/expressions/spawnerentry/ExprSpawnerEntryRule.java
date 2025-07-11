@@ -9,6 +9,7 @@ import org.bukkit.block.spawner.SpawnerEntry;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.spawners.SpawnerModule;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Spawner Entry - Spawn Rule")
 @Description({
@@ -27,12 +28,14 @@ import org.skriptlang.skript.bukkit.spawners.SpawnerModule;
 	"add {_entry} to potential spawns of target block"
 })
 @Since("INSERT VERSION")
-@RequiredPlugins("MC 1.21+")
 public class ExprSpawnerEntryRule extends SimplePropertyExpression<SpawnerEntry, SpawnRule> {
 
-	static {
-		registerDefault(SpawnerModule.SYNTAX_REGISTRY, ExprSpawnerEntryRule.class, SpawnRule.class,
-				"spawn rule", "spawnerentries");
+	public static void register(SyntaxRegistry registry) {
+		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprSpawnerEntryRule.class, SpawnRule.class,
+			"spawner entry rule[s]", "spawnerentries", true)
+				.supplier(ExprSpawnerEntryRule::new)
+				.build()
+		);
 	}
 
 	@Override
