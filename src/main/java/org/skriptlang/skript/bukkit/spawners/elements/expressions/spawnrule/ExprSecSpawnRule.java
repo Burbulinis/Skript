@@ -10,6 +10,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.Trigger;
 import ch.njol.skript.lang.TriggerItem;
+import ch.njol.skript.lang.util.SectionUtils;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.Kleenean;
@@ -18,6 +19,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.spawners.SpawnerModule;
+import org.skriptlang.skript.bukkit.spawners.util.events.SpawnRuleEvent;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxOrigin;
 import org.skriptlang.skript.registration.SyntaxRegistry;
@@ -43,37 +45,38 @@ import java.util.List;
 @Since("INSERT VERSION")
 public class ExprSecSpawnRule extends SectionExpression<SpawnRule> {
 
-	static {
-		var info = SyntaxInfo.Expression.builder(ExprSecSpawnRule.class, SpawnRule.class)
-			.origin(SyntaxOrigin.of(SpawnerModule.ADDON))
+	public static void register(SyntaxRegistry registry) {
+		registry.register(SyntaxRegistry.EXPRESSION, SyntaxInfo.Expression.builder(ExprSecSpawnRule.class, SpawnRule.class)
 			.supplier(ExprSecSpawnRule::new)
 			.priority(SyntaxInfo.SIMPLE)
-			.addPattern("[a] spawn rule")
-			.build();
-
-		SpawnerModule.SYNTAX_REGISTRY.register(SyntaxRegistry.EXPRESSION, info);
-
-		EventValues.registerEventValue(SpawnRuleCreateEvent.class, SpawnRule.class, SpawnRuleCreateEvent::getSpawnRule);
+			.addPattern("[the] spawn rule")
+			.build()
+		);
 	}
 
 	private Trigger trigger;
 
 	@Override
-	public boolean init(Expression<?>[] exprs, int pattern, Kleenean isDelayed, ParseResult result,
-	                    @Nullable SectionNode node, @Nullable List<TriggerItem> triggerItems) {
-		if (node != null)
-			//noinspection unchecked
-			trigger = loadCode(node, "create spawn rule", null, SpawnRuleCreateEvent.class);
+	public boolean init(
+		Expression<?>[] exprs, int pattern, Kleenean isDelayed, ParseResult result,
+		@Nullable SectionNode node, @Nullable List<TriggerItem> triggerItems
+	) {
+		if (node != null) {
+			trigger = SectionUtils.loadLinkedCode("spawn rule create", (beforeLoading, afterLoading) ->
+				loadCode(node, "spawn rule create", beforeLoading, afterLoading, SpawnRuleEvent.class)
+			);
+			return trigger != null;
+		}
 		return true;
 	}
 
 	@Override
 	protected SpawnRule @Nullable [] get(Event event) {
-		SpawnRule rule = new SpawnRuleWrapper(0, 0, 0, 0);
+		SpawnRule rule = new SpawnRule(0, 0, 0, 0);
 		if (trigger != null) {
-			SpawnRuleCreateEvent createEvent = new SpawnRuleCreateEvent(rule);
-			Variables.withLocalVariables(event, createEvent, () ->
-				TriggerItem.walk(trigger, createEvent)
+			SpawnRuleEvent ruleEvent = new SpawnRuleEvent(rule);
+			Variables.withLocalVariables(ruleEvent, ruleEvent, () ->
+				TriggerItem.walk(trigger, ruleEvent)
 			);
 		}
 		return new SpawnRule[]{rule};
@@ -91,26 +94,7 @@ public class ExprSecSpawnRule extends SectionExpression<SpawnRule> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "spawn rule";
-	}
-
-	public static class SpawnRuleCreateEvent extends Event {
-
-		private final SpawnRule rule;
-
-		public SpawnRuleCreateEvent(SpawnRule rule) {
-			this.rule = rule;
-		}
-
-		public SpawnRule getSpawnRule() {
-			return rule;
-		}
-
-		@Override
-		public HandlerList getHandlers() {
-			throw new UnsupportedOperationException();
-		}
-
+		return "the spawn rule";
 	}
 
 }

@@ -1,0 +1,24 @@
+package org.skriptlang.skript.bukkit.spawners.util.events;
+
+import org.bukkit.block.spawner.SpawnRule;
+import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
+
+public class SpawnRuleEvent extends Event {
+
+	private final SpawnRule rule;
+
+	public SpawnRuleEvent(SpawnRule rule) {
+		this.rule = rule;
+	}
+
+	public SpawnRule getSpawnRule() {
+		return rule;
+	}
+
+	@Override
+	public HandlerList getHandlers() {
+		throw new UnsupportedOperationException();
+	}
+
+}

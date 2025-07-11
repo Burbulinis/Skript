@@ -6,11 +6,12 @@ import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
+import ch.njol.util.Math2;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.block.spawner.SpawnRule;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
-import org.skriptlang.skript.bukkit.spawners.SpawnerModule;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Spawn Rule - Block Light Spawn Level")
 @Description({
@@ -32,12 +33,13 @@ import org.skriptlang.skript.bukkit.spawners.SpawnerModule;
 	"set spawner entity of event-block to {_entry}"
 })
 @Since("INSERT VERSION")
-@RequiredPlugins("MC 1.21+")
 public class ExprSpawnRuleBlockLight extends SimplePropertyExpression<SpawnRule, Integer> {
 
-	static {
-		registerDefault(SpawnerModule.SYNTAX_REGISTRY, ExprSpawnRuleBlockLight.class, Integer.class,
-				"(1:max|min)[imum] block light [entity] spawn [rule] (level|value)", "spawnrules"
+	public static void register(SyntaxRegistry registry) {
+		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprSpawnRuleBlockLight.class, Integer.class,
+				"(1:max|min)[imum] block light [entity] spawn [rule] (level|value)[s]", "spawnrules", true)
+				.supplier(ExprSpawnRuleBlockLight::new)
+				.build()
 		);
 	}
 
@@ -50,7 +52,7 @@ public class ExprSpawnRuleBlockLight extends SimplePropertyExpression<SpawnRule,
 	}
 
 	@Override
-	public @Nullable Integer convert(SpawnRule rule) {
+	public Integer convert(SpawnRule rule) {
 		if (max)
 			return rule.getMaxBlockLight();
 		return rule.getMinBlockLight();
@@ -67,15 +69,7 @@ public class ExprSpawnRuleBlockLight extends SimplePropertyExpression<SpawnRule,
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		assert delta != null;
-		int light = ((int) delta[0]);
-
-		if (light > 15) {
-			error("The block light spawn level cannot be greater than 15, thus setting it to a value larger than 15 will do nothing.");
-			return;
-		} else if (light < 0) {
-			error("The block light spawn level cannot be less than 0, thus setting it to a value less than 0 will do nothing.");
-			return;
-		}
+		int light = Math2.fit(0, (int) delta[0], 15);
 
 		for (SpawnRule rule : getExpr().getArray(event)) {
 			int minMax;
@@ -89,28 +83,26 @@ public class ExprSpawnRuleBlockLight extends SimplePropertyExpression<SpawnRule,
 				case SET -> light;
 				case ADD -> minMax + light;
 				case REMOVE -> minMax - light;
-				default -> 0; // should never happen
+				default -> 0;
 			};
+
+			value = Math2.fit(0, value, 15);
+
+			String error = getErrorMessage(value, max ? rule.getMinBlockLight() : rule.getMaxBlockLight());
+			if (error != null) {
+				error(error);
+				continue;
+			}
 
 			if (max) {
 				rule.setMaxBlockLight(value);
 			} else {
 				rule.setMinBlockLight(value);
 			}
-
-			String error = getErrorMessage(value, max ? rule.getMinBlockLight() : rule.getMaxBlockLight());
-			if (!error.isEmpty())
-				error(error);
 		}
 	}
 
 	private String getErrorMessage(int value, int compare) {
-		if (value > 15) {
-			return "The block light spawn level cannot be greater than 15, thus setting it to a value larger than 15 will do nothing.";
-		} else if (value < 0) {
-			return "The block light spawn level cannot be less than 0, thus setting it to a value less than 0 will do nothing.";
-		}
-
 		if (max && value < compare) {
 			return "The maximum block light level cannot be less than the minimum block light level, "
 				+ " thus setting it to a value less than the minimum block light level will do nothing.";
@@ -119,7 +111,7 @@ public class ExprSpawnRuleBlockLight extends SimplePropertyExpression<SpawnRule,
 				+ "thus setting it to a value greater than the maximum block light spawn level will do nothing.";
 		}
 
-		return "";
+		return null;
 	}
 
 	@Override
@@ -129,7 +121,7 @@ public class ExprSpawnRuleBlockLight extends SimplePropertyExpression<SpawnRule,
 
 	@Override
 	protected String getPropertyName() {
-		return (max ? "max" : "min") + " block light spawn level";
+		return (max ? "maximum" : "minimum") + " block light spawn level";
 	}
 
 }
