@@ -9,11 +9,9 @@ import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
 import org.bukkit.loot.LootTable;
 import org.jetbrains.annotations.Nullable;
-import org.skriptlang.skript.bukkit.spawners.SpawnerModule;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerEntryEquipment;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerEntryEquipment.DropChance;
 import org.skriptlang.skript.registration.SyntaxInfo;
-import org.skriptlang.skript.registration.SyntaxOrigin;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
 import java.util.Arrays;
@@ -31,27 +29,25 @@ import java.util.List;
 	"set spawner entity of event-block to {_entry}",
 })
 @Since("INSERT VERSION")
-@RequiredPlugins("MC 1.21+")
 public class ExprSpawnerEntryEquipment extends SimpleExpression<SpawnerEntryEquipment> {
 
-	static {
-		var info = SyntaxInfo.Expression.builder(ExprSpawnerEntryEquipment.class, SpawnerEntryEquipment.class)
-			.origin(SyntaxOrigin.of(SpawnerModule.ADDON))
+	public static void register(SyntaxRegistry registry) {
+		registry.register(SyntaxRegistry.EXPRESSION, SyntaxInfo.Expression.builder(ExprSpawnerEntryEquipment.class, SpawnerEntryEquipment.class)
 			.supplier(ExprSpawnerEntryEquipment::new)
 			.priority(SyntaxInfo.COMBINED)
 			.addPattern("%loottable% with equipment drop chance[s] %equipmentdropchances%")
-			.build();
-
-		SpawnerModule.SYNTAX_REGISTRY.register(SyntaxRegistry.EXPRESSION, info);
+			.build()
+		);
 	}
 
 	private Expression<LootTable> lootTable;
 	private Expression<DropChance> chances;
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
+		//noinspection unchecked
 		lootTable = (Expression<LootTable>) exprs[0];
+		//noinspection unchecked
 		chances = (Expression<DropChance>) exprs[1];
 		return true;
 	}
@@ -80,9 +76,7 @@ public class ExprSpawnerEntryEquipment extends SimpleExpression<SpawnerEntryEqui
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
 		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
-
-		builder.append("spawner equipment with", lootTable, "and", chances);
-
+		builder.append(lootTable, "with equipment drop chances", chances);
 		return builder.toString();
 	}
 

@@ -10,39 +10,25 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.spawners.SpawnerModule;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerEntryEquipment;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Spawner Entry - Equipment with Loot Table")
 @Description("Returns the equipment loot table of a spawner entry equipment.")
 @Examples("set {_loot table} to spawner loot table of {_equipment}")
 @Since("INSERT VERSION")
-@RequiredPlugins("MC 1.21+")
 public class ExprEquipmentWithLootTable extends SimplePropertyExpression<SpawnerEntryEquipment, LootTable> {
 
-	static {
-		register(SpawnerModule.SYNTAX_REGISTRY, ExprEquipmentWithLootTable.class, LootTable.class,
-			"spawner equipment loot[ ]table", "spawnerentryequipments");
+	public static void register(SyntaxRegistry registry) {
+		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprEquipmentWithLootTable.class, LootTable.class,
+			"spawner equipment loot[ ]table[s]", "spawnerentryequipments", false)
+				.supplier(ExprEquipmentWithLootTable::new)
+				.build()
+		);
 	}
 
 	@Override
 	public @NotNull LootTable convert(SpawnerEntryEquipment equipment) {
 		return equipment.getLootTable();
-	}
-
-	@Override
-	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
-		if (mode == ChangeMode.SET)
-			return CollectionUtils.array(LootTable.class);
-		return null;
-	}
-
-	@Override
-	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-		assert delta != null;
-		LootTable lootTable = (LootTable) delta[0];
-
-		for (SpawnerEntryEquipment equipment : getExpr().getArray(event)) {
-			equipment.setLootTable(lootTable);
-		}
 	}
 
 	@Override
