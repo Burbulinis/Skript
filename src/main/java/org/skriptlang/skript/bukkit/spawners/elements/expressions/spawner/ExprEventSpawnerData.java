@@ -18,6 +18,8 @@ import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptTrialSpawner
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
+import java.util.StringJoiner;
+
 public class ExprEventSpawnerData extends SimpleExpression<SkriptSpawnerData> implements EventRestrictedSyntax {
 
 	public static void register(SyntaxRegistry registry) {
@@ -34,10 +36,12 @@ public class ExprEventSpawnerData extends SimpleExpression<SkriptSpawnerData> im
 	}
 
 	private SpawnerType type;
+	private Class<? extends Event>[] events;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		type = SpawnerType.values()[parseResult.mark];
+		events = getParser().getCurrentEvents();
 
 		if (type == SpawnerType.TRIAL && !getParser().isCurrentEvent(TrialSpawnerDataEvent.class)) {
 			Skript.error("'trial spawner data' can only be used in the trial spawner data events.");
@@ -70,16 +74,23 @@ public class ExprEventSpawnerData extends SimpleExpression<SkriptSpawnerData> im
 
 	@Override
 	public Class<? extends SkriptSpawnerData> getReturnType() {
-		return switch (type) {
-			case TRIAL -> SkriptTrialSpawnerData.class;
-			case MOB -> SkriptMobSpawnerData.class;
-			default -> SkriptSpawnerData.class;
-		};
+		if (CollectionUtils.isAnyInstanceOf(events, MobSpawnerDataEvent.class)) {
+			return SkriptMobSpawnerData.class;
+		} else if (CollectionUtils.isAnyInstanceOf(events, TrialSpawnerDataEvent.class)) {
+			return SkriptTrialSpawnerData.class;
+		}
+		return SkriptSpawnerData.class;
 	}
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return (type == SpawnerType.TRIAL ? "trial " : "") + "spawner data";
+		StringJoiner joiner = new StringJoiner(" ", "the", "spawner data");
+		if (type == SpawnerType.TRIAL) {
+			joiner.add("trial");
+		} else if (type == SpawnerType.MOB) {
+			joiner.add("mob");
+		}
+		return joiner.toString();
 	}
 
 }
