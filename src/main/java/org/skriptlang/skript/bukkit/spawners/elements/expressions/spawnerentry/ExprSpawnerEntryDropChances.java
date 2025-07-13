@@ -73,7 +73,7 @@ public class ExprSpawnerEntryDropChances extends PropertyExpression<SkriptSpawne
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		EquipmentSlot[] slots = this.slots.getArray(event);
-		Float chance = delta != null ? (Float) delta[0] : null;
+		float chance = delta != null ? (float) delta[0] : 0;
 
 		for (SkriptSpawnerEntry entry : getExpr().getArray(event)) {
 			for (EquipmentSlot slot : slots) {

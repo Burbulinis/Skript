@@ -2,6 +2,7 @@ package org.skriptlang.skript.bukkit.spawners.util.events;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 import org.skriptlang.skript.bukkit.spawners.util.SkriptSpawnerEntry;
 
 public class SpawnerEntryEvent extends Event {
@@ -17,7 +18,7 @@ public class SpawnerEntryEvent extends Event {
 	}
 
 	@Override
-	public HandlerList getHandlers() {
+	public @NotNull HandlerList getHandlers() {
 		throw new UnsupportedOperationException();
 	}
 
