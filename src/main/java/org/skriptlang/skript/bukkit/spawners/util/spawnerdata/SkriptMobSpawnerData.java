@@ -8,7 +8,10 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.minecart.SpawnerMinecart;
 import org.bukkit.spawner.Spawner;
 import org.jetbrains.annotations.NotNull;
+import org.skriptlang.skript.bukkit.spawners.util.SkriptSpawnerEntry;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
+
+import java.util.stream.Collectors;
 
 /**
  * Represents the data of a {@link Spawner}, which may be a {@link CreatureSpawner} or a {@link SpawnerMinecart}
@@ -54,7 +57,10 @@ public class SkriptMobSpawnerData extends SkriptSpawnerData implements Yggdrasil
 
 		data.setActivationRange(creatureSpawner.getRequiredPlayerRange());
 		data.setSpawnRange(creatureSpawner.getSpawnRange());
-		data.setSpawnerEntries(creatureSpawner.getPotentialSpawns());
+		data.setSpawnerEntries(creatureSpawner.getPotentialSpawns().stream()
+			.map(SkriptSpawnerEntry::fromSpawnerEntry)
+			.collect(Collectors.toSet())
+		);
 
 		data.setMaxNearbyEntityCap(creatureSpawner.getMaxNearbyEntities());
 		data.setSpawnCount(creatureSpawner.getSpawnCount());
@@ -117,8 +123,12 @@ public class SkriptMobSpawnerData extends SkriptSpawnerData implements Yggdrasil
 		creatureSpawner.setRequiredPlayerRange(getActivationRange());
 		creatureSpawner.setSpawnRange(getSpawnRange());
 
-		if (!getSpawnerEntries().isEmpty())
-			creatureSpawner.setPotentialSpawns(getSpawnerEntries());
+		if (!getSpawnerEntries().isEmpty()) {
+			creatureSpawner.setPotentialSpawns(getSpawnerEntries().stream()
+				.map(SkriptSpawnerEntry::toSpawnerEntry)
+				.collect(Collectors.toSet())
+			);
+		}
 
 		creatureSpawner.setMaxNearbyEntities(getMaxNearbyEntityCap());
 		creatureSpawner.setSpawnCount(getSpawnCount());

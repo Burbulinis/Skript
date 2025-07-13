@@ -17,7 +17,9 @@ import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Name("Trial Spawner Configuration with Weighted Loot Table")
 @Description({
@@ -56,7 +58,7 @@ public class ExprSpawnerRewardEntries extends PropertyExpression<SkriptTrialSpaw
 
 	@Override
 	protected TrialSpawnerRewardEntry[] get(Event event, SkriptTrialSpawnerData[] source) {
-		List<TrialSpawnerRewardEntry> entries = new ArrayList<>();
+		Set<TrialSpawnerRewardEntry> entries = new HashSet<>();
 		for (SkriptTrialSpawnerData data : source) {
 			entries.addAll(data.getRewardEntries());
 		}
@@ -73,7 +75,7 @@ public class ExprSpawnerRewardEntries extends PropertyExpression<SkriptTrialSpaw
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-		List<TrialSpawnerRewardEntry> entries = new ArrayList<>();
+		Set<TrialSpawnerRewardEntry> entries = new HashSet<>();
 		if (delta != null) {
 			for (Object object : delta) {
 				if (object instanceof TrialSpawnerRewardEntry entry) {

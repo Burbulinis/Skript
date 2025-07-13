@@ -10,10 +10,10 @@ import ch.njol.skript.lang.TriggerItem;
 import ch.njol.skript.lang.util.SectionUtils;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.Kleenean;
-import org.bukkit.block.spawner.SpawnerEntry;
 import org.bukkit.entity.EntitySnapshot;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.bukkit.spawners.util.SkriptSpawnerEntry;
 import org.skriptlang.skript.bukkit.spawners.util.events.SpawnRuleEvent;
 import org.skriptlang.skript.bukkit.spawners.util.events.SpawnerEntryEvent;
 import org.skriptlang.skript.registration.SyntaxInfo;
@@ -45,13 +45,13 @@ import java.util.List;
 	"add {_entry} to potential spawns of target block"
 })
 @Since("INSERT VERSION")
-public class ExprSecSpawnerEntry extends SectionExpression<SpawnerEntry> {
+public class ExprSecSpawnerEntry extends SectionExpression<SkriptSpawnerEntry> {
 
 	public static void register(SyntaxRegistry registry) {
-		registry.register(SyntaxRegistry.EXPRESSION, SyntaxInfo.Expression.builder(ExprSecSpawnerEntry.class, SpawnerEntry.class)
+		registry.register(SyntaxRegistry.EXPRESSION, SyntaxInfo.Expression.builder(ExprSecSpawnerEntry.class, SkriptSpawnerEntry.class)
 			.supplier(ExprSecSpawnerEntry::new)
 			.priority(SyntaxInfo.COMBINED)
-			.addPattern("[a] spawner entry (of|using) %entitysnapshot%")
+			.addPattern("[a|the] spawner entry (of|using) %entitysnapshot%")
 			.build()
 		);
 	}
@@ -76,12 +76,12 @@ public class ExprSecSpawnerEntry extends SectionExpression<SpawnerEntry> {
 	}
 
 	@Override
-	protected SpawnerEntry @Nullable [] get(Event event) {
+	protected SkriptSpawnerEntry @Nullable [] get(Event event) {
 		EntitySnapshot entitySnapshot = snapshot.getSingle(event);
 		if (entitySnapshot == null)
 			return null;
 
-		SpawnerEntry entry = new SpawnerEntry(entitySnapshot, 1, null);
+		SkriptSpawnerEntry entry = new SkriptSpawnerEntry(entitySnapshot);
 		if (trigger != null) {
 			SpawnerEntryEvent entryEvent = new SpawnerEntryEvent(entry);
 			Variables.withLocalVariables(event, entryEvent, () ->
@@ -89,7 +89,7 @@ public class ExprSecSpawnerEntry extends SectionExpression<SpawnerEntry> {
 			);
 		}
 
-		return new SpawnerEntry[]{entry};
+		return new SkriptSpawnerEntry[]{entry};
 	}
 
 	@Override
@@ -98,8 +98,8 @@ public class ExprSecSpawnerEntry extends SectionExpression<SpawnerEntry> {
 	}
 
 	@Override
-	public Class<? extends SpawnerEntry> getReturnType() {
-		return SpawnerEntry.class;
+	public Class<? extends SkriptSpawnerEntry> getReturnType() {
+		return SkriptSpawnerEntry.class;
 	}
 
 	@Override

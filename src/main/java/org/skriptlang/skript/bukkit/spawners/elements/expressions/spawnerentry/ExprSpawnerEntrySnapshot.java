@@ -11,6 +11,7 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.spawners.SpawnerModule;
+import org.skriptlang.skript.bukkit.spawners.util.SkriptSpawnerEntry;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Spawner Entry - Entity Snapshot")
@@ -21,7 +22,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 	"# the spawner will now spawn pigs"
 })
 @Since("INSERT VERSION")
-public class ExprSpawnerEntrySnapshot extends SimplePropertyExpression<SpawnerEntry, EntitySnapshot> {
+public class ExprSpawnerEntrySnapshot extends SimplePropertyExpression<SkriptSpawnerEntry, EntitySnapshot> {
 
 	public static void register(SyntaxRegistry registry) {
 		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprSpawnerEntrySnapshot.class, EntitySnapshot.class,
@@ -32,8 +33,8 @@ public class ExprSpawnerEntrySnapshot extends SimplePropertyExpression<SpawnerEn
 	}
 
 	@Override
-	public @NotNull EntitySnapshot convert(SpawnerEntry entry) {
-		return entry.getSnapshot();
+	public @NotNull EntitySnapshot convert(SkriptSpawnerEntry entry) {
+		return entry.getEntitySnapshot();
 	}
 
 	@Override
@@ -48,8 +49,8 @@ public class ExprSpawnerEntrySnapshot extends SimplePropertyExpression<SpawnerEn
 		assert delta != null;
 		EntitySnapshot snapshot = (EntitySnapshot) delta[0];
 
-		for (SpawnerEntry entry : getExpr().getArray(event)) {
-			entry.setSnapshot(snapshot);
+		for (SkriptSpawnerEntry entry : getExpr().getArray(event)) {
+			entry.setEntitySnapshot(snapshot);
 		}
 	}
 

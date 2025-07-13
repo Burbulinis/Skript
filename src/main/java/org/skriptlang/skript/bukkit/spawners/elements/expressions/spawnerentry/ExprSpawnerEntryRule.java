@@ -9,6 +9,7 @@ import org.bukkit.block.spawner.SpawnerEntry;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.spawners.SpawnerModule;
+import org.skriptlang.skript.bukkit.spawners.util.SkriptSpawnerEntry;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Spawner Entry - Spawn Rule")
@@ -28,7 +29,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 	"add {_entry} to potential spawns of target block"
 })
 @Since("INSERT VERSION")
-public class ExprSpawnerEntryRule extends SimplePropertyExpression<SpawnerEntry, SpawnRule> {
+public class ExprSpawnerEntryRule extends SimplePropertyExpression<SkriptSpawnerEntry, SpawnRule> {
 
 	public static void register(SyntaxRegistry registry) {
 		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprSpawnerEntryRule.class, SpawnRule.class,
@@ -39,7 +40,7 @@ public class ExprSpawnerEntryRule extends SimplePropertyExpression<SpawnerEntry,
 	}
 
 	@Override
-	public @Nullable SpawnRule convert(SpawnerEntry entry) {
+	public @Nullable SpawnRule convert(SkriptSpawnerEntry entry) {
 		return entry.getSpawnRule();
 	}
 
@@ -54,8 +55,7 @@ public class ExprSpawnerEntryRule extends SimplePropertyExpression<SpawnerEntry,
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		SpawnRule rule = delta != null ? (SpawnRule) delta[0] : null;
-
-		for (SpawnerEntry entry : getExpr().getArray(event)) {
+		for (SkriptSpawnerEntry entry : getExpr().getArray(event)) {
 			entry.setSpawnRule(rule);
 		}
 	}

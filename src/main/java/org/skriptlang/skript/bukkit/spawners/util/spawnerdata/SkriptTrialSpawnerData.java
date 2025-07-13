@@ -10,10 +10,8 @@ import org.jetbrains.annotations.NotNull;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.bukkit.spawners.util.TrialSpawnerRewardEntry;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Represents the data of a {@link TrialSpawner} and its configuration.
@@ -30,7 +28,7 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 	private int concurrentMobAmountIncrement = SpawnerUtils.DEFAULT_CONCURRENT_PER_PLAYER_INCREMENT;
 
 	private Timespan spawnDelay = SpawnerUtils.DEFAULT_TRIAL_SPAWN_DELAY;
-	private @NotNull List<TrialSpawnerRewardEntry> rewardEntries = new ArrayList<>();
+	private @NotNull Set<TrialSpawnerRewardEntry> rewardEntries = new HashSet<>();
 
 	private final boolean ominous;
 
@@ -67,11 +65,9 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 		SkriptSpawnerData.applyToSpawnerData(config, data);
 		data.setMaxSpawnDelay(new Timespan(TimePeriod.TICK, config.getDelay()));
 
-		List<TrialSpawnerRewardEntry> rewardEntries = config.getPossibleRewards().entrySet().stream()
-			.map(entry ->
-				new TrialSpawnerRewardEntry(entry.getKey(), entry.getValue())
-			)
-			.toList();
+		Set<TrialSpawnerRewardEntry> rewardEntries = config.getPossibleRewards().entrySet().stream()
+			.map(entry -> new TrialSpawnerRewardEntry(entry.getKey(), entry.getValue()))
+			.collect(Collectors.toSet());
 		data.setRewardEntries(rewardEntries);
 
 		data.setBaseMobAmount((int) config.getBaseSpawnsBeforeCooldown());
@@ -127,17 +123,11 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 		return ominous;
 	}
 
-	/**
-	 * @inheritDoc
-	 */
 	@Override
 	public int getActivationRange() {
 		return activationRange;
 	}
 
-	/**
-	 * @inheritDoc
-	 */
 	@Override
 	public void setActivationRange(int activationRange) {
 		this.activationRange = activationRange;
@@ -145,6 +135,12 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 
 	/**
 	 * {@inheritDoc}
+	 * <br>
+	 * <br>
+	 * For trial spawners, the minimum and maximum spawn delays are always identical. This results in a fixed delay,
+	 * rather than a random range.
+	 * <p>
+	 * The default value for trial spawners is 2 seconds (40 ticks).
 	 */
 	@Override
 	public @NotNull Timespan getMaxSpawnDelay() {
@@ -152,7 +148,13 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 	}
 
 	/**
-	 * @inheritDoc
+	 * {@inheritDoc}
+	 * <br>
+	 * <br>
+	 * For trial spawners, the minimum and maximum spawn delays are always identical. This results in a fixed delay,
+	 * rather than a random range.
+	 * <p>
+	 * The default value for trial spawners is 2 seconds (40 ticks).
 	 */
 	@Override
 	public void setMaxSpawnDelay(@NotNull Timespan maxSpawnDelay) {
@@ -160,7 +162,13 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 	}
 
 	/**
-	 * @inheritDoc
+	 * {@inheritDoc}
+	 * <br>
+	 * <br>
+	 * For trial spawners, the minimum and maximum spawn delays are always identical. This results in a fixed delay,
+	 * rather than a random range.
+	 * <p>
+	 * The default value for trial spawners is 2 seconds (40 ticks).
 	 */
 	@Override
 	public @NotNull Timespan getMinSpawnDelay() {
@@ -168,7 +176,13 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 	}
 
 	/**
-	 * @inheritDoc
+	 * {@inheritDoc}
+	 * <br>
+	 * <br>
+	 * For trial spawners, the minimum and maximum spawn delays are always identical. This results in a fixed delay,
+	 * rather than a random range.
+	 * <p>
+	 * The default value for trial spawners is 2 seconds (40 ticks).
 	 */
 	@Override
 	public void setMinSpawnDelay(@NotNull Timespan minSpawnDelay) {
@@ -176,33 +190,33 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 	}
 
 	/**
-	 * Returns a list of reward entries this trial spawner can choose during reward ejection.
-	 * @return the list of trial spawner reward entries
+	 * Returns a set of reward entries this trial spawner can choose during reward ejection.
+	 * @return the set of trial spawner reward entries
 	 */
-	public @NotNull List<TrialSpawnerRewardEntry> getRewardEntries() {
-		return List.copyOf(rewardEntries);
+	public @NotNull Set<TrialSpawnerRewardEntry> getRewardEntries() {
+		return Set.copyOf(rewardEntries);
 	}
 
 	/**
 	 * Sets the reward entries for this trial spawner.
-	 * @param rewardEntries the list of reward entries to set
+	 * @param rewardEntries the set of reward entries to set
 	 */
-	public void setRewardEntries(@NotNull List<TrialSpawnerRewardEntry> rewardEntries) {
+	public void setRewardEntries(@NotNull Set<TrialSpawnerRewardEntry> rewardEntries) {
 		Preconditions.checkNotNull(rewardEntries, "rewardEntries cannot be null");
-		this.rewardEntries = new ArrayList<>(rewardEntries);
+		this.rewardEntries = new HashSet<>(rewardEntries);
 	}
 
 	/**
-	 * Adds multiple reward entries to the list of reward entries.
-	 * @param rewardEntries the list of reward entries to add
+	 * Adds multiple reward entries to the set of reward entries.
+	 * @param rewardEntries the set of reward entries to add
 	 */
-	public void addRewardEntries(@NotNull List<TrialSpawnerRewardEntry> rewardEntries) {
+	public void addRewardEntries(@NotNull Set<TrialSpawnerRewardEntry> rewardEntries) {
 		Preconditions.checkNotNull(rewardEntries, "rewardEntries cannot be null");
 		this.rewardEntries.addAll(rewardEntries);
 	}
 
 	/**
-	 * Adds a specific reward entry to the list of reward entries.
+	 * Adds a specific reward entry to the set of reward entries.
 	 * @param rewardEntry the reward entry to add
 	 */
 	public void addRewardEntry(@NotNull TrialSpawnerRewardEntry rewardEntry) {
@@ -211,16 +225,16 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 	}
 
 	/**
-	 * Removes multiple reward entries from the list of reward entries.
-	 * @param rewardEntries the list of reward entries to remove
+	 * Removes multiple reward entries from the set of reward entries.
+	 * @param rewardEntries the set of reward entries to remove
 	 */
-	public void removeRewardEntries(@NotNull List<TrialSpawnerRewardEntry> rewardEntries) {
+	public void removeRewardEntries(@NotNull Set<TrialSpawnerRewardEntry> rewardEntries) {
 		Preconditions.checkNotNull(rewardEntries, "rewardEntries cannot be null");
 		this.rewardEntries.removeAll(rewardEntries);
 	}
 
 	/**
-	 * Removes a specific reward entry from the list of reward entries.
+	 * Removes a specific reward entry from the set of reward entries.
 	 * @param rewardEntry the reward entry to remove
 	 */
 	public void removeRewardEntry(@NotNull TrialSpawnerRewardEntry rewardEntry) {

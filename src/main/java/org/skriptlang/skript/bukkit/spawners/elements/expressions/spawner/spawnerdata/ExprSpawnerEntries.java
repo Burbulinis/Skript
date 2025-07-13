@@ -10,15 +10,17 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
-import org.bukkit.block.spawner.SpawnerEntry;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.bukkit.spawners.util.SkriptSpawnerEntry;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptSpawnerData;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Name("Spawner Entries")
 @Description({
@@ -37,10 +39,10 @@ import java.util.List;
 	"add a spawner entry with entity snapshot of a zombie to potential spawner spawns of target block",
 })
 @Since("INSERT VERSION")
-public class ExprSpawnerEntries extends PropertyExpression<SkriptSpawnerData, SpawnerEntry> {
+public class ExprSpawnerEntries extends PropertyExpression<SkriptSpawnerData, SkriptSpawnerEntry> {
 
 	public static void register(SyntaxRegistry registry) {
-		registry.register(SyntaxRegistry.EXPRESSION, SyntaxInfo.Expression.builder(ExprSpawnerEntries.class, SpawnerEntry.class)
+		registry.register(SyntaxRegistry.EXPRESSION, SyntaxInfo.Expression.builder(ExprSpawnerEntries.class, SkriptSpawnerEntry.class)
 			.supplier(ExprSpawnerEntries::new)
 			.priority(PropertyExpression.DEFAULT_PRIORITY)
 			.addPatterns(
@@ -58,14 +60,14 @@ public class ExprSpawnerEntries extends PropertyExpression<SkriptSpawnerData, Sp
 	}
 
 	@Override
-	protected SpawnerEntry @Nullable [] get(Event event, SkriptSpawnerData[] source) {
-		List<SpawnerEntry> entries = new ArrayList<>();
+	protected SkriptSpawnerEntry @Nullable [] get(Event event, SkriptSpawnerData[] source) {
+		List<SkriptSpawnerEntry> entries = new ArrayList<>();
 
 		for (SkriptSpawnerData data : source) {
 			entries.addAll(data.getSpawnerEntries());
 		}
 
-		return entries.toArray(SpawnerEntry[]::new);
+		return entries.toArray(SkriptSpawnerEntry[]::new);
 	}
 
 	@Override
@@ -73,15 +75,15 @@ public class ExprSpawnerEntries extends PropertyExpression<SkriptSpawnerData, Sp
 		if (mode == ChangeMode.REMOVE_ALL)
 			return null;
 
-		return CollectionUtils.array(SpawnerEntry[].class);
+		return CollectionUtils.array(SkriptSpawnerEntry[].class);
 	}
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-		List<SpawnerEntry> entries = new ArrayList<>();
+		Set<SkriptSpawnerEntry> entries = new HashSet<>();
 		if (delta != null) {
 			for (Object object : delta)
-				entries.add((SpawnerEntry) object);
+				entries.add((SkriptSpawnerEntry) object);
 		}
 
 		for (SkriptSpawnerData data : getExpr().getArray(event)) {
@@ -95,8 +97,8 @@ public class ExprSpawnerEntries extends PropertyExpression<SkriptSpawnerData, Sp
 	}
 
 	@Override
-	public Class<? extends SpawnerEntry> getReturnType() {
-		return SpawnerEntry.class;
+	public Class<? extends SkriptSpawnerEntry> getReturnType() {
+		return SkriptSpawnerEntry.class;
 	}
 
 	@Override

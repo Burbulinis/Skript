@@ -12,17 +12,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
 
 public class SkriptSpawnerEntry implements AnyWeighted {
 
 	private @NotNull EntitySnapshot entitySnapshot;
 	private @Nullable SpawnRule spawnRule;
 	private @Nullable LootTable equipmentLootTable;
-	private @NotNull List<SkriptEquipmentDropChance> equipmentDropChances = new ArrayList<>();
+	private @NotNull Map<EquipmentSlot, Float> dropChances = new HashMap<>();
 
 	private int weight = 1;
 
@@ -41,11 +38,7 @@ public class SkriptSpawnerEntry implements AnyWeighted {
 		Equipment equipment = entry.getEquipment();
 		if (equipment != null) {
 			skriptEntry.setEquipmentLootTable(equipment.getEquipmentLootTable());
-			skriptEntry.setEquipmentDropChances(
-				equipment.getDropChances().entrySet().stream()
-					.map(chance -> new SkriptEquipmentDropChance(chance.getKey(), chance.getValue()))
-					.toList()
-			);
+			skriptEntry.setDropChances(equipment.getDropChances());
 		}
 
 		return skriptEntry;
@@ -61,11 +54,9 @@ public class SkriptSpawnerEntry implements AnyWeighted {
 		);
 
 		LootTable lootTable = skriptEntry.getEquipmentLootTable();
-		List<SkriptEquipmentDropChance> dropChances = skriptEntry.getEquipmentDropChances();
+		Map<EquipmentSlot, Float> dropChances = skriptEntry.getDropChances();
 		if (lootTable != null && !dropChances.isEmpty()) {
-			Map<EquipmentSlot, Float> map = dropChances.stream()
-				.collect(Collectors.toMap(SkriptEquipmentDropChance::slot, SkriptEquipmentDropChance::chance));
-			entry.setEquipment(new Equipment(lootTable, map));
+			entry.setEquipment(new Equipment(lootTable, dropChances));
 		}
 
 		return entry;
@@ -111,37 +102,27 @@ public class SkriptSpawnerEntry implements AnyWeighted {
 		this.equipmentLootTable = equipmentLootTable;
 	}
 
-	public @NotNull List<SkriptEquipmentDropChance> getEquipmentDropChances() {
-		return List.copyOf(equipmentDropChances);
+	public @NotNull Map<EquipmentSlot, Float> getDropChances() {
+		return Map.copyOf(dropChances);
 	}
 
-	public void setEquipmentDropChances(@NotNull List<SkriptEquipmentDropChance> dropChances) {
-		Preconditions.checkNotNull(dropChances, "drop chances cannot be null");
-		this.equipmentDropChances = new ArrayList<>(dropChances);
+	public void setDropChances(@NotNull Map<EquipmentSlot, Float> dropChances) {
+		Preconditions.checkNotNull(dropChances, "dropChances cannot be null");
+		this.dropChances = new HashMap<>(dropChances);
 	}
 
-	public void addEquipmentDropChances(@NotNull List<SkriptEquipmentDropChance> dropChances) {
-		Preconditions.checkNotNull(dropChances, "drop chances cannot be null");
-		this.equipmentDropChances.addAll(dropChances);
+	public void setDropChance(@NotNull EquipmentSlot slot, float chance) {
+		Preconditions.checkNotNull(slot, "slot cannot be null");
+		this.dropChances.put(slot, chance);
 	}
 
-	public void addEquipmentDropChance(@NotNull SkriptEquipmentDropChance dropChance) {
-		Preconditions.checkNotNull(dropChance, "drop chance cannot be null");
-		this.equipmentDropChances.add(dropChance);
-	}
-
-	public void removeEquipmentDropChances(@NotNull List<SkriptEquipmentDropChance> dropChances) {
-		Preconditions.checkNotNull(dropChances, "drop chances cannot be null");
-		this.equipmentDropChances.removeAll(dropChances);
-	}
-
-	public void removeEquipmentDropChance(@NotNull SkriptEquipmentDropChance dropChance) {
-		Preconditions.checkNotNull(dropChance, "drop chance cannot be null");
-		this.equipmentDropChances.remove(dropChance);
+	public void removeDropChance(@NotNull EquipmentSlot slot) {
+		Preconditions.checkNotNull(slot, "slot cannot be null");
+		this.dropChances.remove(slot);
 	}
 
 	public void clearEquipmentDropChances() {
-		this.equipmentDropChances.clear();
+		this.dropChances.clear();
 	}
 
 }

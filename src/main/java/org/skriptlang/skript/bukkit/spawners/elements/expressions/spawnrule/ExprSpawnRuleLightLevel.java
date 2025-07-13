@@ -11,17 +11,16 @@ import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.block.spawner.SpawnRule;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
-import org.skriptlang.skript.bukkit.spawners.SpawnerModule;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Spawn Rule - Sky Light Spawn Level")
+@Name("Spawn Rule - Block Light Spawn Level")
 @Description({
-	"Returns the minimum/maximum sky light spawn levels of a spawn rule. "
-		+ "The sky light spawn levels determine the light level of the sky "
+	"Returns the minimum/maximum block light spawn levels of a spawn rule. "
+		+ "The block light spawn levels determine the light level of the block "
 		+ "that the spawner entry will spawn entities.",
-	"Note that the sky light spawn levels must be between 0 and 15, "
-		+ "the minimum sky light spawn level must be less than or equal to "
-		+ "the maximum sky light spawn level and vice versa."
+	"Note that the block light spawn levels must be between 0 and 15 "
+		+ ", the minimum block light spawn level must be less than or equal to "
+		+ "the maximum block light spawn level and vice versa."
 })
 @Examples({
 	"set {_entry} to a spawner entry using entity snapshot of a zombie:",
@@ -34,30 +33,29 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 	"set spawner entity of event-block to {_entry}"
 })
 @Since("INSERT VERSION")
-public class ExprSpawnRuleSkyLight extends SimplePropertyExpression<SpawnRule, Integer> {
+public class ExprSpawnRuleLightLevel extends SimplePropertyExpression<SpawnRule, Integer> {
 
 	public static void register(SyntaxRegistry registry) {
-		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprSpawnRuleBlockLight.class, Integer.class,
-			"(1:max|min)[imum] sky light [entity] spawn (level|value)[s]", "spawnrules", true)
-			.supplier(ExprSpawnRuleBlockLight::new)
-			.build()
+		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprSpawnRuleLightLevel.class, Integer.class,
+				"(:max|min)[imum] (block|:sky) light [entity] spawn (level|value)[s]", "spawnrules", true)
+				.supplier(ExprSpawnRuleLightLevel::new)
+				.build()
 		);
 	}
 
-
 	private boolean max;
+	private boolean skyLight;
 
 	@Override
-	public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		max = parseResult.mark == 1;
-		return super.init(expressions, matchedPattern, isDelayed, parseResult);
+	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
+		max = parseResult.hasTag("max");
+		skyLight = parseResult.hasTag("sky");
+		return super.init(exprs, matchedPattern, isDelayed, parseResult);
 	}
 
 	@Override
 	public Integer convert(SpawnRule rule) {
-		if (max)
-			return rule.getMaxSkyLight();
-		return rule.getMinSkyLight();
+		return getLightLevel(rule, max);
 	}
 
 	@Override
@@ -74,12 +72,7 @@ public class ExprSpawnRuleSkyLight extends SimplePropertyExpression<SpawnRule, I
 		int light = Math2.fit(0, (int) delta[0], 15);
 
 		for (SpawnRule rule : getExpr().getArray(event)) {
-			int minMax;
-			if (max) {
-				minMax = rule.getMaxSkyLight();
-			} else {
-				minMax = rule.getMinSkyLight();
-			}
+			int minMax = getLightLevel(rule, max);
 
 			int value = switch (mode) {
 				case SET -> light;
@@ -90,30 +83,44 @@ public class ExprSpawnRuleSkyLight extends SimplePropertyExpression<SpawnRule, I
 
 			value = Math2.fit(0, value, 15);
 
-			String error = getErrorMessage(value, max ? rule.getMinSkyLight() : rule.getMaxSkyLight());
+			String error = getErrorMessage(value, getLightLevel(rule, !max));
 			if (error != null) {
 				error(error);
 				continue;
 			}
 
-			if (max) {
-				rule.setMaxSkyLight(value);
+			if (skyLight) {
+				if (max) {
+					rule.setMaxSkyLight(value);
+				} else {
+					rule.setMinSkyLight(value);
+				}
 			} else {
-				rule.setMinSkyLight(value);
+				if (max) {
+					rule.setMaxBlockLight(value);
+				} else {
+					rule.setMinBlockLight(value);
+				}
 			}
 		}
 	}
 
 	private String getErrorMessage(int value, int compare) {
 		if (max && value < compare) {
-			return "The maximum sky light spawn level cannot be less than the minimum sky light spawn level, "
-				+ " thus setting it to a value less than the minimum sky light spawn level will do nothing.";
+			return "The maximum block light level cannot be less than the minimum block light level, "
+				+ " thus setting it to a value less than the minimum block light level will do nothing.";
 		} else if (!max && value > compare) {
-			return "The minimum sky light spawn level cannot be greater than the maximum sky light spawn level, "
-				+ "thus setting it to a value greater than the maximum sky light spawn level will do nothing.";
+			return "The minimum block light spawn level cannot be greater than the maximum block light spawn level, "
+				+ "thus setting it to a value greater than the maximum block light spawn level will do nothing.";
 		}
 
 		return null;
+	}
+
+	private int getLightLevel(SpawnRule rule, boolean max) {
+		if (skyLight)
+			return max ? rule.getMaxSkyLight() : rule.getMinSkyLight();
+		return max ? rule.getMaxBlockLight() : rule.getMinBlockLight();
 	}
 
 	@Override
@@ -123,7 +130,7 @@ public class ExprSpawnRuleSkyLight extends SimplePropertyExpression<SpawnRule, I
 
 	@Override
 	protected String getPropertyName() {
-		return (max ? "maximum" : "minimum") + " sky light spawn level";
+		return (max ? "maximum" : "minimum") + " block light spawn level";
 	}
 
 }

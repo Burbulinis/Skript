@@ -1,18 +1,18 @@
 package org.skriptlang.skript.bukkit.spawners.util.events;
 
-import org.bukkit.block.spawner.SpawnerEntry;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.skriptlang.skript.bukkit.spawners.util.SkriptSpawnerEntry;
 
 public class SpawnerEntryEvent extends Event {
 
-	private final SpawnerEntry entry;
+	private final SkriptSpawnerEntry entry;
 
-	public SpawnerEntryEvent(SpawnerEntry entry) {
+	public SpawnerEntryEvent(SkriptSpawnerEntry entry) {
 		this.entry = entry;
 	}
 
-	public SpawnerEntry getSpawnerEntry() {
+	public SkriptSpawnerEntry getSpawnerEntry() {
 		return entry;
 	}
 

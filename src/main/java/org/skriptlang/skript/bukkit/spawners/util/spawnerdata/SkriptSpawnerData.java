@@ -3,13 +3,15 @@ package org.skriptlang.skript.bukkit.spawners.util.spawnerdata;
 import ch.njol.skript.util.Timespan;
 import ch.njol.yggdrasil.YggdrasilSerializable;
 import com.google.common.base.Preconditions;
-import org.bukkit.block.spawner.SpawnerEntry;
 import org.bukkit.spawner.BaseSpawner;
 import org.jetbrains.annotations.NotNull;
+import org.skriptlang.skript.bukkit.spawners.util.SkriptSpawnerEntry;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Abstract class representing the data of a trial spawner or a regular spawner.
@@ -22,21 +24,21 @@ public abstract class SkriptSpawnerData implements YggdrasilSerializable {
 	private Timespan minSpawnDelay = SpawnerUtils.DEFAULT_MIN_SPAWN_DELAY;
 	private Timespan maxSpawnDelay = SpawnerUtils.DEFAULT_MAX_SPAWN_DELAY;
 
-	private @NotNull List<SpawnerEntry> spawnerEntries = new ArrayList<>();
+	private @NotNull Set<SkriptSpawnerEntry> spawnerEntries = new HashSet<>();
 
 	/**
 	 * Applies the spawner data from the given spawner to this SkriptSpawnerData instance.
 	 * @param spawner the spawner to apply the data from
 	 */
-	protected static void applyToSpawnerData(
-		@NotNull BaseSpawner spawner,
-		@NotNull SkriptSpawnerData data)
-	{
+	protected static void applyToSpawnerData(@NotNull BaseSpawner spawner, @NotNull SkriptSpawnerData data) {
 		Preconditions.checkNotNull(spawner, "spawner cannot be null");
 
 		data.setActivationRange(spawner.getRequiredPlayerRange());
 		data.setSpawnRange(spawner.getSpawnRange());
-		data.setSpawnerEntries(spawner.getPotentialSpawns());
+		data.setSpawnerEntries(spawner.getPotentialSpawns().stream()
+			.map(SkriptSpawnerEntry::fromSpawnerEntry)
+			.collect(Collectors.toSet())
+		);
 	}
 
 	/**
@@ -48,7 +50,12 @@ public abstract class SkriptSpawnerData implements YggdrasilSerializable {
 
 		spawner.setRequiredPlayerRange(getActivationRange());
 		spawner.setSpawnRange(getSpawnRange());
-		spawner.setPotentialSpawns(getSpawnerEntries());
+		if (!getSpawnerEntries().isEmpty()) {
+			spawner.setPotentialSpawns(getSpawnerEntries().stream()
+				.map(SkriptSpawnerEntry::toSpawnerEntry)
+				.toList()
+			);
+		}
 	}
 
 	/**
@@ -109,11 +116,6 @@ public abstract class SkriptSpawnerData implements YggdrasilSerializable {
 	 * The maximum spawn delay is always greater than or equal to the minimum spawn delay.
 	 * <p>
 	 * The default value for regular spawners is 40 seconds (800 ticks).
-	 * <p>
-	 * For trial spawners, the minimum and maximum spawn delays are always identical. This results in a fixed delay,
-	 * rather than a random range.
-	 * <p>
-	 * The default value for trial spawners is 2 seconds (40 ticks).
 	 * @return the maximum spawn delay
 	 */
 	public @NotNull Timespan getMaxSpawnDelay() {
@@ -192,7 +194,7 @@ public abstract class SkriptSpawnerData implements YggdrasilSerializable {
 	 * If this is not empty, the spawner will use these entries to determine what entities to spawn.
 	 * @return a list of spawner entries, or an empty list
 	 */
-	public @NotNull List<SpawnerEntry> getSpawnerEntries() {
+	public @NotNull List<SkriptSpawnerEntry> getSpawnerEntries() {
 		return List.copyOf(spawnerEntries);
 	}
 
@@ -202,16 +204,16 @@ public abstract class SkriptSpawnerData implements YggdrasilSerializable {
 	 * If this is not empty, the spawner will use these entries to determine what entities to spawn.
 	 * @param spawnerEntries the list of spawner entries to set, or an empty list to clear
 	 */
-	public void setSpawnerEntries(@NotNull List<SpawnerEntry> spawnerEntries) {
+	public void setSpawnerEntries(@NotNull Set<SkriptSpawnerEntry> spawnerEntries) {
 		Preconditions.checkNotNull(spawnerEntries, "spawnerEntries cannot be null");
-		this.spawnerEntries = new ArrayList<>(spawnerEntries);
+		this.spawnerEntries = new HashSet<>(spawnerEntries);
 	}
 
 	/**
 	 * Adds spawner entries to the list of spawner entries.
 	 * @param spawnerEntries the spawner entry to add
 	 */
-	public void addSpawnerEntries(@NotNull List<SpawnerEntry> spawnerEntries) {
+	public void addSpawnerEntries(@NotNull Set<SkriptSpawnerEntry> spawnerEntries) {
 		Preconditions.checkNotNull(spawnerEntries, "spawnerEntry cannot be null");
 		this.spawnerEntries.addAll(spawnerEntries);
 	}
@@ -220,7 +222,7 @@ public abstract class SkriptSpawnerData implements YggdrasilSerializable {
 	 * Adds a single spawner entry to the list of spawner entries.
 	 * @param spawnerEntry the spawner entry to add
 	 */
-	public void addSpawnerEntry(@NotNull SpawnerEntry spawnerEntry) {
+	public void addSpawnerEntry(@NotNull SkriptSpawnerEntry spawnerEntry) {
 		Preconditions.checkNotNull(spawnerEntry, "spawnerEntry cannot be null");
 		this.spawnerEntries.add(spawnerEntry);
 	}
@@ -229,7 +231,7 @@ public abstract class SkriptSpawnerData implements YggdrasilSerializable {
 	 * Removes spawner entries from the list of spawner entries.
 	 * @param spawnerEntries the spawner entry to remove
 	 */
-	public void removeSpawnerEntries(@NotNull List<SpawnerEntry> spawnerEntries) {
+	public void removeSpawnerEntries(@NotNull Set<SkriptSpawnerEntry> spawnerEntries) {
 		Preconditions.checkNotNull(spawnerEntries, "spawnerEntry cannot be null");
 		this.spawnerEntries.removeAll(spawnerEntries);
 	}
@@ -238,7 +240,7 @@ public abstract class SkriptSpawnerData implements YggdrasilSerializable {
 	 * Removes a single spawner entry from the list of spawner entries.
 	 * @param spawnerEntry the spawner entry to remove
 	 */
-	public void removeSpawnerEntry(@NotNull SpawnerEntry spawnerEntry) {
+	public void removeSpawnerEntry(@NotNull SkriptSpawnerEntry spawnerEntry) {
 		Preconditions.checkNotNull(spawnerEntry, "spawnerEntry cannot be null");
 		this.spawnerEntries.remove(spawnerEntry);
 	}
