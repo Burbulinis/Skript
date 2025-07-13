@@ -16,6 +16,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.spawner.SpawnRule;
 import org.bukkit.block.spawner.SpawnerEntry;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntitySnapshot;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.event.entity.TrialSpawnerSpawnEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -23,6 +24,7 @@ import org.bukkit.loot.LootTable;
 import org.jetbrains.annotations.NotNull;
 import org.skriptlang.skript.addon.AddonModule;
 import org.skriptlang.skript.addon.SkriptAddon;
+import org.skriptlang.skript.bukkit.spawners.util.SkriptSpawnerEntry;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerEntryEquipment;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerEntryEquipment.DropChance;
 import org.skriptlang.skript.bukkit.spawners.util.TrialSpawnerRewardEntry;
@@ -38,7 +40,10 @@ import org.skriptlang.skript.lang.converter.Converter;
 import org.skriptlang.skript.lang.converter.Converters;
 
 import java.io.IOException;
+import java.io.NotSerializableException;
 import java.io.StreamCorruptedException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.StringJoiner;
 
 public class SpawnerModule implements AddonModule {
@@ -160,13 +165,163 @@ public class SpawnerModule implements AddonModule {
 			})
 		);
 
+		Classes.registerClass(new ClassInfo<>(SkriptSpawnerEntry.class, "spawnerentry")
+			.user("spawner ?entr(y|ies)")
+			.name("Spawner Entry")
+			.description("todo")
+			.since("INSERT VERSION")
+			.defaultExpression(new EventValueExpression<>(SkriptSpawnerEntry.class))
+			.parser(new Parser<>() {
+				@Override
+				public boolean canParse(ParseContext context) {
+					return false;
+				}
+
+				@Override
+				public String toString(SkriptSpawnerEntry entry, int flags) {
+					return "spawner entry of " + Classes.toString(entry.getEntitySnapshot());
+				}
+
+				@Override
+				public String toVariableNameString(SkriptSpawnerEntry entry) {
+					return "spawner_entry:" + entry.hashCode();
+				}
+			})
+			.serializer(new Serializer<>() {
+				@Override
+				public Fields serialize(SkriptSpawnerEntry entry) {
+					Fields fields = new Fields();
+
+					fields.putPrimitive("weight", entry.weight());
+					fields.putObject("entity_snapshot", entry.getEntitySnapshot());
+					fields.putObject("spawn_rule", entry.getSpawnRule());
+					fields.putObject("equipment_loot_table", entry.getEquipmentLootTable());
+
+					int count = 0;
+					for (var entrySet : entry.getDropChances().entrySet()) {
+						fields.putObject("equipment_slot_" + count, entrySet.getKey());
+						fields.putPrimitive("chance_" + count, entrySet.getValue());
+						count++;
+					}
+
+					return fields;
+				}
+
+				@Override
+				public void deserialize(SkriptSpawnerEntry entry, Fields fields) {
+					assert false;
+				}
+
+				@Override
+				protected SkriptSpawnerEntry deserialize(Fields fields) throws StreamCorruptedException {
+					SkriptSpawnerEntry entry = new SkriptSpawnerEntry(fields.getObject("entity_snapshot", EntitySnapshot.class));
+					entry.setWeight(fields.getPrimitive("weight", int.class));
+					entry.setSpawnRule(fields.getObject("spawn_rule", SpawnRule.class));
+					entry.setEquipmentLootTable(fields.getObject("equipment_loot_table", LootTable.class));
+
+					Map<EquipmentSlot, Float> dropChances = new HashMap<>();
+					int count = 0;
+					while (true) {
+						EquipmentSlot slot = fields.getObject("equipment_slot_" + count, EquipmentSlot.class);
+						if (slot == null)
+							break;
+						float chance = fields.getPrimitive("chance_" + count, float.class);
+						dropChances.put(slot, chance);
+						count++;
+					}
+
+					entry.setDropChances(dropChances);
+					return entry;
+				}
+
+				@Override
+				public boolean mustSyncDeserialization() {
+					return true;
+				}
+
+				@Override
+				protected boolean canBeInstantiated() {
+					return false;
+				}
+			})
+		);
+
+		Classes.registerClass(new ClassInfo<>(SpawnRule.class, "spawnrule")
+			.user("spawn ?rules?")
+			.name("Spawn Rule")
+			.description("todo")
+			.since("INSERT VERSION")
+			.defaultExpression(new EventValueExpression<>(SpawnRule.class))
+			.parser(new Parser<>() {
+				@Override
+				public boolean canParse(ParseContext context) {
+					return false;
+				}
+
+				@Override
+				public String toString(SpawnRule rule, int flags) {
+					StringJoiner joiner = new StringJoiner(" ");
+					joiner.add("spawn rule with");
+					joiner.add("min block light " + rule.getMinBlockLight() + ',');
+					joiner.add("max block light " + rule.getMaxBlockLight() + ',');
+					joiner.add("min sky light " + rule.getMinSkyLight() + ", and");
+					joiner.add("max sky light " + rule.getMaxSkyLight());
+					return joiner.toString();
+				}
+
+				@Override
+				public String toVariableNameString(SpawnRule rule) {
+					return "spawn rule:"
+						+ rule.getMinBlockLight() + ','
+						+ rule.getMaxBlockLight() + ','
+						+ rule.getMinSkyLight() + ','
+						+ rule.getMaxSkyLight();
+				}
+			})
+			.serializer(new Serializer<>() {
+				@Override
+				public Fields serialize(SpawnRule rule) {
+					Fields fields = new Fields();
+					fields.putPrimitive("min_block_light", rule.getMinBlockLight());
+					fields.putPrimitive("max_block_light", rule.getMaxBlockLight());
+					fields.putPrimitive("min_sky_light", rule.getMinSkyLight());
+					fields.putPrimitive("max_sky_light", rule.getMaxSkyLight());
+					return fields;
+				}
+
+				@Override
+				public void deserialize(SpawnRule rule, Fields fields) {
+					assert false;
+				}
+
+				@Override
+				protected SpawnRule deserialize(Fields fields) throws StreamCorruptedException {
+					int minBlockLight = fields.getPrimitive("min_block_light", int.class);
+					int maxBlockLight = fields.getPrimitive("max_block_light", int.class);
+					int minSkyLight = fields.getPrimitive("min_sky_light", int.class);
+					int maxSkyLight = fields.getPrimitive("max_sky_light", int.class);
+					return new SpawnRule(minBlockLight, maxBlockLight, minSkyLight, maxSkyLight);
+				}
+
+				@Override
+				public boolean mustSyncDeserialization() {
+					return true;
+				}
+
+				@Override
+				protected boolean canBeInstantiated() {
+					return false;
+				}
+			})
+		);
+
 		Converters.registerConverter(TrialSpawnerRewardEntry.class, AnyWeighted.class,
 			reward -> reward::weight, Converter.NO_RIGHT_CHAINING
 		);
 
 		EventValues.registerEventValue(TrialSpawnerDataEvent.class, SkriptTrialSpawnerData.class, TrialSpawnerDataEvent::getSpawnerData);
 		EventValues.registerEventValue(MobSpawnerDataEvent.class, SkriptMobSpawnerData.class, MobSpawnerDataEvent::getSpawnerData);
-		EventValues.registerEventValue(SpawnerEntryEvent.class, SpawnerEntry.class, SpawnerEntryEvent::getSpawnerEntry);
+		EventValues.registerEventValue(SpawnerEntryEvent.class, SkriptSpawnerEntry.class, SpawnerEntryEvent::getSpawnerEntry);
 		EventValues.registerEventValue(SpawnRuleEvent.class, SpawnRule.class, SpawnRuleEvent::getSpawnRule);
 	}
 
