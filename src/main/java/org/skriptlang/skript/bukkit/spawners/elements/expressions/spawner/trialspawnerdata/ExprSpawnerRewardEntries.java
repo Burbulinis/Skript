@@ -16,9 +16,7 @@ import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptTrialSpawner
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Name("Trial Spawner Configuration with Weighted Loot Table")

@@ -14,7 +14,9 @@ import org.skriptlang.skript.bukkit.spawners.util.SkriptSpawnerEntry;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class ExprSpawnerEntryDropChances extends PropertyExpression<SkriptSpawnerEntry, Float> {
 

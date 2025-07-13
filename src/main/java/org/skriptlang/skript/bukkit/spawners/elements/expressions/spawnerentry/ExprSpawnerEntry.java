@@ -1,10 +1,10 @@
 package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawnerentry;
 
-import ch.njol.skript.doc.*;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.EventValueExpression;
-import org.bukkit.block.spawner.SpawnerEntry;
-import org.skriptlang.skript.bukkit.spawners.SpawnerModule;
-import org.skriptlang.skript.bukkit.spawners.elements.expressions.spawnrule.ExprSpawnRule;
 import org.skriptlang.skript.bukkit.spawners.util.SkriptSpawnerEntry;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 

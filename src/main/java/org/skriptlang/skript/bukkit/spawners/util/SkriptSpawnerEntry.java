@@ -12,7 +12,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SkriptSpawnerEntry implements AnyWeighted {
 
