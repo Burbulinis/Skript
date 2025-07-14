@@ -54,7 +54,7 @@ public class ExprSpawnDelay extends SimplePropertyExpression<Object, Timespan> {
 		if (SpawnerUtils.isCreatureSpawner(object)) {
 			CreatureSpawner creatureSpawner = SpawnerUtils.getCreatureSpawner(object);
 			return new Timespan(TimePeriod.TICK, creatureSpawner.getDelay());
-		} else if (SpawnerUtils.isTrialSpawner(object) && SpawnerUtils.IS_RUNNING_1_21_4) {
+		} else if (SpawnerUtils.IS_RUNNING_1_21_4 && SpawnerUtils.isTrialSpawner(object)) {
 			TrialSpawner spawner = SpawnerUtils.getTrialSpawner(object);
 			long ticks = Math.max(0, spawner.getNextSpawnAttempt() - spawner.getWorld().getGameTime());
 			return new Timespan(TimePeriod.TICK, ticks);

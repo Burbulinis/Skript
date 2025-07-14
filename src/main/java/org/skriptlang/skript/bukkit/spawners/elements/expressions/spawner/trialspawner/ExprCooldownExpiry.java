@@ -1,6 +1,9 @@
 package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.trialspawner;
 
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
+import ch.njol.skript.lang.Expression;
+import ch.njol.skript.lang.Literal;
+import ch.njol.skript.lang.simplification.SimplifiedLiteral;
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.Timespan.TimePeriod;
 import ch.njol.util.Math2;
@@ -40,6 +43,13 @@ public class ExprCooldownExpiry extends SimplePropertyExpression<Block, Timespan
 	@Override
 	protected String getPropertyName() {
 		return "trial cooldown expiry";
+	}
+
+	@Override
+	public Expression<? extends Timespan> simplify() {
+		if (getExpr() instanceof Literal<? extends Block>)
+			return SimplifiedLiteral.fromExpression(this);
+		return this;
 	}
 
 }

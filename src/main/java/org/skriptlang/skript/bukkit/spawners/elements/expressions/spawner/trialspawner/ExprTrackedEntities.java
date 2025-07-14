@@ -3,8 +3,10 @@ package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.trial
 import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
+import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.SyntaxStringBuilder;
+import ch.njol.skript.lang.simplification.SimplifiedLiteral;
 import ch.njol.util.Kleenean;
 import org.bukkit.block.Block;
 import org.bukkit.block.TrialSpawner;
@@ -95,6 +97,13 @@ public class ExprTrackedEntities extends PropertyExpression<Block, Entity> {
 		builder.append("of", getExpr());
 
 		return builder.toString();
+	}
+
+	@Override
+	public Expression<? extends Entity> simplify() {
+		if (getExpr() instanceof Literal<? extends Block>)
+			return SimplifiedLiteral.fromExpression(this);
+		return this;
 	}
 
 }

@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
  * @see SkriptMobSpawnerData
  * @see SkriptSpawnerData
  */
+@SuppressWarnings("UnstableApiUsage")
 public class SkriptTrialSpawnerData extends SkriptSpawnerData implements YggdrasilSerializable {
 
 	private int activationRange = SpawnerUtils.DEFAULT_TRIAL_ACTIVATION_RANGE;
