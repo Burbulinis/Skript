@@ -25,7 +25,7 @@ public class ExprSpawnerEntryDropChances extends PropertyExpression<SkriptSpawne
 			.supplier(ExprSpawnerEntryDropChances::new)
 			.priority(PropertyExpression.DEFAULT_PRIORITY)
 			.addPatterns(
-				"[the] drop chance[s] of %spawnerentries% for %equipmentslots%",
+				"[the] drop chance[s] [of %spawnerentries%] for %equipmentslots%",
 				"%spawnerentries%'[s] drop chance[s] for %equipmentslots%")
 			.build()
 		);

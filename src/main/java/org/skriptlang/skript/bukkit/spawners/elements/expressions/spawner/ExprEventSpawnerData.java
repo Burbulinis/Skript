@@ -9,6 +9,7 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.bukkit.spawners.util.events.MobSpawnerDataEvent;
 import org.skriptlang.skript.bukkit.spawners.util.events.SpawnerDataEvent;
 import org.skriptlang.skript.bukkit.spawners.util.events.TrialSpawnerDataEvent;
@@ -23,16 +24,20 @@ import java.util.StringJoiner;
 public class ExprEventSpawnerData extends SimpleExpression<SkriptSpawnerData> implements EventRestrictedSyntax {
 
 	public static void register(SyntaxRegistry registry) {
+		String pattern = "[the] [1:mob] spawner data";
+		if (SpawnerUtils.IS_RUNNING_1_21)
+			pattern = "[the] [1:mob|2:trial] spawner data";
+
 		registry.register(SyntaxRegistry.EXPRESSION, SyntaxInfo.Expression.builder(ExprEventSpawnerData.class, SkriptSpawnerData.class)
 			.supplier(ExprEventSpawnerData::new)
 			.priority(SyntaxInfo.SIMPLE)
-			.addPattern("[the] [1:trial|2:mob] spawner data")
+			.addPattern(pattern)
 			.build()
 		);
 	}
 
 	private enum SpawnerType {
-		ANY, TRIAL, MOB
+		ANY, MOB, TRIAL
 	}
 
 	private SpawnerType type;

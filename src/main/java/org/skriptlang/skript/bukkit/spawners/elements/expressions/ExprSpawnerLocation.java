@@ -1,6 +1,5 @@
 package org.skriptlang.skript.bukkit.spawners.elements.expressions;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.doc.*;
 import ch.njol.skript.lang.EventRestrictedSyntax;
 import ch.njol.skript.lang.Expression;
@@ -12,9 +11,7 @@ import com.destroystokyo.paper.event.entity.PreSpawnerSpawnEvent;
 import org.bukkit.Location;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
-import org.skriptlang.skript.bukkit.spawners.SpawnerModule;
 import org.skriptlang.skript.registration.SyntaxInfo;
-import org.skriptlang.skript.registration.SyntaxOrigin;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Spawner Location")
@@ -24,24 +21,21 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 		"\tset {_location} to the location of the spawner"
 })
 @Since("INSERT VERSION")
-@RequiredPlugins("Paper 1.21+")
 public class ExprSpawnerLocation extends SimpleExpression<Location> implements EventRestrictedSyntax {
 
-	static {
-		if (Skript.classExists("com.destroystokyo.paper.event.entity.PreSpawnerSpawnEvent")) {
-			var info = SyntaxInfo.Expression.builder(ExprSpawnerLocation.class, Location.class)
-				.origin(SyntaxOrigin.of(SpawnerModule.ADDON))
-				.supplier(ExprSpawnerLocation::new)
-				.priority(SyntaxInfo.SIMPLE)
-				.addPatterns("[the] spawner's location", "[the] location of [the] spawner")
-				.build();
-
-			SpawnerModule.SYNTAX_REGISTRY.register(SyntaxRegistry.EXPRESSION, info);
-		}
+	public static void register(SyntaxRegistry registry) {
+		registry.register(SyntaxRegistry.EXPRESSION, SyntaxInfo.Expression.builder(ExprSpawnerLocation.class, Location.class)
+			.supplier(ExprSpawnerLocation::new)
+			.priority(SyntaxInfo.SIMPLE)
+			.addPatterns(
+				"[the] spawner's location",
+				"[the] location of [the] spawner")
+			.build()
+		);
 	}
 
 	@Override
-	public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
+	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		return true;
 	}
 
@@ -52,7 +46,9 @@ public class ExprSpawnerLocation extends SimpleExpression<Location> implements E
 
 	@Override
 	protected Location @Nullable [] get(Event event) {
-		return new Location[]{((PreSpawnerSpawnEvent) event).getSpawnerLocation()};
+		if (!(event instanceof PreSpawnerSpawnEvent spawnEvent))
+			return null;
+		return new Location[]{spawnEvent.getSpawnerLocation()};
 	}
 
 	@Override

@@ -3,12 +3,15 @@ package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.trial
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import org.bukkit.loot.LootTable;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.bukkit.spawners.util.TrialSpawnerRewardEntry;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
 public class ExprRewardEntryLootTable extends SimplePropertyExpression<TrialSpawnerRewardEntry, LootTable> {
 
 	public static void register(SyntaxRegistry registry) {
+		if (!SpawnerUtils.IS_RUNNING_1_21)
+			return;
 		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprRewardEntryLootTable.class, LootTable.class,
 			"reward [entry] loot table[s]", "rewardentries", false)
 				.supplier(ExprRewardEntryLootTable::new)
