@@ -64,7 +64,6 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 	public static SkriptTrialSpawnerData fromTrialSpawner(@NotNull TrialSpawner trialSpawner, boolean ominous) {
 		SkriptTrialSpawnerData data = new SkriptTrialSpawnerData(ominous);
 
-		//data.setCooldownLength(new Timespan(TimePeriod.TICK, trialSpawner.getCooldownLength()));
 		var config = SpawnerUtils.getTrialSpawnerConfiguration(trialSpawner, ominous);
 		SkriptSpawnerData.applyToSpawnerData(config, data);
 		data.setMaxSpawnDelay(new Timespan(TimePeriod.TICK, config.getDelay()));
@@ -99,7 +98,6 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 	 */
 	public void applyDataToTrialSpawner(@NotNull TrialSpawner trialSpawner) {
 		Preconditions.checkNotNull(trialSpawner, "trialSpawner cannot be null");
-		//trialSpawner.setCooldownLength(Math.clamp(getCooldownLength().getAs(TimePeriod.TICK), 0 , Integer.MAX_VALUE));
 
 		var config = SpawnerUtils.getTrialSpawnerConfiguration(trialSpawner, ominous);
 		super.applyToSpawner(config);
