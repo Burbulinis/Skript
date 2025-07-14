@@ -45,7 +45,7 @@ public class ExprSecSpawnRule extends SectionExpression<SpawnRule> {
 		registry.register(SyntaxRegistry.EXPRESSION, SyntaxInfo.Expression.builder(ExprSecSpawnRule.class, SpawnRule.class)
 			.supplier(ExprSecSpawnRule::new)
 			.priority(SyntaxInfo.SIMPLE)
-			.addPattern("[the] spawn rule")
+			.addPattern("[a|the] spawn rule")
 			.build()
 		);
 	}

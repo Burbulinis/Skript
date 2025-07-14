@@ -36,7 +36,7 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 	private final boolean ominous;
 
 	/**
-	 * Creates a new SkriptTrialSpawnerData instance
+	 * Creates a new SkriptTrialSpawnerData instance with default values
 	 * @param ominous whether the data should be ominous
 	 */
 	public SkriptTrialSpawnerData(boolean ominous) {

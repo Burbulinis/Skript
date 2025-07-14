@@ -1,9 +1,12 @@
 package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner;
 
+import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
+import ch.njol.util.coll.CollectionUtils;
+import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptMobSpawnerData;
@@ -45,6 +48,36 @@ public class ExprSpawnerData extends SimplePropertyExpression<Object, SkriptSpaw
 		}
 
 		return null;
+	}
+
+	@Override
+	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
+		return switch (mode) {
+			case SET, RESET -> {
+				if (trial)
+					yield CollectionUtils.array(SkriptTrialSpawnerData.class);
+				yield CollectionUtils.array(SkriptMobSpawnerData.class);
+			}
+			default -> null;
+		};
+	}
+
+	@Override
+	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
+		SkriptSpawnerData data = delta != null ? (SkriptSpawnerData) delta[0] : null;
+
+		if (data == null)
+			data = trial ? new SkriptTrialSpawnerData(ominous) : new SkriptMobSpawnerData();
+
+		for (Object object : getExpr().getArray(event)) {
+			if (!trial && SpawnerUtils.isCreatureSpawner(object)) {
+				((SkriptMobSpawnerData) data).applyDataToSpawner(SpawnerUtils.getCreatureSpawner(object));
+			} else if (!trial && SpawnerUtils.isSpawnerMinecart(object)) {
+				((SkriptMobSpawnerData) data).applyDataToSpawner(SpawnerUtils.getSpawnerMinecart(object));
+			} else if (trial && SpawnerUtils.isTrialSpawner(object)) {
+				((SkriptTrialSpawnerData) data).applyDataToTrialSpawner(SpawnerUtils.getTrialSpawner(object));
+			}
+		}
 	}
 
 	@Override
