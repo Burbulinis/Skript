@@ -40,7 +40,7 @@ public class ExprTrackedEntities extends PropertyExpression<Block, Entity> {
 			return;
 		registry.register(SyntaxRegistry.EXPRESSION, SyntaxInfo.Expression.builder(ExprTrackedEntities.class, Entity.class)
 			.supplier(ExprTrackedEntities::new)
-			.priority(PropertyExpression.DEFAULT_PRIORITY)
+			.priority(DEFAULT_PRIORITY)
 			.addPatterns(getPatterns("tracked player[s]", "blocks"))
 			.addPatterns(getPatterns("tracked entit(y|ies)", "blocks"))
 			.build()

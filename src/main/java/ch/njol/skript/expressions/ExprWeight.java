@@ -20,19 +20,29 @@ public class ExprWeight extends SimplePropertyExpression<AnyWeighted, Number> {
 
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
-		if (mode == ChangeMode.SET)
-			return CollectionUtils.array(Number.class);
-		return null;
+		return switch (mode) {
+			case SET, ADD, REMOVE -> CollectionUtils.array(Number.class);
+			default -> null;
+		};
 	}
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		assert delta != null;
-		Number weightValue = (Number) delta[0];
+
+		Number deltaValue = (Number) delta[0];
 		for (AnyWeighted weighted : getExpr().getArray(event)) {
 			if (!weighted.supportsWeightChange())
 				error("This object does not support weight modification.");
-			weighted.setWeight(weightValue);
+
+			Number newValue = switch (mode) {
+				case SET -> deltaValue;
+				case ADD -> weighted.weight().doubleValue() + deltaValue.doubleValue();
+				case REMOVE -> weighted.weight().doubleValue() - deltaValue.doubleValue();
+				default -> 0;
+			};
+
+			weighted.setWeight(newValue);
 		}
 	}
 

@@ -122,7 +122,7 @@ public class SkriptSpawnerEntry implements AnyWeighted {
 		this.dropChances.remove(slot);
 	}
 
-	public void clearEquipmentDropChances() {
+	public void clearDropChances() {
 		this.dropChances.clear();
 	}
 

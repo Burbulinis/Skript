@@ -8,13 +8,9 @@ import org.bukkit.block.TrialSpawner;
 import org.bukkit.loot.LootTable;
 import org.jetbrains.annotations.NotNull;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
-import org.skriptlang.skript.bukkit.spawners.util.TrialSpawnerRewardEntry;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Represents the data of a {@link TrialSpawner} and its configuration.
@@ -32,7 +28,7 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 	private int concurrentMobAmountIncrement = SpawnerUtils.DEFAULT_CONCURRENT_PER_PLAYER_INCREMENT;
 
 	private Timespan spawnDelay = SpawnerUtils.DEFAULT_TRIAL_SPAWN_DELAY;
-	private @NotNull Set<TrialSpawnerRewardEntry> rewardEntries = new HashSet<>();
+	private @NotNull Map<LootTable, Integer> rewardEntries = new HashMap<>();
 
 	private final boolean ominous;
 
@@ -67,11 +63,7 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 		var config = SpawnerUtils.getTrialSpawnerConfiguration(trialSpawner, ominous);
 		SkriptSpawnerData.applyToSpawnerData(config, data);
 		data.setMaxSpawnDelay(new Timespan(TimePeriod.TICK, config.getDelay()));
-
-		Set<TrialSpawnerRewardEntry> rewardEntries = config.getPossibleRewards().entrySet().stream()
-			.map(entry -> new TrialSpawnerRewardEntry(entry.getKey(), entry.getValue()))
-			.collect(Collectors.toSet());
-		data.setRewardEntries(rewardEntries);
+		data.setRewardEntries(config.getPossibleRewards());
 
 		data.setBaseMobAmount((int) config.getBaseSpawnsBeforeCooldown());
 		data.setBaseMobAmountIncrement((int) config.getAdditionalSpawnsBeforeCooldown());
@@ -102,11 +94,7 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 		var config = SpawnerUtils.getTrialSpawnerConfiguration(trialSpawner, ominous);
 		super.applyToSpawner(config);
 
-		Map<LootTable, Integer> weightedMap = new HashMap<>();
-		for (TrialSpawnerRewardEntry entry : rewardEntries) {
-			weightedMap.put(entry.lootTable(), entry.weight());
-		}
-		config.setPossibleRewards(weightedMap);
+		config.setPossibleRewards(rewardEntries);
 
 		config.setBaseSpawnsBeforeCooldown(getBaseMobAmount());
 		config.setAdditionalSpawnsBeforeCooldown(getBaseMobAmountIncrement());
@@ -192,56 +180,49 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 	}
 
 	/**
-	 * Returns a set of reward entries this trial spawner can choose during reward ejection.
-	 * @return the set of trial spawner reward entries
+	 * Returns the reward entries for this trial spawner data.
+	 * @return a map of loot tables and their corresponding weights
 	 */
-	public @NotNull Set<TrialSpawnerRewardEntry> getRewardEntries() {
-		return Set.copyOf(rewardEntries);
+	public @NotNull Map<LootTable, Integer> getRewardEntries() {
+		return Map.copyOf(rewardEntries);
 	}
 
 	/**
-	 * Sets the reward entries for this trial spawner.
-	 * @param rewardEntries the set of reward entries to set
+	 * Returns the weight of the specified loot table in this trial spawner data.
+	 * @param lootTable the loot table to get the weight for
+	 * @return the weight of the loot table, or null if it does not exist in the map
 	 */
-	public void setRewardEntries(@NotNull Set<TrialSpawnerRewardEntry> rewardEntries) {
+	public Integer getRewardWeight(@NotNull LootTable lootTable) {
+		Preconditions.checkNotNull(lootTable, "lootTable cannot be null");
+		return rewardEntries.get(lootTable);
+	}
+
+	/**
+	 * Sets the reward entries for this trial spawner data.
+	 * @param rewardEntries a map of loot tables and their corresponding weights
+	 */
+	public void setRewardEntries(@NotNull Map<LootTable, Integer> rewardEntries) {
 		Preconditions.checkNotNull(rewardEntries, "rewardEntries cannot be null");
-		this.rewardEntries = new HashSet<>(rewardEntries);
+		this.rewardEntries = new HashMap<>(rewardEntries);
 	}
 
 	/**
-	 * Adds multiple reward entries to the set of reward entries.
-	 * @param rewardEntries the set of reward entries to add
+	 * Adds a reward entry to the map of reward entries.
+	 * @param lootTable the loot table
+	 * @param weight the weight of the loot table
 	 */
-	public void addRewardEntries(@NotNull Set<TrialSpawnerRewardEntry> rewardEntries) {
-		Preconditions.checkNotNull(rewardEntries, "rewardEntries cannot be null");
-		this.rewardEntries.addAll(rewardEntries);
+	public void setRewardEntry(@NotNull LootTable lootTable, int weight) {
+		Preconditions.checkNotNull(lootTable, "lootTable cannot be null");
+		this.rewardEntries.put(lootTable, weight);
 	}
 
 	/**
-	 * Adds a specific reward entry to the set of reward entries.
-	 * @param rewardEntry the reward entry to add
+	 * Removes a reward entry from the map of reward entries.
+	 * @param lootTable the loot table to remove
 	 */
-	public void addRewardEntry(@NotNull TrialSpawnerRewardEntry rewardEntry) {
-		Preconditions.checkNotNull(rewardEntry, "rewardEntry cannot be null");
-		this.rewardEntries.add(rewardEntry);
-	}
-
-	/**
-	 * Removes multiple reward entries from the set of reward entries.
-	 * @param rewardEntries the set of reward entries to remove
-	 */
-	public void removeRewardEntries(@NotNull Set<TrialSpawnerRewardEntry> rewardEntries) {
-		Preconditions.checkNotNull(rewardEntries, "rewardEntries cannot be null");
-		this.rewardEntries.removeAll(rewardEntries);
-	}
-
-	/**
-	 * Removes a specific reward entry from the set of reward entries.
-	 * @param rewardEntry the reward entry to remove
-	 */
-	public void removeRewardEntry(@NotNull TrialSpawnerRewardEntry rewardEntry) {
-		Preconditions.checkNotNull(rewardEntry, "rewardEntry cannot be null");
-		this.rewardEntries.remove(rewardEntry);
+	public void removeRewardEntry(@NotNull LootTable lootTable) {
+		Preconditions.checkNotNull(lootTable, "lootTable cannot be null");
+		this.rewardEntries.remove(lootTable);
 	}
 
 	/**

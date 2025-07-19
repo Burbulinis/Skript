@@ -23,7 +23,7 @@ public class ExprSpawnerEntryDropChances extends PropertyExpression<SkriptSpawne
 	public static void register(SyntaxRegistry registry) {
 		registry.register(SyntaxRegistry.EXPRESSION, SyntaxInfo.Expression.builder(ExprSpawnerEntryDropChances.class, Float.class)
 			.supplier(ExprSpawnerEntryDropChances::new)
-			.priority(PropertyExpression.DEFAULT_PRIORITY)
+			.priority(DEFAULT_PRIORITY)
 			.addPatterns(
 				"[the] drop chance[s] [of %spawnerentries%] for %equipmentslots%",
 				"%spawnerentries%'[s] drop chance[s] for %equipmentslots%")
@@ -93,7 +93,7 @@ public class ExprSpawnerEntryDropChances extends PropertyExpression<SkriptSpawne
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
 		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
-		builder.append("drop chances of", getExpr(), "for", slots);
+		builder.append("the drop chances of", getExpr(), "for", slots);
 		return builder.toString();
 	}
 

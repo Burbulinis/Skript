@@ -189,13 +189,13 @@ public abstract class SkriptSpawnerData implements YggdrasilSerializable {
 	}
 
 	/**
-	 * Gets the list of spawner entries that the spawner will use to spawn entities.
+	 * Gets the set of spawner entries that the spawner will use to spawn entities.
 	 * <p>
 	 * If this is not empty, the spawner will use these entries to determine what entities to spawn.
-	 * @return a list of spawner entries, or an empty list
+	 * @return a set of spawner entries, or an empty set
 	 */
-	public @NotNull List<SkriptSpawnerEntry> getSpawnerEntries() {
-		return List.copyOf(spawnerEntries);
+	public @NotNull Set<SkriptSpawnerEntry> getSpawnerEntries() {
+		return Set.copyOf(spawnerEntries);
 	}
 
 	/**

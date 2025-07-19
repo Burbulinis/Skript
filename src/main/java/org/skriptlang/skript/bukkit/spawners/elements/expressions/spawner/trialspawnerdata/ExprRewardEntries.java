@@ -11,13 +11,11 @@ import org.bukkit.event.Event;
 import org.bukkit.loot.LootTable;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
-import org.skriptlang.skript.bukkit.spawners.util.TrialSpawnerRewardEntry;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptTrialSpawnerData;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Name("Trial Spawner Configuration with Weighted Loot Table")
 @Description({
@@ -34,14 +32,14 @@ import java.util.Set;
 })
 @Since("INSERT VERSION")
 @RequiredPlugins("Minecraft 1.21+")
-public class ExprSpawnerRewardEntries extends PropertyExpression<SkriptTrialSpawnerData, TrialSpawnerRewardEntry> {
+public class ExprRewardEntries extends PropertyExpression<SkriptTrialSpawnerData, LootTable> {
 
 	public static void register(SyntaxRegistry syntaxRegistry) {
 		if (!SpawnerUtils.IS_RUNNING_1_21)
 			return;
-		syntaxRegistry.register(SyntaxRegistry.EXPRESSION, SyntaxInfo.Expression.builder(ExprSpawnerRewardEntries.class, TrialSpawnerRewardEntry.class)
-			.supplier(ExprSpawnerRewardEntries::new)
-			.priority(PropertyExpression.DEFAULT_PRIORITY)
+		syntaxRegistry.register(SyntaxRegistry.EXPRESSION, SyntaxInfo.Expression.builder(ExprRewardEntries.class, LootTable.class)
+			.supplier(ExprRewardEntries::new)
+			.priority(DEFAULT_PRIORITY)
 			.addPatterns(getDefaultPatterns("reward entr(y|ies)", "trialspawnerdatas"))
 			.build()
 		);
@@ -55,48 +53,49 @@ public class ExprSpawnerRewardEntries extends PropertyExpression<SkriptTrialSpaw
 	}
 
 	@Override
-	protected TrialSpawnerRewardEntry[] get(Event event, SkriptTrialSpawnerData[] source) {
-		Set<TrialSpawnerRewardEntry> entries = new HashSet<>();
-		for (SkriptTrialSpawnerData data : source) {
-			entries.addAll(data.getRewardEntries());
-		}
-		return entries.toArray(TrialSpawnerRewardEntry[]::new);
+	protected LootTable[] get(Event event, SkriptTrialSpawnerData[] source) {
+		return Arrays.stream(source)
+			.flatMap(data -> data.getRewardEntries().keySet().stream())
+			.toArray(LootTable[]::new);
 	}
 
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		return switch (mode) {
-			case SET, ADD, REMOVE, DELETE -> CollectionUtils.array(TrialSpawnerRewardEntry[].class, LootTable[].class);
+			case SET, ADD, REMOVE, DELETE -> CollectionUtils.array(LootTable[].class);
 			default -> null;
 		};
 	}
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-		Set<TrialSpawnerRewardEntry> entries = new HashSet<>();
+		Map<LootTable, Integer> lootTables = new HashMap<>();
 		if (delta != null) {
 			for (Object object : delta) {
-				if (object instanceof TrialSpawnerRewardEntry entry) {
-					entries.add(entry);
-				} else if (object instanceof LootTable lootTable) {
-					entries.add(new TrialSpawnerRewardEntry(lootTable, 1));
-				}
+				lootTables.put((LootTable) object, 1);
 			}
 		}
 
 		for (SkriptTrialSpawnerData data : getExpr().getArray(event)) {
-			switch (mode) {
-				case SET -> data.setRewardEntries(entries);
-				case ADD -> data.addRewardEntries(entries);
-				case REMOVE -> data.removeRewardEntries(entries);
-				case DELETE -> data.clearRewardEntries();
+			if (mode == ChangeMode.DELETE) {
+				data.clearRewardEntries();
+				continue;
 			}
+
+			Map<LootTable, Integer> currentEntries = data.getRewardEntries();
+			switch (mode) {
+				case SET -> currentEntries = lootTables;
+				case ADD -> currentEntries.putAll(lootTables);
+				case REMOVE -> lootTables.keySet().forEach(currentEntries::remove);
+			}
+
+			data.setRewardEntries(currentEntries);
 		}
 	}
 
 	@Override
-	public Class<? extends TrialSpawnerRewardEntry> getReturnType() {
-		return TrialSpawnerRewardEntry.class;
+	public Class<? extends LootTable> getReturnType() {
+		return LootTable.class;
 	}
 
 	@Override

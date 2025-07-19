@@ -315,10 +315,6 @@ public class SpawnerModule implements AddonModule {
 			})
 		);
 
-		Converters.registerConverter(TrialSpawnerRewardEntry.class, AnyWeighted.class,
-			reward -> reward::weight, Converter.NO_RIGHT_CHAINING
-		);
-
 		EventValues.registerEventValue(TrialSpawnerDataEvent.class, SkriptTrialSpawnerData.class, TrialSpawnerDataEvent::getSpawnerData);
 		EventValues.registerEventValue(MobSpawnerDataEvent.class, SkriptMobSpawnerData.class, MobSpawnerDataEvent::getSpawnerData);
 		EventValues.registerEventValue(SpawnerEntryEvent.class, SkriptSpawnerEntry.class, SpawnerEntryEvent::getSpawnerEntry);

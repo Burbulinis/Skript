@@ -44,7 +44,7 @@ public class ExprSpawnerEntries extends PropertyExpression<SkriptSpawnerData, Sk
 	public static void register(SyntaxRegistry registry) {
 		registry.register(SyntaxRegistry.EXPRESSION, SyntaxInfo.Expression.builder(ExprSpawnerEntries.class, SkriptSpawnerEntry.class)
 			.supplier(ExprSpawnerEntries::new)
-			.priority(PropertyExpression.DEFAULT_PRIORITY)
+			.priority(DEFAULT_PRIORITY)
 			.addPatterns(
 				"[the] spawner entr(y|ies) [of %spawnerdatas%]",
 				"[%spawnerdatas%'[s]] spawner entr(y|ies)")
