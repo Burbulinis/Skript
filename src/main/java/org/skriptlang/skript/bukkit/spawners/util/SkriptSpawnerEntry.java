@@ -56,9 +56,8 @@ public class SkriptSpawnerEntry implements AnyWeighted {
 
 		LootTable lootTable = skriptEntry.getEquipmentLootTable();
 		Map<EquipmentSlot, Float> dropChances = skriptEntry.getDropChances();
-		if (lootTable != null && !dropChances.isEmpty()) {
+		if (lootTable != null)
 			entry.setEquipment(new Equipment(lootTable, dropChances));
-		}
 
 		return entry;
 	}
