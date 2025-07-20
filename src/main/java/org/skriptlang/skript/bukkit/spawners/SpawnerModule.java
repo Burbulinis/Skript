@@ -6,7 +6,6 @@ import ch.njol.skript.classes.*;
 import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.lang.ParseContext;
-import ch.njol.skript.lang.util.common.AnyWeighted;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.yggdrasil.Fields;
@@ -25,14 +24,10 @@ import org.jetbrains.annotations.NotNull;
 import org.skriptlang.skript.addon.AddonModule;
 import org.skriptlang.skript.addon.SkriptAddon;
 import org.skriptlang.skript.bukkit.spawners.util.SkriptSpawnerEntry;
-import org.skriptlang.skript.bukkit.spawners.util.SpawnerEntryEquipment;
-import org.skriptlang.skript.bukkit.spawners.util.SpawnerEntryEquipment.DropChance;
-import org.skriptlang.skript.bukkit.spawners.util.TrialSpawnerRewardEntry;
 import org.skriptlang.skript.bukkit.spawners.util.events.MobSpawnerDataEvent;
 import org.skriptlang.skript.bukkit.spawners.util.events.SpawnRuleEvent;
 import org.skriptlang.skript.bukkit.spawners.util.events.SpawnerEntryEvent;
 import org.skriptlang.skript.bukkit.spawners.util.events.TrialSpawnerDataEvent;
-import org.skriptlang.skript.bukkit.spawners.util.lang.AnySpawnerWeighted;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptMobSpawnerData;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptSpawnerData;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptTrialSpawnerData;
@@ -106,63 +101,6 @@ public class SpawnerModule implements AddonModule {
 				}
 			})
 			.serializer(new YggdrasilSerializer<>())
-		);
-
-		Classes.registerClass(new ClassInfo<>(TrialSpawnerRewardEntry.class, "rewardentry")
-			.user("reward ?entr(y|ies)")
-			.name("Reward Entry")
-			.description("todo")
-			.since("INSERT VERSION")
-			.parser(new Parser<>() {
-				@Override
-				public boolean canParse(ParseContext context) {
-					return false;
-				}
-
-				@Override
-				public String toString(TrialSpawnerRewardEntry rewardEntry, int flags) {
-					return "reward entry of " +
-						Classes.toString(rewardEntry.lootTable()) +
-						" with weight " +
-						rewardEntry.weight();
-				}
-
-				@Override
-				public String toVariableNameString(TrialSpawnerRewardEntry rewardEntry) {
-					return "reward_entry:" + rewardEntry.weight() + ',' + rewardEntry.lootTable().getKey().getKey();
-				}
-			})
-			.serializer(new Serializer<>() {
-				@Override
-				public Fields serialize(TrialSpawnerRewardEntry rewardEntry) {
-					Fields fields = new Fields();
-					fields.putObject("loot_table", rewardEntry.lootTable());
-					fields.putPrimitive("weight", rewardEntry.weight());
-					return fields;
-				}
-
-				@Override
-				public void deserialize(TrialSpawnerRewardEntry rewardEntry, Fields fields) {
-					assert false;
-				}
-
-				@Override
-				protected TrialSpawnerRewardEntry deserialize(Fields fields) throws StreamCorruptedException {
-					LootTable lootTable = fields.getObject("loot_table", LootTable.class);
-					int weight = fields.getPrimitive("weight", int.class);
-					return new TrialSpawnerRewardEntry(lootTable, weight);
-				}
-
-				@Override
-				public boolean mustSyncDeserialization() {
-					return true;
-				}
-
-				@Override
-				protected boolean canBeInstantiated() {
-					return false;
-				}
-			})
 		);
 
 		Classes.registerClass(new ClassInfo<>(SkriptSpawnerEntry.class, "spawnerentry")

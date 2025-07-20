@@ -7,6 +7,10 @@ import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptSpawnerData;
 
 public abstract class SpawnerDataEvent extends Event {
 
+	/**
+	 * Gets the SkriptSpawnerData associated with this event.
+	 * @return the SkriptSpawnerData for this event.
+	 */
 	public abstract SkriptSpawnerData getSpawnerData();
 
 	@Override

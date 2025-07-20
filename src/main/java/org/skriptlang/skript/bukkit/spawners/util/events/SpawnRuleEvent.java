@@ -12,6 +12,10 @@ public class SpawnRuleEvent extends Event {
 		this.rule = rule;
 	}
 
+	/**
+	 * Gets the spawn rule associated with this event.
+	 * @return the spawn rule
+	 */
 	public SpawnRule getSpawnRule() {
 		return rule;
 	}

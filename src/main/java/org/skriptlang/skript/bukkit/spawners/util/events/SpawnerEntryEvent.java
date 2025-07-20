@@ -13,6 +13,10 @@ public class SpawnerEntryEvent extends Event {
 		this.entry = entry;
 	}
 
+	/**
+	 * Gets the Skript spawner entry associated with this event.
+	 * @return the Skript spawner entry
+	 */
 	public SkriptSpawnerEntry getSpawnerEntry() {
 		return entry;
 	}

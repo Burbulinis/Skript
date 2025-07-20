@@ -1,5 +1,8 @@
 package org.skriptlang.skript.bukkit.spawners.util;
 
+/**
+ * Enum representing the type of spawner.
+ */
 public enum SpawnerType {
 
 	MINECART,
