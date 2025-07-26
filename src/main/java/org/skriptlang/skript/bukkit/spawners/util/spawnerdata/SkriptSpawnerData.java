@@ -1,22 +1,22 @@
 package org.skriptlang.skript.bukkit.spawners.util.spawnerdata;
 
 import ch.njol.skript.util.Timespan;
-import ch.njol.yggdrasil.YggdrasilSerializable;
+import ch.njol.yggdrasil.Fields;
 import com.google.common.base.Preconditions;
 import org.bukkit.spawner.BaseSpawner;
 import org.jetbrains.annotations.NotNull;
 import org.skriptlang.skript.bukkit.spawners.util.SkriptSpawnerEntry;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 
+import java.io.StreamCorruptedException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
  * Abstract class representing the data of a trial spawner or a regular spawner.
  */
-public abstract class SkriptSpawnerData implements YggdrasilSerializable {
+public abstract class SkriptSpawnerData {
 
 	private int activationRange = SpawnerUtils.DEFAULT_ACTIVATION_RANGE;
 	private int spawnRange = SpawnerUtils.DEFAULT_SPAWN_RANGE;
@@ -252,6 +252,40 @@ public abstract class SkriptSpawnerData implements YggdrasilSerializable {
 	 */
 	public void clearSpawnerEntries() {
 		spawnerEntries.clear();
+	}
+
+	/*
+	 * Serialization
+	 */
+
+	protected Fields serialize() {
+		Fields fields = new Fields();
+		fields.putPrimitive("activation_range", this.activationRange);
+		fields.putPrimitive("spawn_range", this.spawnRange);
+		fields.putObject("min_spawn_delay", this.minSpawnDelay);
+		fields.putObject("max_spawn_delay", this.maxSpawnDelay);
+
+		int count = 0;
+		for (SkriptSpawnerEntry entry : this.spawnerEntries) {
+			fields.putObject("spawner_entry_" + count, entry);
+			count++;
+		}
+
+		return fields;
+	}
+
+	protected void deserialize(@NotNull Fields fields) throws StreamCorruptedException {
+		this.activationRange = fields.getPrimitive("activation_range", int.class);
+		this.spawnRange = fields.getPrimitive("spawn_range", int.class);
+
+		this.minSpawnDelay = fields.getObject("min_spawn_delay", Timespan.class);
+		this.maxSpawnDelay = fields.getObject("max_spawn_delay", Timespan.class);
+
+		int count = 0;
+		while (fields.contains("spawner_entry_" + count)) {
+			this.spawnerEntries.add(fields.getObject("spawner_entry_" + count, SkriptSpawnerEntry.class));
+			count++;
+		}
 	}
 
 }

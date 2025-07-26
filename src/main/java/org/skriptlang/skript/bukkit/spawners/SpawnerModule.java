@@ -1,6 +1,5 @@
 package org.skriptlang.skript.bukkit.spawners;
 
-import ch.njol.skript.Skript;
 import ch.njol.skript.bukkitutil.EntityUtils;
 import ch.njol.skript.classes.*;
 import ch.njol.skript.entity.EntityData;
@@ -20,7 +19,6 @@ import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.event.entity.TrialSpawnerSpawnEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.loot.LootTable;
-import org.jetbrains.annotations.NotNull;
 import org.skriptlang.skript.addon.AddonModule;
 import org.skriptlang.skript.addon.SkriptAddon;
 import org.skriptlang.skript.bukkit.spawners.util.SkriptSpawnerEntry;
@@ -31,10 +29,7 @@ import org.skriptlang.skript.bukkit.spawners.util.events.TrialSpawnerDataEvent;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptMobSpawnerData;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptSpawnerData;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptTrialSpawnerData;
-import org.skriptlang.skript.lang.converter.Converter;
-import org.skriptlang.skript.lang.converter.Converters;
 
-import java.io.IOException;
 import java.io.StreamCorruptedException;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,7 +45,6 @@ public class SpawnerModule implements AddonModule {
 			.name("Spawner Data")
 			.description("todo")
 			.since("INSERT VERSION")
-			.serializer(new YggdrasilSerializer<>())
 		);
 
 		Classes.registerClass(new ClassInfo<>(SkriptMobSpawnerData.class, "mobspawnerdata")
@@ -159,10 +153,8 @@ public class SpawnerModule implements AddonModule {
 
 					Map<EquipmentSlot, Float> dropChances = new HashMap<>();
 					int count = 0;
-					while (true) {
+					while (fields.contains("equipment_slot_" + count)) {
 						EquipmentSlot slot = fields.getObject("equipment_slot_" + count, EquipmentSlot.class);
-						if (slot == null)
-							break;
 						float chance = fields.getPrimitive("chance_" + count, float.class);
 						dropChances.put(slot, chance);
 						count++;
@@ -257,6 +249,16 @@ public class SpawnerModule implements AddonModule {
 		EventValues.registerEventValue(MobSpawnerDataEvent.class, SkriptMobSpawnerData.class, MobSpawnerDataEvent::getSpawnerData);
 		EventValues.registerEventValue(SpawnerEntryEvent.class, SkriptSpawnerEntry.class, SpawnerEntryEvent::getSpawnerEntry);
 		EventValues.registerEventValue(SpawnRuleEvent.class, SpawnRule.class, SpawnRuleEvent::getSpawnRule);
+
+		EventValues.registerEventValue(SpawnerSpawnEvent.class, Location.class, SpawnerSpawnEvent::getLocation);
+		EventValues.registerEventValue(SpawnerSpawnEvent.class, Entity.class, SpawnerSpawnEvent::getEntity);
+
+		EventValues.registerEventValue(TrialSpawnerSpawnEvent.class, Block.class, event -> event.getTrialSpawner().getBlock());
+		EventValues.registerEventValue(TrialSpawnerSpawnEvent.class, Location.class, TrialSpawnerSpawnEvent::getLocation);
+		EventValues.registerEventValue(TrialSpawnerSpawnEvent.class, Entity.class, TrialSpawnerSpawnEvent::getEntity);
+
+		EventValues.registerEventValue(PreSpawnerSpawnEvent.class, EntityData.class,
+			event -> EntityUtils.toSkriptEntityData(event.getType()));
 	}
 
 	@Override
@@ -365,66 +367,6 @@ public class SpawnerModule implements AddonModule {
 			})
 		);
 
-		Classes.registerClass(new ClassInfo<>(SpawnerEntryEquipment.class, "spawnerentryequipment")
-			.user("spawner ?entry ?equipments?")
-			.name("Spawner Entry Equipment")
-			.description(
-				"Represents a spawner entry equipment. Spawner entry equipments are used to specify the equipment "
-				+ "that an entity will spawn with. This includes the equipment loot table and the drop chances for each "
-				+ "equipment slot. You can find more information about this in the Minecraft wiki for "
-				+ "<a href='https://minecraft.wiki/w/Monster_Spawner'>spawners</a>")
-			.since("INSERT VERSION")
-			.requiredPlugins("MC 1.21+")
-			.parser(new Parser<>() {
-				@Override
-				public boolean canParse(ParseContext context) {
-					return false;
-				}
-
-				@Override
-				public String toString(SpawnerEntryEquipment equipment, int flags) {
-					return "spawner entry equipment with "
-						+ Classes.toString(equipment.getLootTable())
-						+ " and "
-						+ Classes.toString(equipment.getDropChances().toArray(), true);
-				}
-
-				@Override
-				public String toVariableNameString(SpawnerEntryEquipment equipment) {
-					return "spawner entry equipment:" + equipment.hashCode();
-				}
-			})
-		);
-
-		Classes.registerClass(new ClassInfo<>(DropChance.class, "equipmentdropchance")
-			.user("(spawner entry ?)?equipment ?drop ?chances?")
-			.name("Spawner Entry Equipment Drop Chance")
-			.description("Represents a spawner entry's equipment drop chance. This is used to specify the drop chance "
-				+ "for an equipment slot. You can find more information about this in the Minecraft wiki for "
-				+ "<a href='https://minecraft.wiki/w/Monster_Spawner'>spawners</a>")
-			.since("INSERT VERSION")
-			.requiredPlugins("MC 1.21+")
-			.parser(new Parser<>() {
-				@Override
-				public boolean canParse(ParseContext context) {
-					return false;
-				}
-
-				@Override
-				public String toString(DropChance equipment, int flags) {
-					return "equipment drop with chance "
-						+ equipment.getDropChance()
-						+ " for "
-						+ Classes.toString(equipment.getEquipmentSlot());
-				}
-
-				@Override
-				public String toVariableNameString(DropChance equipment) {
-					return "equipment drop:" + equipment.getEquipmentSlot() + ',' + equipment.getDropChance();
-				}
-			})
-		);
-
 		Classes.registerClass(new ClassInfo<>(SpawnRule.class, "spawnrule")
 			.user("spawn ?rules?")
 			.name("Spawn Rule")
@@ -496,70 +438,6 @@ public class SpawnerModule implements AddonModule {
 				}
 			})
 		);
-
-		Classes.registerClass(new AnyInfo<>(AnySpawnerWeighted.class, "spawnerweighted")
-				.user("spawner ?weighteds?")
-				.name("Any Spawner Weighted Thing")
-				.description("Something related to spawners that has a weight.")
-				.usage("")
-				.examples("the weight of {_spawner entry}", "the weight of {_weighted loot table}")
-				.since("INSERT VERSION")
-				.defaultExpression(new EventValueExpression<>(AnySpawnerWeighted.class))
-		);
-
-		//todo: remove after merge of equippable pr
-		Classes.registerClass(new EnumClassInfo<>(EquipmentSlot.class, "equipmentslot", "equipment slots")
-			.user("equipment slot")
-			.name("Equipment Slot")
-			.description("Represents an equipment slot.")
-			.since("INSERT VERSION")
-		);
-
-		ADDON = addon;
-		SYNTAX_REGISTRY = addon.syntaxRegistry();
-		try {
-			Skript.getAddonInstance().loadClasses(
-				"me.burb.skriptspawner.spawner",
-				"elements");
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-
-		Converters.registerConverter(SpawnerEntry.class, AnySpawnerWeighted.class,
-			entry -> new AnySpawnerWeighted() {
-				@Override
-				public @NotNull Integer spawnerWeight() {
-					return entry.getSpawnWeight();
-				}
-
-				@Override
-				public boolean supportsSpawnerWeightChange() {
-					return true;
-				}
-
-				@Override
-				public void setSpawnerWeight(Integer weight) throws UnsupportedOperationException {
-					if (weight > 0)
-						entry.setSpawnWeight(weight);
-				}
-		}, Converter.NO_RIGHT_CHAINING);
-
-		EventValues.registerEventValue(SpawnerSpawnEvent.class, Block.class, event -> {
-			if (event.getSpawner() != null)
-				return event.getSpawner().getBlock();
-			return null;
-		});
-		EventValues.registerEventValue(SpawnerSpawnEvent.class, Location.class, SpawnerSpawnEvent::getLocation);
-		EventValues.registerEventValue(SpawnerSpawnEvent.class, Entity.class, SpawnerSpawnEvent::getEntity);
-
-		EventValues.registerEventValue(TrialSpawnerSpawnEvent.class, Block.class, event -> event.getTrialSpawner().getBlock());
-		EventValues.registerEventValue(TrialSpawnerSpawnEvent.class, Location.class, TrialSpawnerSpawnEvent::getLocation);
-		EventValues.registerEventValue(TrialSpawnerSpawnEvent.class, Entity.class, TrialSpawnerSpawnEvent::getEntity);
-
-		if (Skript.classExists("com.destroystokyo.paper.event.entity.PreSpawnerSpawnEvent")) {
-			EventValues.registerEventValue(PreSpawnerSpawnEvent.class, EntityData.class,
-				event -> EntityUtils.toSkriptEntityData(event.getType()));
-		}
 	}
 
 }

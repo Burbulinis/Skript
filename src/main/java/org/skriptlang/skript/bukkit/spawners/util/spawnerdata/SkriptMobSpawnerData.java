@@ -2,7 +2,8 @@ package org.skriptlang.skript.bukkit.spawners.util.spawnerdata;
 
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.Timespan.TimePeriod;
-import ch.njol.yggdrasil.YggdrasilSerializable;
+import ch.njol.yggdrasil.Fields;
+import ch.njol.yggdrasil.YggdrasilSerializable.YggdrasilExtendedSerializable;
 import com.google.common.base.Preconditions;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.minecart.SpawnerMinecart;
@@ -11,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.skriptlang.skript.bukkit.spawners.util.SkriptSpawnerEntry;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 
+import java.io.StreamCorruptedException;
 import java.util.stream.Collectors;
 
 /**
@@ -19,10 +21,12 @@ import java.util.stream.Collectors;
  * @see SkriptTrialSpawnerData
  * @see SkriptSpawnerData
  */
-public class SkriptMobSpawnerData extends SkriptSpawnerData implements YggdrasilSerializable {
+public class SkriptMobSpawnerData extends SkriptSpawnerData implements YggdrasilExtendedSerializable {
 
 	private int maxNearbyEntityCap = SpawnerUtils.DEFAULT_MAX_NEARBY_ENTITIES;
 	private int spawnCount = SpawnerUtils.DEFAULT_SPAWN_COUNT;
+
+	public SkriptMobSpawnerData() {}
 
 	/**
 	 * Creates a new SkriptSpawnerData instance from the given Bukkit {@link Spawner}.
@@ -177,6 +181,28 @@ public class SkriptMobSpawnerData extends SkriptSpawnerData implements Yggdrasil
 	 */
 	public void setSpawnCount(int spawnCount) {
 		this.spawnCount = spawnCount;
+	}
+
+	/*
+	 * YggdrasilExtendedSerializable
+	 */
+
+	@Override
+	public Fields serialize() {
+		Fields fields = super.serialize();
+
+		fields.putPrimitive("max_nearby_entity_cap", this.maxNearbyEntityCap);
+		fields.putPrimitive("spawn_count", this.spawnCount);
+
+		return fields;
+	}
+
+	@Override
+	public void deserialize(@NotNull Fields fields) throws StreamCorruptedException {
+		super.deserialize(fields);
+
+		this.maxNearbyEntityCap = fields.getPrimitive("max_nearby_entity_cap", int.class);
+		this.spawnCount = fields.getPrimitive("spawn_count", int.class);
 	}
 
 }

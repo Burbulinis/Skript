@@ -2,13 +2,15 @@ package org.skriptlang.skript.bukkit.spawners.util.spawnerdata;
 
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.Timespan.TimePeriod;
-import ch.njol.yggdrasil.YggdrasilSerializable;
+import ch.njol.yggdrasil.Fields;
+import ch.njol.yggdrasil.YggdrasilSerializable.YggdrasilExtendedSerializable;
 import com.google.common.base.Preconditions;
 import org.bukkit.block.TrialSpawner;
 import org.bukkit.loot.LootTable;
 import org.jetbrains.annotations.NotNull;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 
+import java.io.StreamCorruptedException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,7 +21,7 @@ import java.util.Map;
  * @see SkriptSpawnerData
  */
 @SuppressWarnings("UnstableApiUsage")
-public class SkriptTrialSpawnerData extends SkriptSpawnerData implements YggdrasilSerializable {
+public class SkriptTrialSpawnerData extends SkriptSpawnerData implements YggdrasilExtendedSerializable {
 
 	private int activationRange = SpawnerUtils.DEFAULT_TRIAL_ACTIVATION_RANGE;
 	private int baseMobAmount = SpawnerUtils.DEFAULT_BASE_MOB_AMOUNT;
@@ -30,7 +32,12 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 	private Timespan spawnDelay = SpawnerUtils.DEFAULT_TRIAL_SPAWN_DELAY;
 	private @NotNull Map<LootTable, Integer> rewardEntries = new HashMap<>();
 
-	private final boolean ominous;
+	private boolean ominous = false;
+
+	/**
+	 * Creates a new SkriptTrialSpawnerData instance with the ominous value defaulted to false.
+	 */
+	public SkriptTrialSpawnerData() {}
 
 	/**
 	 * Creates a new SkriptTrialSpawnerData instance with default values
@@ -339,6 +346,55 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 	 */
 	public void setConcurrentMobAmountIncrement(int incrementPerPlayer) {
 		concurrentMobAmountIncrement = incrementPerPlayer;
+	}
+
+	/*
+	 * YggdrasilExtendedSerializable
+	 */
+
+	@Override
+	public Fields serialize() {
+		Fields fields = super.serialize();
+
+		fields.putPrimitive("activation_range", this.activationRange);
+		fields.putPrimitive("base_mob_amount", this.baseMobAmount);
+		fields.putPrimitive("base_mob_amount_increment", this.baseMobAmountIncrement);
+		fields.putPrimitive("concurrent_mob_amount", this.concurrentMobAmount);
+		fields.putPrimitive("concurrent_mob_amount_increment", this.concurrentMobAmountIncrement);
+		fields.putObject("spawn_delay", this.spawnDelay);
+
+		int count = 0;
+		for (var entrySet : this.rewardEntries.entrySet()) {
+			fields.putObject("loot_table_" + count, entrySet.getKey());
+			fields.putPrimitive("loot_table_weight_" + count, entrySet.getValue());
+			count++;
+		}
+
+		fields.putPrimitive("ominous", this.ominous);
+
+		return fields;
+	}
+
+	@Override
+	public void deserialize(@NotNull Fields fields) throws StreamCorruptedException {
+		super.deserialize(fields);
+
+		this.activationRange = fields.getPrimitive("activation_range", int.class);
+		this.baseMobAmount = fields.getPrimitive("base_mob_amount", int.class);
+		this.baseMobAmountIncrement = fields.getPrimitive("base_mob_amount_increment", int.class);
+		this.concurrentMobAmount = fields.getPrimitive("concurrent_mob_amount", int.class);
+		this.concurrentMobAmountIncrement = fields.getPrimitive("concurrent_mob_amount_increment", int.class);
+		this.spawnDelay = fields.getObject("spawn_delay", Timespan.class);
+
+		int count = 0;
+		while (fields.contains("loot_table_" + count)) {
+			LootTable lootTable = fields.getObject("loot_table_" + count, LootTable.class);
+			Integer weight = fields.getPrimitive("loot_table_weight_" + count, int.class);
+			this.rewardEntries.put(lootTable, weight);
+			count++;
+		}
+
+		this.ominous = fields.getPrimitive("ominous", boolean.class);
 	}
 
 }
