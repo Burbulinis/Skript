@@ -3,10 +3,8 @@ package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.trial
 import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.SyntaxStringBuilder;
-import ch.njol.skript.lang.simplification.SimplifiedLiteral;
 import ch.njol.util.Kleenean;
 import org.bukkit.block.Block;
 import org.bukkit.block.TrialSpawner;

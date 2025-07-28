@@ -3,9 +3,6 @@ package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.trial
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
-import ch.njol.skript.lang.Expression;
-import ch.njol.skript.lang.Literal;
-import ch.njol.skript.lang.simplification.SimplifiedLiteral;
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.Timespan.TimePeriod;
 import ch.njol.util.Math2;

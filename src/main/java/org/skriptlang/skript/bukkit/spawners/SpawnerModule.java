@@ -1,7 +1,10 @@
 package org.skriptlang.skript.bukkit.spawners;
 
 import ch.njol.skript.bukkitutil.EntityUtils;
-import ch.njol.skript.classes.*;
+import ch.njol.skript.classes.ClassInfo;
+import ch.njol.skript.classes.Parser;
+import ch.njol.skript.classes.Serializer;
+import ch.njol.skript.classes.YggdrasilSerializer;
 import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.lang.ParseContext;

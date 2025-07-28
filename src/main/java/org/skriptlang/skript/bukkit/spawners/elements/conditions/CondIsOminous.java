@@ -2,7 +2,6 @@ package org.skriptlang.skript.bukkit.spawners.elements.conditions;
 
 import ch.njol.skript.conditions.base.PropertyCondition;
 import ch.njol.skript.doc.*;
-import org.bukkit.block.TrialSpawner;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
