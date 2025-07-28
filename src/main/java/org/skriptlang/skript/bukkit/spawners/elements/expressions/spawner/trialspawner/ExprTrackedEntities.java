@@ -99,11 +99,4 @@ public class ExprTrackedEntities extends PropertyExpression<Block, Entity> {
 		return builder.toString();
 	}
 
-	@Override
-	public Expression<? extends Entity> simplify() {
-		if (getExpr() instanceof Literal<? extends Block>)
-			return SimplifiedLiteral.fromExpression(this);
-		return this;
-	}
-
 }

@@ -5,6 +5,7 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
+import org.bukkit.block.Block;
 import org.bukkit.block.data.type.TrialSpawner;
 import org.bukkit.block.data.type.TrialSpawner.State;
 import org.bukkit.event.Event;
@@ -19,37 +20,36 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 @Description("Make a trial spawner or a trial spawner configuration eject a reward out of it.")
 @Examples("eject the trial spawner rewards of target block")
 @Since("INSERT VERSION")
-@RequiredPlugins("MC 1.21+")
+@RequiredPlugins("Minecraft 1.21+")
 public class EffEjectReward extends Effect {
 
-	static {
-		var info = SyntaxInfo.builder(EffEjectReward.class)
-			.origin(SyntaxOrigin.of(SpawnerModule.ADDON))
+	public static void register(SyntaxRegistry registry) {
+		registry.register(SyntaxRegistry.EFFECT, SyntaxInfo.builder(EffEjectReward.class)
 			.supplier(EffEjectReward::new)
 			.priority(SyntaxInfo.COMBINED)
 			.addPatterns(
-				"eject [the] trial spawner reward[s] of %blocks/trialspawnerconfigs%",
-				"eject [the] %blocks/trialspawnerconfigs%'[s] trial spawner reward[s]")
-			.build();
-
-		SpawnerModule.SYNTAX_REGISTRY.register(SyntaxRegistry.EFFECT, info);
+				"(spit out|eject) [the] trial reward[s] of %blocks%",
+				"(spit out|eject) %blocks%'[s] trial reward[s]")
+			.build()
+		);
 	}
 
-	private Expression<?> objects;
+	private Expression<Block> blocks;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		objects = exprs[0];
+		//noinspection unchecked
+		blocks = (Expression<Block>) exprs[0];
 		return true;
 	}
 
 	@Override
 	protected void execute(Event event) {
-		for (Object object : objects.getArray(event)) {
-			if (!SpawnerUtils.isTrialSpawner(object))
+		for (Block block : blocks.getArray(event)) {
+			if (!SpawnerUtils.isTrialSpawner(block))
 				continue;
 
-			org.bukkit.block.TrialSpawner state = SpawnerUtils.getAsSkriptTrialSpawner(object);
+			org.bukkit.block.TrialSpawner state = SpawnerUtils.getTrialSpawner(block);
 			TrialSpawner data = (TrialSpawner) state.getBlockData();
 
 			data.setTrialSpawnerState(State.EJECTING_REWARD);
@@ -60,7 +60,7 @@ public class EffEjectReward extends Effect {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "eject trial spawner rewards from " + objects.toString(event, debug);
+		return "spit out the trial rewards of " + blocks.toString(event, debug);
 	}
 
 }

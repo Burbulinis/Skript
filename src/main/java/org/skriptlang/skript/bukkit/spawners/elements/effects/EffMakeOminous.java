@@ -12,6 +12,7 @@ import org.bukkit.block.data.type.TrialSpawner;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.spawners.SpawnerModule;
+import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxOrigin;
 import org.skriptlang.skript.registration.SyntaxRegistry;
@@ -25,18 +26,18 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 		"\tmake the trial spawner state of event-block ominous"
 })
 @Since("INSERT VERSION")
-@RequiredPlugins("MC 1.21+")
+@RequiredPlugins("Minecraft 1.21+")
 public class EffMakeOminous extends Effect {
 
-	static {
-		var info = SyntaxInfo.builder(EffMakeOminous.class)
-			.origin(SyntaxOrigin.of(SpawnerModule.ADDON))
+	public static void register(SyntaxRegistry registry) {
+		if (!SpawnerUtils.IS_RUNNING_1_21)
+			return;
+		registry.register(SyntaxRegistry.EFFECT, SyntaxInfo.builder(EffMakeOminous.class)
 			.supplier(EffMakeOminous::new)
 			.priority(SyntaxInfo.COMBINED)
-			.addPatterns("make [the] trial spawner state of %blocks/blockdatas% (:ominous|normal)")
-			.build();
-
-		SpawnerModule.SYNTAX_REGISTRY.register(SyntaxRegistry.EFFECT, info);
+			.addPatterns("make %blocks/blockdatas% (:ominous|regular|normal)")
+			.build()
+		);
 	}
 
 	private boolean ominous;
@@ -65,11 +66,11 @@ public class EffMakeOminous extends Effect {
 	public String toString(@Nullable Event event, boolean debug) {
 		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
 
-		builder.append("make the trial spawner state of", spawners);
+		builder.append("make", spawners);
 		if (ominous) {
 			builder.append("ominous");
 		} else {
-			builder.append("regular");
+			builder.append("normal");
 		}
 
 		return builder.toString();

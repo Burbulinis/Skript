@@ -1,10 +1,10 @@
-package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner;
+package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.spawnerdata;
 
 import ch.njol.skript.config.SectionNode;
+import ch.njol.skript.doc.RequiredPlugins;
 import ch.njol.skript.expressions.base.SectionExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
-import ch.njol.skript.lang.SyntaxStringBuilder;
 import ch.njol.skript.lang.Trigger;
 import ch.njol.skript.lang.TriggerItem;
 import ch.njol.skript.lang.util.SectionUtils;
@@ -24,6 +24,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 import java.util.List;
 import java.util.Locale;
 
+@RequiredPlugins("Minecraft 1.21+ (for trial spawner data)")
 public class ExprSecSpawnerData extends SectionExpression<SkriptSpawnerData> {
 
 	public static void register(SyntaxRegistry registry) {
@@ -33,7 +34,7 @@ public class ExprSecSpawnerData extends SectionExpression<SkriptSpawnerData> {
 			.addPattern("[the] mob spawner data");
 
 		if (SpawnerUtils.IS_RUNNING_1_21)
-			info.addPattern("[the] [:ominous] trial spawner data");
+			info.addPattern("[the] trial spawner data");
 
 		registry.register(SyntaxRegistry.EXPRESSION, info.build());
 	}
@@ -43,7 +44,6 @@ public class ExprSecSpawnerData extends SectionExpression<SkriptSpawnerData> {
 	}
 
 	private DataType type;
-	private boolean ominous;
 	private Trigger trigger;
 
 	@Override
@@ -52,7 +52,6 @@ public class ExprSecSpawnerData extends SectionExpression<SkriptSpawnerData> {
 		@Nullable SectionNode node, @Nullable List<TriggerItem> triggerItems
 	) {
 		type = DataType.values()[pattern];
-		ominous = result.hasTag("ominous");
 		if (node != null) {
 			String name = type.name().toLowerCase(Locale.ENGLISH) + " spawner data";
 			trigger = SectionUtils.loadLinkedCode(name, (beforeLoading, afterLoading) ->
@@ -66,7 +65,7 @@ public class ExprSecSpawnerData extends SectionExpression<SkriptSpawnerData> {
 	protected SkriptSpawnerData @Nullable [] get(Event event) {
 		SkriptSpawnerData data = (type == DataType.MOB)
 			? new SkriptMobSpawnerData()
-			: new SkriptTrialSpawnerData(ominous);
+			: new SkriptTrialSpawnerData();
 
 		if (trigger != null) {
 			Event dataEvent = (type == DataType.MOB)
@@ -94,11 +93,7 @@ public class ExprSecSpawnerData extends SectionExpression<SkriptSpawnerData> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
-		if (ominous)
-			builder.append("ominous");
-		builder.append(type.name().toLowerCase(Locale.ENGLISH), "spawner data");
-		return builder.toString();
+		return type.name().toLowerCase(Locale.ENGLISH) + " spawner data";
 	}
 
 }

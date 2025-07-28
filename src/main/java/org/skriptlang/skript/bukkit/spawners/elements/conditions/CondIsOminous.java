@@ -2,10 +2,9 @@ package org.skriptlang.skript.bukkit.spawners.elements.conditions;
 
 import ch.njol.skript.conditions.base.PropertyCondition;
 import ch.njol.skript.doc.*;
-import org.bukkit.block.Block;
 import org.bukkit.block.TrialSpawner;
-import org.skriptlang.skript.bukkit.spawners.SpawnerModule;
-import org.skriptlang.skript.bukkit.spawners.util.TrialSpawnerConfig;
+import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Trial Spawner - Is Ominous")
 @Description(
@@ -20,23 +19,27 @@ import org.skriptlang.skript.bukkit.spawners.util.TrialSpawnerConfig;
 		"\tsend \"That's true! The config is not ominous.\""
 })
 @Since("INSERT VERSION")
-@RequiredPlugins("MC 1.21+")
+@RequiredPlugins("Minecraft 1.21+")
 public class CondIsOminous extends PropertyCondition<Object> {
 
-	static {
-		register(SpawnerModule.SYNTAX_REGISTRY, CondIsOminous.class,
-			"ominous", "trialspawnerconfigs/blocks/blockdatas");
+	public static void register(SyntaxRegistry registry) {
+		if (!SpawnerUtils.IS_RUNNING_1_21)
+			return;
+		registry.register(SyntaxRegistry.CONDITION, infoBuilder(CondIsOminous.class, PropertyType.BE,
+			"ominous", "blocks/blockdatas")
+				.supplier(CondIsOminous::new)
+				.build()
+		);
 	}
 
 	@Override
 	public boolean check(Object object) {
-		if (object instanceof TrialSpawnerConfig config) {
-			return config.ominous();
-		} else if (object instanceof Block block && block.getState() instanceof TrialSpawner spawner) {
-			return spawner.isOminous();
+		if (SpawnerUtils.isTrialSpawner(object)) {
+			return SpawnerUtils.getTrialSpawner(object).isOminous();
 		} else if (object instanceof org.bukkit.block.data.type.TrialSpawner spawner) {
 			return spawner.isOminous();
 		}
+
 		return false;
 	}
 

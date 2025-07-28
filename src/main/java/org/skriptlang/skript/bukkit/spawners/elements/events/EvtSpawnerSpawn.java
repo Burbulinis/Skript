@@ -1,93 +1,110 @@
 package org.skriptlang.skript.bukkit.spawners.elements.events;
 
+import ch.njol.skript.bukkitutil.EntityUtils;
 import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.SyntaxStringBuilder;
-import org.bukkit.entity.Entity;
+import ch.njol.util.coll.CollectionUtils;
+import com.destroystokyo.paper.event.entity.PreSpawnerSpawnEvent;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.entity.EntityType;
 import org.bukkit.event.Event;
+import org.bukkit.event.entity.EntityEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.event.entity.TrialSpawnerSpawnEvent;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.registration.BukkitRegistryKeys;
 import org.skriptlang.skript.bukkit.registration.BukkitSyntaxInfos;
-import org.skriptlang.skript.bukkit.spawners.SpawnerModule;
+import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.registration.SyntaxInfo;
-import org.skriptlang.skript.registration.SyntaxOrigin;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
-import java.util.List;
-
+@SuppressWarnings("UnstableApiUsage")
 public class EvtSpawnerSpawn extends SkriptEvent {
 
-	static {
-		var info = BukkitSyntaxInfos.Event.builder(EvtSpawnerSpawn.class, "Spawner Spawn")
-			.origin(SyntaxOrigin.of(SpawnerModule.ADDON))
-			.supplier(EvtSpawnerSpawn::new)
-			.priority(SyntaxInfo.COMBINED)
-			.addEvents(List.of(SpawnerSpawnEvent.class, TrialSpawnerSpawnEvent.class))
-			.addPattern("[:trial] spawner spawn[ing] [of %-entitydatas%]")
-			.addDescription("Called when a spawner spawns an entity.")
-			.addExamples(
-				"on spawner spawn of pig:",
-					"\tbroadcast \"A little piggy spawned!\"",
-				"",
-				"on trial spawner spawn of pig:",
-					"\tbroadcast \"A little piggy spawned from a trial spawner!\"")
-			.since("INSERT VERSION")
-			.addRequiredPlugin("MC 1.21+")
-			.build();
+	public static void register(SyntaxRegistry registry) {
+		Class<? extends Event>[] events = CollectionUtils.array(SpawnerSpawnEvent.class, PreSpawnerSpawnEvent.class);
+		String pattern = "[:pre] spawner spawn[ing] [of %-entitydatas%]";
 
-		SpawnerModule.SYNTAX_REGISTRY.register(BukkitRegistryKeys.EVENT, info);
+		if (SpawnerUtils.IS_RUNNING_1_21) {
+			events = CollectionUtils.array(SpawnerSpawnEvent.class, PreSpawnerSpawnEvent.class, TrialSpawnerSpawnEvent.class);
+			pattern = "[:pre] [:trial] spawner spawn[ing] [of %-entitydatas%]";
+		}
+
+		registry.register(BukkitRegistryKeys.EVENT, BukkitSyntaxInfos.Event.builder(EvtSpawnerSpawn.class, "Spawner Spawn")
+			.priority(SyntaxInfo.COMBINED)
+			.supplier(EvtSpawnerSpawn::new)
+			.addEvents(events)
+			.addPattern(pattern)
+			.addDescription("Called when a spawner spawns an entity or is about to.")
+			.addExamples("todo")
+			.addSince("INSERT VERSION")
+			.addRequiredPlugin("Minecraft 1.21+ (for trial spawners)")
+			.build()
+		);
 	}
 
-	private Literal<EntityData<?>> entityDatas;
+	private boolean pre;
 	private boolean trial;
+	private Literal<EntityData<?>> entityDatas;
 
 	@Override
 	public boolean init(Literal<?>[] args, int matchedPattern, ParseResult parseResult) {
-		//noinspection unchecked
-		entityDatas =  (Literal<EntityData<?>>) args[0];
+		pre = parseResult.hasTag("pre");
 		trial = parseResult.hasTag("trial");
+		//noinspection unchecked
+		entityDatas = (Literal<EntityData<?>>) args[0];
 		return true;
 	}
 
+
 	@Override
 	public boolean check(Event event) {
-		boolean pass = true;
+		if (pre && event instanceof PreSpawnerSpawnEvent preEvent) {
+			Block block = preEvent.getSpawnerLocation().getBlock();
+			if (trial && block.getType() != Material.TRIAL_SPAWNER)
+				return false;
+		}
+
 		if (entityDatas != null) {
-			Entity entity = null;
-			if (event instanceof SpawnerSpawnEvent spawnerEvent) {
-				entity = spawnerEvent.getEntity();
-			} else if (event instanceof TrialSpawnerSpawnEvent trialEvent) {
-				entity = trialEvent.getEntity();
+			EntityType currentType = null;
+
+			if (event instanceof EntityEvent entityEvent) {
+				currentType = entityEvent.getEntityType();
+			} else if (event instanceof PreSpawnerSpawnEvent preEvent) {
+				currentType = preEvent.getType();
 			}
 
-			assert entity != null;
-
-			for (EntityData<?> entityType : entityDatas.getArray()) {
-				if (entityType.isInstance(entity)) {
-					pass = true;
+			boolean match = false;
+			for (EntityData<?> entityData : entityDatas.getArray()) {
+				if (entityData.isSupertypeOf(EntityUtils.toSkriptEntityData(currentType))) {
+					match = true;
 					break;
 				}
-				pass = false;
 			}
+
+			if (!match)
+				return false;
 		}
 
-		if (trial && pass) {
+		if (pre) {
+			return event instanceof PreSpawnerSpawnEvent;
+		} else if (trial) {
 			return event instanceof TrialSpawnerSpawnEvent;
-		} else if (!trial && pass) {
+		} else {
 			return event instanceof SpawnerSpawnEvent;
 		}
-
-		return false;
 	}
-
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
 		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
 
+		if (pre)
+			builder.append("pre");
 		if (trial)
 			builder.append("trial");
 		builder.append("spawner spawn");

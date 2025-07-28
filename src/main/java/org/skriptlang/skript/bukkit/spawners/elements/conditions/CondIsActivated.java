@@ -6,6 +6,7 @@ import org.bukkit.block.data.type.TrialSpawner;
 import org.bukkit.block.data.type.TrialSpawner.State;
 import org.skriptlang.skript.bukkit.spawners.SpawnerModule;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
+import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Spawner - Is Active")
 @Description(
@@ -18,22 +19,28 @@ import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 		"\tsend \"The spawner is activated!\""
 })
 @Since("INSERT VERSION")
-@RequiredPlugins("MC 1.21+")
+@RequiredPlugins("Minecraft 1.21+ (for trial spawners, spawner minecarts)")
 public class CondIsActivated extends PropertyCondition<Object> {
 
-	static {
-		register(SpawnerModule.SYNTAX_REGISTRY, CondIsActivated.class,
-			"[an] (activated|active) spawner", "blocks/entities/trialspawnerconfigs");
+	public static void register(SyntaxRegistry registry) {
+		registry.register(SyntaxRegistry.CONDITION, infoBuilder(CondIsActivated.class, PropertyType.BE,
+			"[an] (activated|active) spawner", SpawnerUtils.spawnerPropertyType)
+				.supplier(CondIsActivated::new)
+				.build()
+		);
 	}
 
 	@Override
 	public boolean check(Object object) {
-		if (SpawnerUtils.isSpawner(object)) {
-			return SpawnerUtils.getAsSkriptSpawner(object).isActivated();
+		if (SpawnerUtils.isCreatureSpawner(object)) {
+			return SpawnerUtils.getCreatureSpawner(object).isActivated();
+		} else if (SpawnerUtils.isSpawnerMinecart(object)) {
+			return SpawnerUtils.getSpawnerMinecart(object).isActivated();
 		} else if (SpawnerUtils.isTrialSpawner(object)) {
-			TrialSpawner data = ((TrialSpawner) SpawnerUtils.getAsSkriptTrialSpawner(object).getBlockData());
-			return data.getTrialSpawnerState() == State.ACTIVE;
+			TrialSpawner trialSpawner = (TrialSpawner) SpawnerUtils.getTrialSpawner(object).getBlockData();
+			return trialSpawner.getTrialSpawnerState() == State.ACTIVE;
 		}
+
 		return false;
 	}
 

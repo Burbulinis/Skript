@@ -96,8 +96,8 @@ public class SkriptMobSpawnerData extends SkriptSpawnerData implements Yggdrasil
 		super.applyToSpawner(spawner);
 		spawner.setMaxNearbyEntities(getMaxNearbyEntityCap());
 		spawner.setSpawnCount(getSpawnCount());
-		spawner.setMaxSpawnDelay(Math.clamp(getMaxSpawnDelay().getAs(TimePeriod.TICK), 0, Integer.MAX_VALUE));
-		spawner.setMinSpawnDelay(Math.clamp(getMinSpawnDelay().getAs(TimePeriod.TICK), 0, Integer.MAX_VALUE));
+		spawner.setMaxSpawnDelay((int) Math.max(getMaxSpawnDelay().getAs(TimePeriod.TICK), Integer.MAX_VALUE));
+		spawner.setMinSpawnDelay((int) Math.max(getMinSpawnDelay().getAs(TimePeriod.TICK), Integer.MAX_VALUE));
 
 		if (spawner instanceof CreatureSpawner creatureSpawner)
 			creatureSpawner.update(true, false);

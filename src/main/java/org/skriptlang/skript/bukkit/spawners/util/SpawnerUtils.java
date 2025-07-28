@@ -8,6 +8,7 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.TrialSpawner;
 import org.bukkit.entity.minecart.SpawnerMinecart;
 import org.bukkit.spawner.TrialSpawnerConfiguration;
+import org.jetbrains.annotations.UnknownNullability;
 
 /**
  * Utility class for spawners.
@@ -25,7 +26,7 @@ public class SpawnerUtils {
 	public static final Timespan DEFAULT_MAX_SPAWN_DELAY = new Timespan(TimePeriod.TICK, 800);
 	public static final Timespan DEFAULT_MIN_SPAWN_DELAY = new Timespan(TimePeriod.TICK, 200);
 	public static final Timespan DEFAULT_COOLDOWN_LENGTH = new Timespan(TimePeriod.TICK, 36_000);
-	public static final Timespan DEFAULT_TRIAL_SPAWN_DELAY = new Timespan(TimePeriod.TICK, 40);;
+	public static final Timespan DEFAULT_TRIAL_SPAWN_DELAY = new Timespan(TimePeriod.TICK, 40);
 
 	public static final int DEFAULT_TRIAL_ACTIVATION_RANGE = 14;
 	public static final int DEFAULT_BASE_MOB_AMOUNT = 6;
@@ -110,7 +111,7 @@ public class SpawnerUtils {
 	 * @return the spawner minecart
 	 * @see #isSpawnerMinecart(Object)
 	 */
-	public static SpawnerMinecart getSpawnerMinecart(Object object) {
+	public static @UnknownNullability SpawnerMinecart getSpawnerMinecart(Object object) {
 		if (!IS_RUNNING_1_21)
 			return null;
 		return (SpawnerMinecart) object;
@@ -139,7 +140,7 @@ public class SpawnerUtils {
 	 * @return the trial spawner
 	 * @see #isTrialSpawner(Object)
 	 */
-	public static TrialSpawner getTrialSpawner(Object object) {
+	public static @UnknownNullability TrialSpawner getTrialSpawner(Object object) {
 		if (!IS_RUNNING_1_21)
 			return null;
 		if (object instanceof Block block)

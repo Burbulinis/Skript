@@ -1,6 +1,7 @@
-package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner;
+package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.spawnerdata;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
+import ch.njol.skript.doc.RequiredPlugins;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -14,6 +15,7 @@ import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptSpawnerData;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptTrialSpawnerData;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
+@RequiredPlugins("Minecraft 1.21+ (for trial spawner data)")
 public class ExprSpawnerData extends SimplePropertyExpression<Object, SkriptSpawnerData> {
 
 	public static void register(SyntaxRegistry registry) {
@@ -67,7 +69,7 @@ public class ExprSpawnerData extends SimplePropertyExpression<Object, SkriptSpaw
 		SkriptSpawnerData data = delta != null ? (SkriptSpawnerData) delta[0] : null;
 
 		if (data == null)
-			data = trial ? new SkriptTrialSpawnerData(ominous) : new SkriptMobSpawnerData();
+			data = trial ? new SkriptTrialSpawnerData() : new SkriptMobSpawnerData();
 
 		for (Object object : getExpr().getArray(event)) {
 			if (!trial && SpawnerUtils.isCreatureSpawner(object)) {
@@ -75,7 +77,7 @@ public class ExprSpawnerData extends SimplePropertyExpression<Object, SkriptSpaw
 			} else if (!trial && SpawnerUtils.isSpawnerMinecart(object)) {
 				((SkriptMobSpawnerData) data).applyDataToSpawner(SpawnerUtils.getSpawnerMinecart(object));
 			} else if (trial && SpawnerUtils.isTrialSpawner(object)) {
-				((SkriptTrialSpawnerData) data).applyDataToTrialSpawner(SpawnerUtils.getTrialSpawner(object));
+				((SkriptTrialSpawnerData) data).applyDataToTrialSpawner(SpawnerUtils.getTrialSpawner(object), ominous);
 			}
 		}
 	}

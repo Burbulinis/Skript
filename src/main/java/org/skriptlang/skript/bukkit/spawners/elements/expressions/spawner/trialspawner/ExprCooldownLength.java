@@ -95,11 +95,4 @@ public class ExprCooldownLength extends SimplePropertyExpression<Block, Timespan
 		return "trial cooldown length";
 	}
 
-	@Override
-	public Expression<? extends Timespan> simplify() {
-		if (getExpr() instanceof Literal<? extends Block>)
-			return SimplifiedLiteral.fromExpression(this);
-		return this;
-	}
-
 }

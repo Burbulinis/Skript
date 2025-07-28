@@ -1,10 +1,7 @@
-package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.mobspawner;
+package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Examples;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.Since;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.block.CreatureSpawner;
@@ -39,6 +36,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 	"set spawner entity of event-block to 16 golden apples # paper exclusive and only for spawners",
 })
 @Since("INSERT VERSION")
+@RequiredPlugins("Minecraft 1.21+ (for trial spawners, spawner minecarts)")
 public class ExprSpawnerEntity extends SimplePropertyExpression<Object, EntitySnapshot> {
 
 	public static void register(SyntaxRegistry registry) {
@@ -51,22 +49,21 @@ public class ExprSpawnerEntity extends SimplePropertyExpression<Object, EntitySn
 
 	@Override
 	public @Nullable EntitySnapshot convert(Object object) {
+		EntitySnapshot snapshot = null;
+
 		if (SpawnerUtils.isCreatureSpawner(object)) {
-			CreatureSpawner creatureSpawner = SpawnerUtils.getCreatureSpawner(object);
-			return creatureSpawner.getSpawnedEntity();
+			snapshot = SpawnerUtils.getCreatureSpawner(object).getSpawnedEntity();
 		} else if (SpawnerUtils.isTrialSpawner(object)) {
 			TrialSpawner trialSpawner = SpawnerUtils.getTrialSpawner(object);
-			var config = SpawnerUtils.getTrialSpawnerConfiguration(
+			snapshot = SpawnerUtils.getTrialSpawnerConfiguration(
 				trialSpawner,
 				trialSpawner.isOminous()
-			);
-			return config.getSpawnedEntity();
+			).getSpawnedEntity();
 		} else if (SpawnerUtils.isSpawnerMinecart(object)) {
-			SpawnerMinecart spawner = SpawnerUtils.getSpawnerMinecart(object);
-			return spawner.getSpawnedEntity();
+			snapshot = SpawnerUtils.getSpawnerMinecart(object).getSpawnedEntity();
 		}
 
-		return null;
+		return snapshot;
 	}
 
 	@Override

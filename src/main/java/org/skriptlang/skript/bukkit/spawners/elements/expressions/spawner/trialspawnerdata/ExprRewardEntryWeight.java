@@ -1,6 +1,7 @@
 package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.trialspawnerdata;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
+import ch.njol.skript.doc.RequiredPlugins;
 import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@RequiredPlugins("Minecraft 1.21+")
 public class ExprRewardEntryWeight extends PropertyExpression<SkriptTrialSpawnerData, Integer> {
 
 	public static void register(SyntaxRegistry registry) {
@@ -29,8 +31,8 @@ public class ExprRewardEntryWeight extends PropertyExpression<SkriptTrialSpawner
 			.supplier(ExprRewardEntryWeight::new)
 			.priority(DEFAULT_PRIORITY)
 			.addPatterns(
-				"[the] reward weight [of %trialspawnerdatas%] for %loottables%",
-				"%trialspawnerdatas%'[s] reward weight for %loottables%")
+				"[the] reward [entry] weight [of %trialspawnerdatas%] for %loottables%",
+				"%trialspawnerdatas%'[s] reward [entry] weight for %loottables%")
 			.build()
 		);
 	}

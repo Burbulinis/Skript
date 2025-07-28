@@ -1,6 +1,7 @@
-package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner;
+package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.spawnerdata;
 
 import ch.njol.skript.Skript;
+import ch.njol.skript.doc.RequiredPlugins;
 import ch.njol.skript.lang.EventRestrictedSyntax;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -21,6 +22,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 
 import java.util.StringJoiner;
 
+@RequiredPlugins("Minecraft 1.21+ (for trial spawner data)")
 public class ExprEventSpawnerData extends SimpleExpression<SkriptSpawnerData> implements EventRestrictedSyntax {
 
 	public static void register(SyntaxRegistry registry) {

@@ -32,20 +32,10 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 	private Timespan spawnDelay = SpawnerUtils.DEFAULT_TRIAL_SPAWN_DELAY;
 	private @NotNull Map<LootTable, Integer> rewardEntries = new HashMap<>();
 
-	private boolean ominous = false;
-
 	/**
-	 * Creates a new SkriptTrialSpawnerData instance with the ominous value defaulted to false.
+	 * Creates a new {@code SkriptTrialSpawnerData} instance.
 	 */
 	public SkriptTrialSpawnerData() {}
-
-	/**
-	 * Creates a new SkriptTrialSpawnerData instance with default values
-	 * @param ominous whether the data should be ominous
-	 */
-	public SkriptTrialSpawnerData(boolean ominous) {
-		this.ominous = ominous;
-	}
 
 	/**
 	 * Creates a new {@code SkriptTrialSpawnerData} instance from the given Bukkit {@link TrialSpawner}.
@@ -65,7 +55,7 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 	 * @return a new {@code SkriptTrialSpawnerData} instance containing the data from the Bukkit trial spawner
 	 */
 	public static SkriptTrialSpawnerData fromTrialSpawner(@NotNull TrialSpawner trialSpawner, boolean ominous) {
-		SkriptTrialSpawnerData data = new SkriptTrialSpawnerData(ominous);
+		SkriptTrialSpawnerData data = new SkriptTrialSpawnerData();
 
 		var config = SpawnerUtils.getTrialSpawnerConfiguration(trialSpawner, ominous);
 		SkriptSpawnerData.applyToSpawnerData(config, data);
@@ -84,10 +74,10 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 	 * Applies this SkriptTrialSpawnerData to the given Bukkit trial spawners.
 	 * @param trialSpawners the array of Bukkit trial spawners to apply the data to
 	 */
-	public void applyDataToTrialSpawners(@NotNull TrialSpawner[] trialSpawners) {
+	public void applyDataToTrialSpawners(@NotNull TrialSpawner @NotNull [] trialSpawners, boolean ominous) {
 		Preconditions.checkNotNull(trialSpawners, "trialSpawners cannot be null");
 		for (TrialSpawner trialSpawner : trialSpawners) {
-			applyDataToTrialSpawner(trialSpawner);
+			applyDataToTrialSpawner(trialSpawner, ominous);
 		}
 	}
 
@@ -95,7 +85,7 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 	 * Applies this SkriptTrialSpawnerData to the given Bukkit trial spawner.
 	 * @param trialSpawner the Bukkit trial spawner to apply the data to
 	 */
-	public void applyDataToTrialSpawner(@NotNull TrialSpawner trialSpawner) {
+	public void applyDataToTrialSpawner(@NotNull TrialSpawner trialSpawner, boolean ominous) {
 		Preconditions.checkNotNull(trialSpawner, "trialSpawner cannot be null");
 
 		var config = SpawnerUtils.getTrialSpawnerConfiguration(trialSpawner, ominous);
@@ -107,17 +97,9 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 		config.setAdditionalSpawnsBeforeCooldown(getBaseMobAmountIncrement());
 		config.setBaseSimultaneousEntities(getConcurrentMobAmount());
 		config.setAdditionalSimultaneousEntities(getConcurrentMobAmountIncrement());
-		config.setDelay(Math.clamp(spawnDelay.getAs(TimePeriod.TICK), 0, Integer.MAX_VALUE));
+		config.setDelay((int) Math.max(spawnDelay.getAs(TimePeriod.TICK), Integer.MAX_VALUE));
 
 		trialSpawner.update(true, false);
-	}
-
-	/**
-	 * Returns whether this trial spawner data is for an ominous trial spawner.
-	 * @return true if this is an ominous trial spawner data, false otherwise
-	 */
-	public boolean isOminous() {
-		return ominous;
 	}
 
 	@Override
@@ -370,8 +352,6 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 			count++;
 		}
 
-		fields.putPrimitive("ominous", this.ominous);
-
 		return fields;
 	}
 
@@ -393,8 +373,6 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 			this.rewardEntries.put(lootTable, weight);
 			count++;
 		}
-
-		this.ominous = fields.getPrimitive("ominous", boolean.class);
 	}
 
 }

@@ -1,4 +1,4 @@
-package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.mobspawner;
+package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.*;
@@ -38,12 +38,12 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 	"reset the spawner delay of the target block"
 })
 @Since("INSERT VERSION")
-@RequiredPlugins("Minecraft 1.21.4+ (for trial spawners)")
+@RequiredPlugins({"Minecraft 1.21+ (spawner minecarts)", "Minecraft 1.21.4+ (for trial spawners)"})
 public class ExprSpawnDelay extends SimplePropertyExpression<Object, Timespan> {
 
 	public static void register(SyntaxRegistry registry) {
 		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprSpawnDelay.class, Timespan.class,
-			"spawn delay[s]", SpawnerUtils.spawnerPropertyType, false	)
+			"spawn delay[s]", SpawnerUtils.spawnerPropertyType, false)
 				.supplier(ExprSpawnDelay::new)
 				.build()
 		);
@@ -51,19 +51,19 @@ public class ExprSpawnDelay extends SimplePropertyExpression<Object, Timespan> {
 
 	@Override
 	public @Nullable Timespan convert(Object object) {
+		Timespan timespan = null;
+
 		if (SpawnerUtils.isCreatureSpawner(object)) {
-			CreatureSpawner creatureSpawner = SpawnerUtils.getCreatureSpawner(object);
-			return new Timespan(TimePeriod.TICK, creatureSpawner.getDelay());
+			timespan = new Timespan(TimePeriod.TICK, SpawnerUtils.getCreatureSpawner(object).getDelay());
 		} else if (SpawnerUtils.IS_RUNNING_1_21_4 && SpawnerUtils.isTrialSpawner(object)) {
 			TrialSpawner spawner = SpawnerUtils.getTrialSpawner(object);
 			long ticks = Math.max(0, spawner.getNextSpawnAttempt() - spawner.getWorld().getGameTime());
-			return new Timespan(TimePeriod.TICK, ticks);
+			timespan = new Timespan(TimePeriod.TICK, ticks);
 		} else if (SpawnerUtils.isSpawnerMinecart(object)) {
-			SpawnerMinecart spawnerMinecart = SpawnerUtils.getSpawnerMinecart(object);
-			return new Timespan(TimePeriod.TICK, spawnerMinecart.getDelay());
+			timespan = new Timespan(TimePeriod.TICK, SpawnerUtils.getSpawnerMinecart(object).getDelay());
 		}
 
-		return null;
+		return timespan;
 	}
 
 	@Override

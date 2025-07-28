@@ -1,11 +1,8 @@
-package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.mobspawner;
+package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner;
 
 import ch.njol.skript.bukkitutil.EntityUtils;
 import ch.njol.skript.classes.Changer.ChangeMode;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Example;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.Since;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
@@ -26,6 +23,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 			send "Spawner's type is %target block's entity type%"
 	""")
 @Since("2.4, 2.9.2 (trial spawner), INSERT VERSION (spawner minecart)")
+@RequiredPlugins("Minecraft 1.21+ (for trial spawners, spawner minecarts)")
 public class ExprSpawnerType extends SimplePropertyExpression<Object, EntityData> {
 
 	public static void register(SyntaxRegistry registry) {
@@ -38,27 +36,21 @@ public class ExprSpawnerType extends SimplePropertyExpression<Object, EntityData
 
 	@Override
 	public @Nullable EntityData<?> convert(Object object) {
-		if (SpawnerUtils.isCreatureSpawner(object)) {
-			CreatureSpawner spawner = SpawnerUtils.getCreatureSpawner(object);
-			if (spawner.getSpawnedType() == null)
-				return null;
+		EntityType entityType = null;
 
-			return EntityUtils.toSkriptEntityData(spawner.getSpawnedType());
+		if (SpawnerUtils.isCreatureSpawner(object)) {
+			entityType = SpawnerUtils.getCreatureSpawner(object).getSpawnedType();
 		} else if (SpawnerUtils.isTrialSpawner(object)) {
 			var config = SpawnerUtils.getTrialSpawnerConfiguration(SpawnerUtils.getTrialSpawner(object));
-			if (config.getSpawnedType() == null)
-				return null;
-
-			return EntityUtils.toSkriptEntityData(config.getSpawnedType());
+			entityType = config.getSpawnedType();
 		} else if (SpawnerUtils.isSpawnerMinecart(object)) {
-			SpawnerMinecart spawner = SpawnerUtils.getSpawnerMinecart(object);
-			if (spawner.getSpawnedType() == null)
-				return null;
-
-			return EntityUtils.toSkriptEntityData(spawner.getSpawnedType());
+			entityType = SpawnerUtils.getSpawnerMinecart(object).getSpawnedType();
 		}
 
-		return null;
+		if (entityType == null)
+			return null;
+
+		return EntityUtils.toSkriptEntityData(entityType);
 	}
 
 	@Override
