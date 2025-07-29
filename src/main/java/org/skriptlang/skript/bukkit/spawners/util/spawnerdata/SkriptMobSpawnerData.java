@@ -79,7 +79,7 @@ public class SkriptMobSpawnerData extends SkriptSpawnerData implements Yggdrasil
 	 * Applies this SkriptSpawnerData to the given spawners.
 	 * @param spawners the spawners to apply the data to
 	 */
-	public void applyDataToSpawners(@NotNull Spawner[] spawners) {
+	public void applyDataToSpawners(@NotNull Spawner @NotNull [] spawners) {
 		Preconditions.checkNotNull(spawners, "spawners cannot be null");
 		for (Spawner spawner : spawners) {
 			applyDataToSpawner(spawner);
@@ -109,7 +109,7 @@ public class SkriptMobSpawnerData extends SkriptSpawnerData implements Yggdrasil
 	 * This is used for versions under 1.21 to allow legacy spawner support.
 	 * @param creatureSpawners the creature spawners to apply the data to
 	 */
-	public void applyDataToSpawners(@NotNull CreatureSpawner[] creatureSpawners) {
+	public void applyDataToSpawners(@NotNull CreatureSpawner @NotNull [] creatureSpawners) {
 		Preconditions.checkNotNull(creatureSpawners, "creatureSpawners cannot be null");
 		for (CreatureSpawner creatureSpawner : creatureSpawners) {
 			applyDataToSpawner(creatureSpawner);

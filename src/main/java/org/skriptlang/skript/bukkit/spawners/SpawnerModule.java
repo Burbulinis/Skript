@@ -1,5 +1,6 @@
 package org.skriptlang.skript.bukkit.spawners;
 
+import ch.njol.skript.Skript;
 import ch.njol.skript.bukkitutil.EntityUtils;
 import ch.njol.skript.classes.ClassInfo;
 import ch.njol.skript.classes.Parser;
@@ -8,10 +9,12 @@ import ch.njol.skript.classes.YggdrasilSerializer;
 import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.expressions.base.EventValueExpression;
 import ch.njol.skript.lang.ParseContext;
+import ch.njol.skript.lang.SyntaxElement;
 import ch.njol.skript.registrations.Classes;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.yggdrasil.Fields;
 import com.destroystokyo.paper.event.entity.PreSpawnerSpawnEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.spawner.SpawnRule;
@@ -24,6 +27,15 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.loot.LootTable;
 import org.skriptlang.skript.addon.AddonModule;
 import org.skriptlang.skript.addon.SkriptAddon;
+import org.skriptlang.skript.bukkit.spawners.elements.conditions.CondIsActivated;
+import org.skriptlang.skript.bukkit.spawners.elements.conditions.CondIsOminous;
+import org.skriptlang.skript.bukkit.spawners.elements.conditions.CondIsTracking;
+import org.skriptlang.skript.bukkit.spawners.elements.effects.EffEjectReward;
+import org.skriptlang.skript.bukkit.spawners.elements.effects.EffMakeOminous;
+import org.skriptlang.skript.bukkit.spawners.elements.effects.EffSpawnerItem;
+import org.skriptlang.skript.bukkit.spawners.elements.effects.EffTrialSpawnerTrack;
+import org.skriptlang.skript.bukkit.spawners.elements.events.EvtSpawnerSpawn;
+import org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.mobspawnerdata.ExprMaxNearbyEntities;
 import org.skriptlang.skript.bukkit.spawners.util.SkriptSpawnerEntry;
 import org.skriptlang.skript.bukkit.spawners.util.events.MobSpawnerDataEvent;
 import org.skriptlang.skript.bukkit.spawners.util.events.SpawnRuleEvent;
@@ -32,8 +44,11 @@ import org.skriptlang.skript.bukkit.spawners.util.events.TrialSpawnerDataEvent;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptMobSpawnerData;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptSpawnerData;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptTrialSpawnerData;
+import org.skriptlang.skript.registration.SyntaxRegistry;
+import org.skriptlang.skript.util.ClassLoader;
 
 import java.io.StreamCorruptedException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringJoiner;
@@ -266,6 +281,21 @@ public class SpawnerModule implements AddonModule {
 
 	@Override
 	public void load(SkriptAddon addon) {
+		ClassLoader.builder()
+			.basePackage("org.skriptlang.skript.bukkit.spawners.elements")
+			.deep(true)
+			.initialize(true)
+			.forEachClass(clazz -> {
+				try {
+					clazz.getMethod("register", SyntaxRegistry.class).invoke(null, addon.syntaxRegistry());
+				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+					Bukkit.getLogger().severe("Failed to load syntax class: " + e);
+				}
+			})
+			.build()
+			.loadClasses(Skript.class, Skript.getAddonInstance().getFile());
+
+		/*
 
 		Classes.registerClass(new ClassInfo<>(TrialSpawnerConfig.class, "trialspawnerconfig")
 			.user("trial ?spawner ?config(urations?)?")
@@ -441,6 +471,8 @@ public class SpawnerModule implements AddonModule {
 				}
 			})
 		);
+
+		 */
 	}
 
 }
