@@ -2830,7 +2830,8 @@ types:
 	spawnerdata: spawner data¦s @a
 	mobspawnerdata: mob spawner data¦s @a
 	trialspawnerdata: trial spawner data¦s @a
-	rewardentry: reward entr¦y¦ies @a
+	spawnrule: spawn rule¦s @a
+	spawnerentry: spawner entr¦y¦ies @a
 
 	# Hooks
 	money: money

@@ -49,9 +49,8 @@ import org.skriptlang.skript.util.ClassLoader;
 
 import java.io.StreamCorruptedException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.StringJoiner;
+import java.lang.reflect.Method;
+import java.util.*;
 
 @SuppressWarnings("UnstableApiUsage")
 public class SpawnerModule implements AddonModule {
@@ -286,15 +285,16 @@ public class SpawnerModule implements AddonModule {
 			.deep(true)
 			.initialize(true)
 			.forEachClass(clazz -> {
-				try {
-					clazz.getMethod("register", SyntaxRegistry.class).invoke(null, addon.syntaxRegistry());
-				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-					Bukkit.getLogger().severe("Failed to load syntax class: " + e);
+				if (SyntaxElement.class.isAssignableFrom(clazz)) {
+					try {
+						clazz.getMethod("register", SyntaxRegistry.class).invoke(null, addon.syntaxRegistry());
+					} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+						Bukkit.getLogger().severe("Failed to load syntax class: " + e);
+					}
 				}
 			})
 			.build()
 			.loadClasses(Skript.class, Skript.getAddonInstance().getFile());
-
 		/*
 
 		Classes.registerClass(new ClassInfo<>(TrialSpawnerConfig.class, "trialspawnerconfig")

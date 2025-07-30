@@ -9,6 +9,9 @@ import org.bukkit.block.TrialSpawner;
 import org.bukkit.entity.minecart.SpawnerMinecart;
 import org.bukkit.spawner.TrialSpawnerConfiguration;
 import org.jetbrains.annotations.UnknownNullability;
+import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptMobSpawnerData;
+import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptSpawnerData;
+import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptTrialSpawnerData;
 
 /**
  * Utility class for spawners.
@@ -146,6 +149,25 @@ public class SpawnerUtils {
 		if (object instanceof Block block)
 			return (TrialSpawner) block.getState();
 		return (TrialSpawner) object;
+	}
+
+	public static void applyToMobSpawner(Object object, SkriptMobSpawnerData data) {
+		if (isCreatureSpawner(object)) {
+			data.applyDataToSpawner(getCreatureSpawner(object));
+		} else if (isSpawnerMinecart(object)) {
+			data.applyDataToSpawner(getSpawnerMinecart(object));
+		}
+	}
+
+	public static SkriptSpawnerData getDataFromObject(Object object, SpawnerDataType dataType) {
+		if (dataType.isMob() && isCreatureSpawner(object)) {
+			return SkriptMobSpawnerData.fromSpawner(getCreatureSpawner(object));
+		} else if (dataType.isMob() && isSpawnerMinecart(object)) {
+			return SkriptMobSpawnerData.fromSpawner(getSpawnerMinecart(object));
+		} else if (dataType.isTrial() && isTrialSpawner(object)) {
+			return SkriptTrialSpawnerData.fromTrialSpawner(getTrialSpawner(object));
+		}
+		return null;
 	}
 
 }

@@ -10,6 +10,7 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.bukkit.spawners.util.SpawnerDataType;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.bukkit.spawners.util.events.MobSpawnerDataEvent;
 import org.skriptlang.skript.bukkit.spawners.util.events.SpawnerDataEvent;
@@ -26,9 +27,9 @@ import java.util.StringJoiner;
 public class ExprEventSpawnerData extends SimpleExpression<SkriptSpawnerData> implements EventRestrictedSyntax {
 
 	public static void register(SyntaxRegistry registry) {
-		String pattern = "[the] [1:mob] spawner data";
+		String pattern = "[the] [:mob] spawner data";
 		if (SpawnerUtils.IS_RUNNING_1_21)
-			pattern = "[the] [1:mob|2:trial] spawner data";
+			pattern = "[the] [:mob|:trial] spawner data";
 
 		registry.register(SyntaxRegistry.EXPRESSION, SyntaxInfo.Expression.builder(ExprEventSpawnerData.class, SkriptSpawnerData.class)
 			.supplier(ExprEventSpawnerData::new)
@@ -38,22 +39,16 @@ public class ExprEventSpawnerData extends SimpleExpression<SkriptSpawnerData> im
 		);
 	}
 
-	private enum SpawnerType {
-		ANY, MOB, TRIAL
-	}
-
-	private SpawnerType type;
-	private Class<? extends Event>[] events;
+	private SpawnerDataType type;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		type = SpawnerType.values()[parseResult.mark];
-		events = getParser().getCurrentEvents();
+		type = SpawnerDataType.fromTags(parseResult.tags);
 
-		if (type == SpawnerType.TRIAL && !getParser().isCurrentEvent(TrialSpawnerDataEvent.class)) {
+		if (type.isTrial() && !getParser().isCurrentEvent(TrialSpawnerDataEvent.class)) {
 			Skript.error("'trial spawner data' can only be used in the trial spawner data events.");
 			return false;
-		} else if (type == SpawnerType.MOB && !getParser().isCurrentEvent(MobSpawnerDataEvent.class)) {
+		} else if (type.isMob() && !getParser().isCurrentEvent(MobSpawnerDataEvent.class)) {
 			Skript.error("'mob spawner data' can only be used in the mob spawner data events.");
 			return false;
 		}
@@ -81,12 +76,7 @@ public class ExprEventSpawnerData extends SimpleExpression<SkriptSpawnerData> im
 
 	@Override
 	public Class<? extends SkriptSpawnerData> getReturnType() {
-		if (CollectionUtils.isAnyInstanceOf(events, MobSpawnerDataEvent.class)) {
-			return SkriptMobSpawnerData.class;
-		} else if (CollectionUtils.isAnyInstanceOf(events, TrialSpawnerDataEvent.class)) {
-			return SkriptTrialSpawnerData.class;
-		}
-		return SkriptSpawnerData.class;
+		return type.getDataClass();
 	}
 
 	@Override
