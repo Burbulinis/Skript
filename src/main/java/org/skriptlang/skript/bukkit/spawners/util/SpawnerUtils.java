@@ -16,6 +16,7 @@ import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptTrialSpawner
 /**
  * Utility class for spawners.
  */
+@SuppressWarnings("UnstableApiUsage")
 public class SpawnerUtils {
 
 	public static boolean IS_RUNNING_1_21 = Skript.isRunningMinecraft(1, 21);
