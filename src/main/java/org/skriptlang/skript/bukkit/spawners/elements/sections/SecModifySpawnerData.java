@@ -30,7 +30,7 @@ public class SecModifySpawnerData extends Section {
 			.addPattern("modify [the] [:mob] spawner data of %" + SpawnerUtils.spawnerPropertyType + '%');
 
 		if (SpawnerUtils.IS_RUNNING_1_21)
-			info.addPattern("modify [the] [:ominous] [:trial] spawner data of %blocks%");
+			info.addPattern("modify [the] [trial:[:ominous] trial] spawner data of %blocks%");
 
 		registry.register(SyntaxRegistry.SECTION, info.build());
 	}
@@ -72,7 +72,7 @@ public class SecModifySpawnerData extends Section {
 
 			if (!dataType.isTrial() && data instanceof SkriptMobSpawnerData mobData) {
 				SpawnerUtils.applyToMobSpawner(object, mobData);
-			} else if (!dataType.isMob() && data instanceof SkriptTrialSpawnerData trialData) {
+			} else if (dataType.isTrial() && data instanceof SkriptTrialSpawnerData trialData) {
 				trialData.applyDataToTrialSpawner(SpawnerUtils.getTrialSpawner(object), ominous);
 			}
 		}
@@ -85,14 +85,9 @@ public class SecModifySpawnerData extends Section {
 		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
 
 		builder.append("modify the");
-		if (mob) {
-			builder.append("mob");
-		} else {
-			if (ominous)
-				builder.append("ominous");
-			builder.append("trial");
-		}
-		builder.append("spawner data of", spawners);
+		if (ominous)
+			builder.append("ominous");
+		builder.append(dataType.toString(), "spawner data of", spawners);
 
 		return builder.toString();
 	}

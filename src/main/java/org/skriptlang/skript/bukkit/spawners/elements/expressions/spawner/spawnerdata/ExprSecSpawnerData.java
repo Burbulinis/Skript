@@ -12,6 +12,7 @@ import ch.njol.skript.variables.Variables;
 import ch.njol.util.Kleenean;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
+import org.skriptlang.skript.bukkit.spawners.util.SpawnerDataType;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.bukkit.spawners.util.events.MobSpawnerDataEvent;
 import org.skriptlang.skript.bukkit.spawners.util.events.TrialSpawnerDataEvent;
@@ -22,7 +23,6 @@ import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
 import java.util.List;
-import java.util.Locale;
 
 @RequiredPlugins("Minecraft 1.21+ (for trial spawner data)")
 public class ExprSecSpawnerData extends SectionExpression<SkriptSpawnerData> {
@@ -39,11 +39,7 @@ public class ExprSecSpawnerData extends SectionExpression<SkriptSpawnerData> {
 		registry.register(SyntaxRegistry.EXPRESSION, info.build());
 	}
 
-	private enum DataType {
-		MOB, TRIAL
-	}
-
-	private DataType type;
+	private SpawnerDataType dataType;
 	private Trigger trigger;
 
 	@Override
@@ -51,9 +47,13 @@ public class ExprSecSpawnerData extends SectionExpression<SkriptSpawnerData> {
 		Expression<?>[] exprs, int pattern, Kleenean delayed, ParseResult result,
 		@Nullable SectionNode node, @Nullable List<TriggerItem> triggerItems
 	) {
-		type = DataType.values()[pattern];
+		dataType = switch (pattern) {
+			case 0 -> SpawnerDataType.MOB;
+			case 1 -> SpawnerDataType.TRIAL;
+			default -> SpawnerDataType.ANY;
+		};
 		if (node != null) {
-			String name = type.name().toLowerCase(Locale.ENGLISH) + " spawner data";
+			String name = dataType + " spawner data";
 			trigger = SectionUtils.loadLinkedCode(name, (beforeLoading, afterLoading) ->
 				loadCode(node, name, beforeLoading, afterLoading, MobSpawnerDataEvent.class));
 			return trigger != null;
@@ -63,12 +63,12 @@ public class ExprSecSpawnerData extends SectionExpression<SkriptSpawnerData> {
 
 	@Override
 	protected SkriptSpawnerData @Nullable [] get(Event event) {
-		SkriptSpawnerData data = (type == DataType.MOB)
+		SkriptSpawnerData data = (dataType.isMob())
 			? new SkriptMobSpawnerData()
 			: new SkriptTrialSpawnerData();
 
 		if (trigger != null) {
-			Event dataEvent = (type == DataType.MOB)
+			Event dataEvent = (dataType.isMob())
 				? new MobSpawnerDataEvent((SkriptMobSpawnerData) data)
 				: new TrialSpawnerDataEvent((SkriptTrialSpawnerData) data);
 
@@ -86,14 +86,12 @@ public class ExprSecSpawnerData extends SectionExpression<SkriptSpawnerData> {
 
 	@Override
 	public Class<? extends SkriptSpawnerData> getReturnType() {
-		if (type == DataType.MOB)
-			return SkriptMobSpawnerData.class;
-		return SkriptTrialSpawnerData.class;
+		return dataType.getDataClass();
 	}
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return type.name().toLowerCase(Locale.ENGLISH) + " spawner data";
+		return dataType + " spawner data";
 	}
 
 }

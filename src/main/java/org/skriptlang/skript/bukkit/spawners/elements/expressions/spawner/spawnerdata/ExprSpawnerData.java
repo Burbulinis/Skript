@@ -16,6 +16,8 @@ import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptSpawnerData;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptTrialSpawnerData;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
+import java.util.StringJoiner;
+
 @RequiredPlugins("Minecraft 1.21+ (for trial spawner data)")
 public class ExprSpawnerData extends SimplePropertyExpression<Object, SkriptSpawnerData> {
 
@@ -83,12 +85,11 @@ public class ExprSpawnerData extends SimplePropertyExpression<Object, SkriptSpaw
 
 	@Override
 	protected String getPropertyName() {
-		if (dataType == SpawnerDataType.MOB) {
-			return "mob spawner data";
-		} else if (dataType == SpawnerDataType.TRIAL) {
-			return (ominous ? "ominous " : "") + "trial spawner data";
-		}
-		return "spawner data";
+		StringJoiner joiner = new StringJoiner(" ", "", "spawner data");
+		if (ominous)
+			joiner.add("ominous");
+		joiner.add(dataType.toString());
+		return joiner.toString();
 	}
 
 }

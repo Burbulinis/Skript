@@ -15,9 +15,7 @@ import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.bukkit.spawners.util.events.MobSpawnerDataEvent;
 import org.skriptlang.skript.bukkit.spawners.util.events.SpawnerDataEvent;
 import org.skriptlang.skript.bukkit.spawners.util.events.TrialSpawnerDataEvent;
-import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptMobSpawnerData;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptSpawnerData;
-import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptTrialSpawnerData;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
@@ -39,16 +37,16 @@ public class ExprEventSpawnerData extends SimpleExpression<SkriptSpawnerData> im
 		);
 	}
 
-	private SpawnerDataType type;
+	private SpawnerDataType dataType;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
-		type = SpawnerDataType.fromTags(parseResult.tags);
+		dataType = SpawnerDataType.fromTags(parseResult.tags);
 
-		if (type.isTrial() && !getParser().isCurrentEvent(TrialSpawnerDataEvent.class)) {
+		if (dataType.isTrial() && !getParser().isCurrentEvent(TrialSpawnerDataEvent.class)) {
 			Skript.error("'trial spawner data' can only be used in the trial spawner data events.");
 			return false;
-		} else if (type.isMob() && !getParser().isCurrentEvent(MobSpawnerDataEvent.class)) {
+		} else if (dataType.isMob() && !getParser().isCurrentEvent(MobSpawnerDataEvent.class)) {
 			Skript.error("'mob spawner data' can only be used in the mob spawner data events.");
 			return false;
 		}
@@ -76,17 +74,13 @@ public class ExprEventSpawnerData extends SimpleExpression<SkriptSpawnerData> im
 
 	@Override
 	public Class<? extends SkriptSpawnerData> getReturnType() {
-		return type.getDataClass();
+		return dataType.getDataClass();
 	}
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
 		StringJoiner joiner = new StringJoiner(" ", "the", "spawner data");
-		if (type == SpawnerType.TRIAL) {
-			joiner.add("trial");
-		} else if (type == SpawnerType.MOB) {
-			joiner.add("mob");
-		}
+		joiner.add(dataType.toString());
 		return joiner.toString();
 	}
 

@@ -151,6 +151,11 @@ public class SpawnerUtils {
 		return (TrialSpawner) object;
 	}
 
+	/**
+	 * Applies the given SkriptMobSpawnerData to the specified object.
+	 * @param object the spawner object to apply the data to
+	 * @param data the SkriptMobSpawnerData to apply
+	 */
 	public static void applyToMobSpawner(Object object, SkriptMobSpawnerData data) {
 		if (isCreatureSpawner(object)) {
 			data.applyDataToSpawner(getCreatureSpawner(object));
@@ -159,6 +164,13 @@ public class SpawnerUtils {
 		}
 	}
 
+	/**
+	 * Retrieves the SkriptSpawnerData from the given object based on the specified data type.
+	 * This method makes sure that the data type and type of spawner match. Meaning it will return null if they don't match.
+	 * @param object the spawner object
+	 * @param dataType the spawner data type to retrieve
+	 * @return the SkriptSpawnerData if the object is a valid spawner for the given data type, null otherwise
+	 */
 	public static SkriptSpawnerData getDataFromObject(Object object, SpawnerDataType dataType) {
 		if (dataType.isMob() && isCreatureSpawner(object)) {
 			return SkriptMobSpawnerData.fromSpawner(getCreatureSpawner(object));

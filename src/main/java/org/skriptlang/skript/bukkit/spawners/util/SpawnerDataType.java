@@ -5,6 +5,7 @@ import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptSpawnerData;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptTrialSpawnerData;
 
 import java.util.List;
+import java.util.Locale;
 
 public enum SpawnerDataType {
 
@@ -41,6 +42,13 @@ public enum SpawnerDataType {
 
 	public boolean isAny() {
 		return this == ANY;
+	}
+
+	@Override
+	public String toString() {
+		if (isAny())
+			return "";
+		return name().toLowerCase(Locale.ENGLISH);
 	}
 
 }
