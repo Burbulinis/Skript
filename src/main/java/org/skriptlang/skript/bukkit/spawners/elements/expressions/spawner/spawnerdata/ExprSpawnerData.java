@@ -69,10 +69,11 @@ public class ExprSpawnerData extends SimplePropertyExpression<Object, SkriptSpaw
 
 			if (!dataType.isTrial() && data instanceof SkriptMobSpawnerData mobData) {
 				SpawnerUtils.applyToMobSpawner(object, mobData);
-			} else if (dataType == SpawnerDataType.TRIAL
+			} else if (
+				dataType == SpawnerDataType.TRIAL
 				&& SpawnerUtils.isTrialSpawner(object)
-				&& data instanceof SkriptTrialSpawnerData trialData)
-			{
+				&& data instanceof SkriptTrialSpawnerData trialData
+			) {
 				trialData.applyDataToTrialSpawner(SpawnerUtils.getTrialSpawner(object), ominous);
 			}
 		}

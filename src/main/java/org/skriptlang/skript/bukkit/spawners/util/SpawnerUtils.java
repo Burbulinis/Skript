@@ -173,11 +173,11 @@ public class SpawnerUtils {
 	 * @return the SkriptSpawnerData if the object is a valid spawner for the given data type, null otherwise
 	 */
 	public static SkriptSpawnerData getDataFromObject(Object object, SpawnerDataType dataType) {
-		if (dataType.isMob() && isCreatureSpawner(object)) {
+		if ((dataType.isMob() || dataType.isAny()) && isCreatureSpawner(object)) {
 			return SkriptMobSpawnerData.fromSpawner(getCreatureSpawner(object));
-		} else if (dataType.isMob() && isSpawnerMinecart(object)) {
+		} else if ((dataType.isMob() || dataType.isAny()) && isSpawnerMinecart(object)) {
 			return SkriptMobSpawnerData.fromSpawner(getSpawnerMinecart(object));
-		} else if (dataType.isTrial() && isTrialSpawner(object)) {
+		} else if ((dataType.isTrial() || dataType.isAny()) && isTrialSpawner(object)) {
 			return SkriptTrialSpawnerData.fromTrialSpawner(getTrialSpawner(object));
 		}
 		return null;
