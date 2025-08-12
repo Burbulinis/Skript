@@ -60,7 +60,7 @@ public class SecModifySpawnerData extends Section {
 			if (data == null)
 				continue;
 
-			SpawnerDataEvent dataEvent = switch(dataType) {
+			SpawnerDataEvent dataEvent = switch (dataType) {
 				case MOB -> new MobSpawnerDataEvent((SkriptMobSpawnerData) data);
 				case TRIAL -> new TrialSpawnerDataEvent((SkriptTrialSpawnerData) data);
 				case ANY -> new SpawnerDataEvent(data, dataType);

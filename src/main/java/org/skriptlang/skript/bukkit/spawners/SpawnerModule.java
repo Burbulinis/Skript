@@ -18,7 +18,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.spawner.SpawnRule;
-import org.bukkit.block.spawner.SpawnerEntry;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntitySnapshot;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
@@ -27,15 +26,6 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.loot.LootTable;
 import org.skriptlang.skript.addon.AddonModule;
 import org.skriptlang.skript.addon.SkriptAddon;
-import org.skriptlang.skript.bukkit.spawners.elements.conditions.CondIsActivated;
-import org.skriptlang.skript.bukkit.spawners.elements.conditions.CondIsOminous;
-import org.skriptlang.skript.bukkit.spawners.elements.conditions.CondIsTracking;
-import org.skriptlang.skript.bukkit.spawners.elements.effects.EffEjectReward;
-import org.skriptlang.skript.bukkit.spawners.elements.effects.EffMakeOminous;
-import org.skriptlang.skript.bukkit.spawners.elements.effects.EffSpawnerItem;
-import org.skriptlang.skript.bukkit.spawners.elements.effects.EffTrialSpawnerTrack;
-import org.skriptlang.skript.bukkit.spawners.elements.events.EvtSpawnerSpawn;
-import org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.mobspawnerdata.ExprMaxNearbyEntities;
 import org.skriptlang.skript.bukkit.spawners.util.SkriptSpawnerEntry;
 import org.skriptlang.skript.bukkit.spawners.util.events.MobSpawnerDataEvent;
 import org.skriptlang.skript.bukkit.spawners.util.events.SpawnRuleEvent;
@@ -49,8 +39,9 @@ import org.skriptlang.skript.util.ClassLoader;
 
 import java.io.StreamCorruptedException;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.StringJoiner;
 
 @SuppressWarnings("UnstableApiUsage")
 public class SpawnerModule implements AddonModule {

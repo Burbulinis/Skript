@@ -7,7 +7,6 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.SyntaxStringBuilder;
 import ch.njol.util.Kleenean;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.TrialSpawner;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
@@ -51,7 +50,7 @@ public class EffMakeOminous extends Effect {
 	@Override
 	protected void execute(Event event) {
 		for (Object object : spawners.getArray(event)) {
-			if (object instanceof BlockData data && data instanceof TrialSpawner spawner) {
+			if (object instanceof TrialSpawner spawner) {
 				spawner.setOminous(ominous);
 			} else if (object instanceof Block block && block.getState() instanceof org.bukkit.block.TrialSpawner spawner) {
 				spawner.setOminous(ominous);
