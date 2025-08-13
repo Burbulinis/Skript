@@ -5,7 +5,6 @@ import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.Timespan.TimePeriod;
-import ch.njol.util.Math2;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.block.Block;
 import org.bukkit.block.TrialSpawner;
