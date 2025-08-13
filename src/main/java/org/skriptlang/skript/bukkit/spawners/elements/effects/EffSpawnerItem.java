@@ -1,5 +1,6 @@
 package org.skriptlang.skript.bukkit.spawners.elements.effects;
 
+import ch.njol.skript.doc.RequiredPlugins;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -13,6 +14,7 @@ import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
+@RequiredPlugins("Minecraft 1.21+ (for spawner minecarts)")
 public class EffSpawnerItem extends Effect {
 
 	public static void register(SyntaxRegistry registry) {

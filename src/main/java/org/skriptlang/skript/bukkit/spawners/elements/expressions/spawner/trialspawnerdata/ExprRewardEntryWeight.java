@@ -83,14 +83,12 @@ public class ExprRewardEntryWeight extends PropertyExpression<SkriptTrialSpawner
 
 		for (SkriptTrialSpawnerData data : getExpr().getArray(event)) {
 			for (LootTable lootTable : lootTables) {
-				int newWeight = switch (mode) {
+				data.setRewardEntry(lootTable, switch (mode) {
 					case SET, RESET -> weight;
 					case ADD -> Optional.of(data.getRewardWeight(lootTable)).orElse(0) + weight;
 					case REMOVE -> Optional.of(data.getRewardWeight(lootTable)).orElse(0) - weight;
 					default -> 1;
-				};
-
-				data.setRewardEntry(lootTable, newWeight);
+				});
 			}
 		}
 	}

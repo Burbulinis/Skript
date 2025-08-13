@@ -22,6 +22,8 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 public class EffEjectReward extends Effect {
 
 	public static void register(SyntaxRegistry registry) {
+		if (!SpawnerUtils.IS_RUNNING_1_21)
+			return;
 		registry.register(SyntaxRegistry.EFFECT, SyntaxInfo.builder(EffEjectReward.class)
 			.supplier(EffEjectReward::new)
 			.priority(SyntaxInfo.COMBINED)

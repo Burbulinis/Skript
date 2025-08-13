@@ -7,8 +7,6 @@ import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.SyntaxStringBuilder;
 import ch.njol.util.coll.CollectionUtils;
-import com.destroystokyo.paper.event.entity.PreSpawnerSpawnEvent;
-import org.bukkit.entity.EntityType;
 import org.bukkit.event.Event;
 import org.bukkit.event.entity.EntityEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
@@ -40,7 +38,7 @@ public class EvtSpawnerSpawn extends SkriptEvent {
 			.addDescription("Called when a spawner spawns an entity or is about to.")
 			.addExamples("todo")
 			.addSince("INSERT VERSION")
-			.addRequiredPlugin("Minecraft 1.21+ (for trial spawners)")
+			.addRequiredPlugin("Minecraft 1.21+ (for trial spawners, spawner minecarts)")
 			.build()
 		);
 	}
@@ -62,18 +60,12 @@ public class EvtSpawnerSpawn extends SkriptEvent {
 
 	@Override
 	public boolean check(Event event) {
-		if (entityDatas != null) {
-			EntityType currentType = null;
-
-			if (event instanceof EntityEvent entityEvent) {
-				currentType = entityEvent.getEntityType();
-			} else if (event instanceof PreSpawnerSpawnEvent preEvent) {
-				currentType = preEvent.getType();
-			}
+		if (entityDatas != null && event instanceof EntityEvent entityEvent) {
+			EntityData<?> currentData = EntityUtils.toSkriptEntityData(entityEvent.getEntityType());
 
 			boolean match = false;
-			for (EntityData<?> entityData : entityDatas.getArray()) {
-				if (entityData.isSupertypeOf(EntityUtils.toSkriptEntityData(currentType))) {
+			for (EntityData<?> specifiedData : entityDatas.getArray()) {
+				if (specifiedData.isSupertypeOf(currentData)) {
 					match = true;
 					break;
 				}

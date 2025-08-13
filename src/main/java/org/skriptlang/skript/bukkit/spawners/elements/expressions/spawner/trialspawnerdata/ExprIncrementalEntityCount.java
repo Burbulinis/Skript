@@ -61,6 +61,7 @@ public class ExprIncrementalEntityCount extends SimplePropertyExpression<SkriptT
 				case RESET -> concurrent ? SpawnerUtils.DEFAULT_CONCURRENT_PER_PLAYER_INCREMENT : SpawnerUtils.DEFAULT_BASE_PER_PLAYER_INCREMENT;
 				default -> count;
 			};
+
 			if (concurrent) {
 				data.setConcurrentMobAmountIncrement(value);
 			} else {

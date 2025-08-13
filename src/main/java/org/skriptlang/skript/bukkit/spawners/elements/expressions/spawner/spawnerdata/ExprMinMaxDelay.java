@@ -100,8 +100,8 @@ public class ExprMinMaxDelay extends SimplePropertyExpression<SkriptSpawnerData,
 				warning("The maximum spawn delay cannot be lower than the minimum spawn delay, "
 					+ "thus setting it to a value lower than the minimum spawn delay will do nothing.");
 			} else if (!max && value.compareTo(timespan) > 0) {
-				warning("The minimum spawn delay cannot be lower than the maximum spawn delay, "
-					+ "thus setting it to a value lower than the maximum spawn delay will do nothing.");
+				warning("The minimum spawn delay cannot be higher than the maximum spawn delay, "
+					+ "thus setting it to a value higher than the maximum spawn delay will do nothing.");
 			}
 		}
 	}

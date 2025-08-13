@@ -80,7 +80,7 @@ public class ExprSpawnDelay extends SimplePropertyExpression<Object, Timespan> {
 
 		int ticks = 0;
 		if (timespan != null)
-			ticks = (int) Math2.fit(0, timespan.getAs(TimePeriod.TICK), Integer.MAX_VALUE);
+			ticks = (int) Math.min(timespan.getAs(TimePeriod.TICK), Integer.MAX_VALUE);
 
 		for (Object object : getExpr().getArray(event)) {
 			if (SpawnerUtils.isCreatureSpawner(object)) {

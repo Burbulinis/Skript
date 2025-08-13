@@ -83,6 +83,7 @@ public class ExprBaseEntityCount extends SimplePropertyExpression<SkriptTrialSpa
 				case RESET -> concurrent ? SpawnerUtils.DEFAULT_CONCURRENT_MOB_AMOUNT : SpawnerUtils.DEFAULT_BASE_MOB_AMOUNT;
 				default -> count;
 			};
+
 			if (concurrent) {
 				data.setConcurrentMobAmount(value);
 			} else {

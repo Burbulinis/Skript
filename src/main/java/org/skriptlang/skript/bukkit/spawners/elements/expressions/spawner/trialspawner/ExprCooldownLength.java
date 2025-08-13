@@ -61,7 +61,7 @@ public class ExprCooldownLength extends SimplePropertyExpression<Block, Timespan
 
 		int ticks = 0;
 		if (timespan != null)
-			ticks = (int) Math2.fit(0, timespan.getAs(TimePeriod.TICK), Integer.MAX_VALUE);
+			ticks = (int) Math.min(timespan.getAs(TimePeriod.TICK), Integer.MAX_VALUE);
 
 		for (Block block : getExpr().getArray(event)) {
 			if (!SpawnerUtils.isTrialSpawner(block))
@@ -74,7 +74,7 @@ public class ExprCooldownLength extends SimplePropertyExpression<Block, Timespan
 			spawner.setCooldownLength(switch (mode) {
 				case ADD -> base + ticks;
 				case REMOVE -> base - ticks;
-				case RESET -> (int) Math2.fit(0, SpawnerUtils.DEFAULT_COOLDOWN_LENGTH.getAs(TimePeriod.TICK), Integer.MAX_VALUE);
+				case RESET -> (int) Math.min(SpawnerUtils.DEFAULT_COOLDOWN_LENGTH.getAs(TimePeriod.TICK), Integer.MAX_VALUE);
 				default -> ticks;
 			});
 

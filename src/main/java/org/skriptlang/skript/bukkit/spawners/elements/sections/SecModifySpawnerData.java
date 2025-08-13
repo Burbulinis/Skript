@@ -30,7 +30,7 @@ public class SecModifySpawnerData extends Section {
 			.addPattern("modify [the] [:mob] spawner data of %" + SpawnerUtils.spawnerPropertyType + '%');
 
 		if (SpawnerUtils.IS_RUNNING_1_21)
-			info.addPattern("modify [the] [trial:[:ominous] trial] spawner data of %blocks%");
+			info.addPattern("modify [the] [:ominous] trial:trial spawner data of %blocks%");
 
 		registry.register(SyntaxRegistry.SECTION, info.build());
 	}

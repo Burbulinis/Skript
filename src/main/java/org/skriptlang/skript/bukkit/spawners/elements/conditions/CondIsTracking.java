@@ -32,6 +32,8 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 public class CondIsTracking extends Condition {
 
 	public static void register(SyntaxRegistry registry) {
+		if (!SpawnerUtils.IS_RUNNING_1_21)
+			return;
 		registry.register(SyntaxRegistry.CONDITION, SyntaxInfo.builder(CondIsTracking.class)
 			.supplier(CondIsTracking::new)
 			.priority(SyntaxInfo.COMBINED)
