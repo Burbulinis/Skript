@@ -69,7 +69,7 @@ public class SpawnerModule implements AddonModule {
 
 				@Override
 				public String toString(SkriptMobSpawnerData data, int flags) {
-					return data.toString();
+					return "mob spawner data";
 				}
 
 				@Override
@@ -85,6 +85,7 @@ public class SpawnerModule implements AddonModule {
 			.name("Trial Spawner Data")
 			.description("todo")
 			.since("INSERT VERSION")
+			.requiredPlugins("Minecraft 1.21+")
 			.defaultExpression(new EventValueExpression<>(SkriptTrialSpawnerData.class))
 			.parser(new Parser<>() {
 				@Override
@@ -94,7 +95,7 @@ public class SpawnerModule implements AddonModule {
 
 				@Override
 				public String toString(SkriptTrialSpawnerData data, int flags) {
-					return data.toString();
+					return "trial spawner data";
 				}
 
 				@Override
@@ -198,8 +199,7 @@ public class SpawnerModule implements AddonModule {
 
 				@Override
 				public String toString(SpawnRule rule, int flags) {
-					StringJoiner joiner = new StringJoiner(" ");
-					joiner.add("spawn rule with");
+					StringJoiner joiner = new StringJoiner(" ", "spawn rule with", "");
 					joiner.add("min block light " + rule.getMinBlockLight() + ',');
 					joiner.add("max block light " + rule.getMaxBlockLight() + ',');
 					joiner.add("min sky light " + rule.getMinSkyLight() + ", and");
