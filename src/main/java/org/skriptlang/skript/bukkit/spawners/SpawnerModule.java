@@ -126,7 +126,7 @@ public class SpawnerModule implements AddonModule {
 				A spawner entry represents what entity can spawn from a spawner, including details such as \
 				spawn rules, spawn weight, and equipment.
 				More information about spawner entries can be found on \
-				<a href='https://minecraft.wiki/w/Monster_Spawner'>the Minecraft wiki page about spawners</a>
+				<a href='https://minecraft.wiki/w/Monster_Spawner'>the Minecraft wiki page about spawners</a>.
 				""")
 			.since("INSERT VERSION")
 			.defaultExpression(new EventValueExpression<>(SkriptSpawnerEntry.class))
