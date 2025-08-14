@@ -7,12 +7,20 @@ import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptTrialSpawner
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Represents the type of spawner data.
+ */
 public enum SpawnerDataType {
 
 	MOB(SkriptMobSpawnerData.class),
 	TRIAL(SkriptTrialSpawnerData.class),
 	ANY(SkriptSpawnerData.class);
 
+	/**
+	 * Creates a SpawnerDataType from the given parse result tags.
+	 * @param tags the tags from the parse result
+	 * @return the corresponding SpawnerDataType
+	 */
 	public static SpawnerDataType fromTags(List<String> tags) {
 		if (tags.contains("trial")) {
 			return TRIAL;
@@ -28,18 +36,31 @@ public enum SpawnerDataType {
 		this.dataClass = dataClass;
 	}
 
+	/**
+	 * Gets the class of the SkriptSpawnerData associated with this type.
+	 * @return the class of SkriptSpawnerData
+	 */
 	public Class<? extends SkriptSpawnerData> getDataClass() {
 		return dataClass;
 	}
 
+	/**
+	 * @return whether the type is {@link #MOB}
+	 */
 	public boolean isMob() {
 		return this == MOB;
 	}
 
+	/**
+	 * @return whether the type is {@link #TRIAL}
+	 */
 	public boolean isTrial() {
 		return this == TRIAL;
 	}
 
+	/**
+	 * @return whether the type is {@link #ANY}
+	 */
 	public boolean isAny() {
 		return this == ANY;
 	}

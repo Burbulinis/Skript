@@ -51,14 +51,22 @@ public class SpawnerModule implements AddonModule {
 		Classes.registerClass(new ClassInfo<>(SkriptSpawnerData.class, "spawnerdata")
 			.user("spawner ?datas?")
 			.name("Spawner Data")
-			.description("todo")
+			.description("""
+				Represents the common data of a mob spawner or a trial spawner, including spawner entries, minimum \
+				and maximum spawn delays, and more.
+				""")
+			.defaultExpression(new EventValueExpression<>(SkriptSpawnerData.class))
 			.since("INSERT VERSION")
 		);
 
 		Classes.registerClass(new ClassInfo<>(SkriptMobSpawnerData.class, "mobspawnerdata")
-			.user("(mob|entity) ?spawner ?datas?")
+			.user("mob ?spawner ?datas?")
 			.name("Mob Spawner Data")
-			.description("todo")
+			.description("""
+				Represents mob spawner data that can be contained in a monster spawner or a spawner minecart. \
+				Additional information can be found on \
+				<a href='https://minecraft.wiki/w/Monster_Spawner'>the Minecraft wiki page about mob spawners</a>.
+				""")
 			.since("INSERT VERSION")
 			.defaultExpression(new EventValueExpression<>(SkriptMobSpawnerData.class))
 			.parser(new Parser<>() {
@@ -83,7 +91,12 @@ public class SpawnerModule implements AddonModule {
 		Classes.registerClass(new ClassInfo<>(SkriptTrialSpawnerData.class, "trialspawnerdata")
 			.user("trial ?spawner ?datas?")
 			.name("Trial Spawner Data")
-			.description("todo")
+			.description("""
+				Represents the static data of a trial spawner, including details such as \
+				activation range, reward entries, and more.
+				Additional information can be found on \
+				<a href='https://minecraft.wiki/w/Trial_Spawner'>the Minecraft wiki page about trial spawners</a>.
+				""")
 			.since("INSERT VERSION")
 			.requiredPlugins("Minecraft 1.21+")
 			.defaultExpression(new EventValueExpression<>(SkriptTrialSpawnerData.class))
@@ -109,7 +122,12 @@ public class SpawnerModule implements AddonModule {
 		Classes.registerClass(new ClassInfo<>(SkriptSpawnerEntry.class, "spawnerentry")
 			.user("spawner ?entr(y|ies)")
 			.name("Spawner Entry")
-			.description("todo")
+			.description("""
+				A spawner entry represents what entity can spawn from a spawner, including details such as \
+				spawn rules, spawn weight, and equipment.
+				More information about spawner entries can be found on \
+				<a href='https://minecraft.wiki/w/Monster_Spawner'>the Minecraft wiki page about spawners</a>
+				""")
 			.since("INSERT VERSION")
 			.defaultExpression(new EventValueExpression<>(SkriptSpawnerEntry.class))
 			.parser(new Parser<>() {
@@ -188,7 +206,11 @@ public class SpawnerModule implements AddonModule {
 		Classes.registerClass(new ClassInfo<>(SpawnRule.class, "spawnrule")
 			.user("spawn ?rules?")
 			.name("Spawn Rule")
-			.description("todo")
+			.description("""
+				Spawn rules specify the light levels required for a spawner entry to spawn. \
+				More information can be found on \
+				<a href='https://minecraft.wiki/w/Monster_Spawner'>the Minecraft wiki page about spawners</a>.
+				""")
 			.since("INSERT VERSION")
 			.defaultExpression(new EventValueExpression<>(SpawnRule.class))
 			.parser(new Parser<>() {
@@ -286,184 +308,6 @@ public class SpawnerModule implements AddonModule {
 			})
 			.build()
 			.loadClasses(Skript.class, Skript.getAddonInstance().getFile());
-		/*
-
-		Classes.registerClass(new ClassInfo<>(TrialSpawnerConfig.class, "trialspawnerconfig")
-			.user("trial ?spawner ?config(urations?)?")
-			.name("Trial Spawner Configuration")
-			.description(
-				"Represents a trial spawner configuration. Trial spawner configurations fall under the "
-				+ "base spawner category, having more configuration options. When using the base spawner expressions, "
-				+ "effects or conditions, you can use this configuration to specify the type of trial spawner you want. "
-				+ "If you were to specify a trial spawner block in those expressions, it would use the current configuration."
-				+ "You can find more information about this in the Minecraft wiki for "
-				+ "<a href='https://minecraft.wiki/w/Trial_Spawner'>trial spawners</a>")
-			.since("INSERT VERSION")
-			.requiredPlugins("MC 1.21+")
-			.parser(new Parser<>() {
-				@Override
-				public boolean canParse(ParseContext context) {
-					return false;
-				}
-
-				@Override
-				public String toString(TrialSpawnerConfig config, int flags) {
-					StringBuilder builder = new StringBuilder();
-					if (config.ominous()) {
-						builder.append("ominous ");
-					} else {
-						builder.append("normal ");
-					}
-
-					builder.append("trial spawner config of trial spawner at ");
-					builder.append(Classes.toString(config.state().getLocation()));
-
-					return builder.toString();
-				}
-
-				@Override
-				public String toVariableNameString(TrialSpawnerConfig config) {
-					return "trial spawner configuration:" + config.hashCode();
-				}
-			})
-		);
-
-		Classes.registerClass(new ClassInfo<>(WeightedLootTable.class, "weightedloottable")
-			.user("weighted ?loot ?tables?")
-			.name("Weighted Loot Table")
-			.description(
-				"Represents a weighted loot table. Trial spawners pick a weighted loot table to use as its reward.",
-				"This is a weighted type. The weight expression can be used here, e.g. `weight of %weighted loot table%`")
-			.since("INSERT VERSION")
-			.requiredPlugins("MC 1.21+")
-			.parser(new Parser<>() {
-				@Override
-				public boolean canParse(ParseContext context) {
-					return false;
-				}
-
-				public
-				@Override String toString(WeightedLootTable reward, int flags) {
-					return "trial spawner reward with "
-						+ Classes.toString(reward.getLootTable())
-						+ " and weight " + reward.spawnerWeight();
-				}
-
-				@Override
-				public String toVariableNameString(WeightedLootTable reward) {
-					return "trial spawner reward:" + reward.getLootTable().getKey() + ',' + reward.spawnerWeight();
-				}
-			})
-		);
-
-		Classes.registerClass(new ClassInfo<>(SpawnerEntry.class, "spawnerentry")
-			.user("spawner ?entr(y|ies)")
-			.name("Spawner Entry")
-			.description("Represents a spawner entry. Spawner entries are entities that spawn from a spawner with "
-				+ "more configuration, e.g. spawn rules, spawn weight, and equipment. You can find more information "
-				+ "about this in the Minecraft wiki for <a href='https://minecraft.wiki/w/Monster_Spawner'>spawners</a>",
-				"This is a weighted type. The weight expression can be used here, e.g. `weight of %spawner entry%`")
-			.since("INSERT VERSION")
-			.defaultExpression(new EventValueExpression<>(SpawnerEntry.class))
-			.requiredPlugins("MC 1.21+")
-			.parser(new Parser<>() {
-				@Override
-				public boolean canParse(ParseContext context) {
-					return false;
-				}
-
-				@Override
-				public String toString(SpawnerEntry entry, int flags) {
-					StringBuilder builder = new StringBuilder();
-
-					builder.append("spawner entry with ").append(Classes.toString(entry.getSnapshot()));
-					if (entry.getSpawnRule() != null)
-						builder.append(", ").append(Classes.toString(entry.getSpawnRule()));
-					builder.append(" and weight ").append(entry.getSpawnWeight());
-
-					return builder.toString();
-				}
-
-				@Override
-				public String toVariableNameString(SpawnerEntry entry) {
-					return "spawner entry:" + entry.getSnapshot() + ',' + entry.getSpawnRule() + ',' + entry.getSpawnWeight();
-				}
-			})
-		);
-
-		Classes.registerClass(new ClassInfo<>(SpawnRule.class, "spawnrule")
-			.user("spawn ?rules?")
-			.name("Spawn Rule")
-			.description("Represents a spawn rule. Spawn rules are used to specify the light levels required for an entity "
-				+ "to spawn. You can find more information about this in the Minecraft wiki for "
-				+ "<a href='https://minecraft.wiki/w/Monster_Spawner'>spawners</a>")
-			.since("INSERT VERSION")
-			.requiredPlugins("MC 1.21+")
-			.defaultExpression(new EventValueExpression<>(SpawnRuleWrapper.class))
-			.parser(new Parser<>() {
-				@Override
-				public boolean canParse(ParseContext context) {
-					return false;
-				}
-
-				@Override
-				public String toString(SpawnRule rule, int flags) {
-					StringJoiner joiner = new StringJoiner(" ");
-					joiner.add("spawn rule with");
-					joiner.add("min block light " + rule.getMinBlockLight() + ',');
-					joiner.add("max block light " + rule.getMaxBlockLight() + ',');
-					joiner.add("min sky light " + rule.getMinSkyLight() + ", and");
-					joiner.add("max sky light " + rule.getMaxSkyLight());
-					return joiner.toString();
-				}
-
-				@Override
-				public String toVariableNameString(SpawnRule rule) {
-					return "spawn rule:"
-							+ rule.getMinBlockLight() + ','
-							+ rule.getMaxBlockLight() + ','
-							+ rule.getMinSkyLight() + ','
-							+ rule.getMaxSkyLight();
-				}
-			})
-			.serializer(new Serializer<>() {
-				@Override
-				public Fields serialize(SpawnRule spawnRule) {
-					Fields fields = new Fields();
-					fields.putPrimitive("minBlockLight", spawnRule.getMinBlockLight());
-					fields.putPrimitive("maxBlockLight", spawnRule.getMaxBlockLight());
-					fields.putPrimitive("minSkyLight", spawnRule.getMinSkyLight());
-					fields.putPrimitive("maxSkyLight", spawnRule.getMaxSkyLight());
-					return fields;
-				}
-
-				@Override
-				public void deserialize(SpawnRule o, Fields f) {
-					assert false;
-				}
-
-				@Override
-				protected SpawnRule deserialize(Fields fields) throws StreamCorruptedException {
-					int minBlockLight = fields.getPrimitive("minBlockLight", int.class);
-					int maxBlockLight = fields.getPrimitive("maxBlockLight", int.class);
-					int minSkyLight = fields.getPrimitive("minSkyLight", int.class);
-					int maxSkyLight = fields.getPrimitive("maxSkyLight", int.class);
-					return new SpawnRuleWrapper(minBlockLight, maxBlockLight, minSkyLight, maxSkyLight);
-				}
-
-				@Override
-				public boolean mustSyncDeserialization() {
-					return true;
-				}
-
-				@Override
-				protected boolean canBeInstantiated() {
-					return false;
-				}
-			})
-		);
-
-		 */
 	}
 
 }
