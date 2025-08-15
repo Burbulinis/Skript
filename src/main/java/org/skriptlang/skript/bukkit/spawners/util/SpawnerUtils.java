@@ -183,4 +183,23 @@ public class SpawnerUtils {
 		return null;
 	}
 
+	/**
+	 * Applies the given SkriptSpawnerData to the specified object based on the data type.
+	 * @param data the SkriptSpawnerData to apply
+	 * @param object the spawner object to apply the data to
+	 * @param dataType the type of data to apply (mob or trial)
+	 * @param ominous whether to apply the ominous trial spawner data
+	 * @param regular whether to also apply the regular trial spawner data
+	 */
+	public static void applyData(SkriptSpawnerData data, Object object, SpawnerDataType dataType, boolean ominous, boolean regular) {
+		if (!dataType.isTrial() && data instanceof SkriptMobSpawnerData mobData) {
+			SpawnerUtils.applyToMobSpawner(object, mobData);
+		} else if (dataType.isTrial() && data instanceof SkriptTrialSpawnerData trialData) {
+			TrialSpawner trialSpawner = SpawnerUtils.getTrialSpawner(object);
+			trialData.applyDataToTrialSpawner(trialSpawner, ominous);
+			if (regular)
+				trialData.applyDataToTrialSpawner(trialSpawner, false);
+		}
+	}
+
 }

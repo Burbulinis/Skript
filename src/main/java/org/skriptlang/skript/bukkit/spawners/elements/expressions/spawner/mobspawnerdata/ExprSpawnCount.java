@@ -1,10 +1,7 @@
 package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.mobspawnerdata;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Examples;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.Since;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
@@ -13,21 +10,27 @@ import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptMobSpawnerData;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Spawner - Spawn Count")
-@Description({
-	"Returns the spawn count.",
-	"The spawn count is the number of entities "
-		+ "that the spawner will attempt to spawn each spawn attempt. By default, the value is 4.",
-	"If the spawner entity is an item, the spawn count is the number of stacks of items to spawn.",
-	"",
-	"Spawners are creature spawners and spawner minecarts."
-})
-@Examples({
-	"set spawn count of target block to 5",
-	"add 2 to spawn count of target block",
-	"remove 1 from spawn count of target block",
-	"reset spawn count of target block"
-})
+@Name("Spawn Count")
+@Description("""
+	Returns the spawn count of the mob spawner. This is the amount of entities the mob spawner will attempt to spawn \
+	each spawn attempt. Though, if the spawner is spawning items, the spawn count is the \
+	amount of stacks of item to spawn.
+
+	By default, the spawn count is 4.
+	""")
+@Example("""
+	set {_data} to mob spawner data of event-block
+	set spawn count of {_data} to 5
+	broadcast {_data}'s spawn count
+	""")
+@Example("""
+	modify the mob spawner data of event-block:
+		set spawn count of {_data} to 5
+		add 2 to spawn count of {_data}
+		remove 1 from spawn count of {_data}
+		reset spawn count of {_data}
+		set mob spawner data of event-block to {_data}
+	""")
 @Since("INSERT VERSION")
 public class ExprSpawnCount extends SimplePropertyExpression<SkriptMobSpawnerData, Integer> {
 

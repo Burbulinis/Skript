@@ -6,6 +6,7 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SectionUtils;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.Kleenean;
+import org.bukkit.block.TrialSpawner;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerDataType;
@@ -30,14 +31,14 @@ public class SecModifySpawnerData extends Section {
 			.addPattern("modify [the] [:mob] spawner data of %" + SpawnerUtils.spawnerPropertyType + '%');
 
 		if (SpawnerUtils.IS_RUNNING_1_21)
-			info.addPattern("modify [the] [:ominous] trial:trial spawner data of %blocks%");
+			info.addPattern("modify [the] [:ominous [regular:and (regular|normal]] trial:trial spawner data of %blocks%");
 
 		registry.register(SyntaxRegistry.SECTION, info.build());
 	}
 
 	private Expression<?> spawners;
 	private SpawnerDataType dataType;
-	private boolean ominous;
+	private boolean ominous, regular;
 
 	private Trigger trigger;
 
@@ -46,6 +47,7 @@ public class SecModifySpawnerData extends Section {
 		spawners = exprs[0];
 		dataType = SpawnerDataType.fromTags(parseResult.tags);
 		ominous = parseResult.hasTag("ominous");
+		regular = parseResult.hasTag("regular");
 
 		trigger = SectionUtils.loadLinkedCode("modify spawner data", (beforeLoading, afterLoading)
 			-> loadCode(sectionNode, "modify spawner data", beforeLoading, afterLoading, SpawnerDataEvent.class));
@@ -70,11 +72,7 @@ public class SecModifySpawnerData extends Section {
 				TriggerItem.walk(trigger, dataEvent)
 			);
 
-			if (!dataType.isTrial() && data instanceof SkriptMobSpawnerData mobData) {
-				SpawnerUtils.applyToMobSpawner(object, mobData);
-			} else if (dataType.isTrial() && data instanceof SkriptTrialSpawnerData trialData) {
-				trialData.applyDataToTrialSpawner(SpawnerUtils.getTrialSpawner(object), ominous);
-			}
+			SpawnerUtils.applyData(data, object, dataType, ominous, regular);
 		}
 
 		return super.walk(event, false);

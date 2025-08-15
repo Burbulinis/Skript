@@ -1,10 +1,7 @@
 package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.mobspawnerdata;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Examples;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.Since;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
@@ -13,17 +10,25 @@ import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptMobSpawnerData;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Spawner - Maximum Nearby Entity Amount")
-@Description({
-	"Get the maximum amount of similar entities within the spawn range. This is 6 by default.",
-	"The spawner will no longer spawn entities if the value was surpassed.",
-})
-@Examples({
-	"set {_max} to spawner nearby entity amount of target block",
-	"add 5 to spawner nearby entity amount of target block",
-	"remove 2 from spawner nearby entity amount of target block",
-	"reset spawner nearby entity amount of target block"
-})
+@Name("Maximum Nearby Entity Cap")
+@Description("""
+	Returns the maximum nearby entity cap of similiar entities within the spawn range of a mob spawners. The mob \
+	spawner will no longer spawn entities if the value was surpassed.
+
+	By default, the maximum nearby entity cap is 6.
+	""")
+@Example("""
+	set {_data} to mob spawner data of event-block
+	set {_data}'s maximum nearby entity cap to 8
+	broadcast the maximum nearby entity cap of {_data}
+	""")
+@Example("""
+	modify the mob spawner data of event-block:
+		set maximum nearby entity cap of {_data} to 10
+		add 5 to maximum nearby entity cap of {_data}
+		remove 2 from maximum nearby entity cap of {_data}
+		reset maximum nearby entity cap of {_data}
+	""")
 @Since("INSERT VERSION")
 public class ExprMaxNearbyEntities extends SimplePropertyExpression<SkriptMobSpawnerData, Integer> {
 

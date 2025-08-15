@@ -1,7 +1,7 @@
 package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.spawnerdata;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.doc.RequiredPlugins;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.lang.EventRestrictedSyntax;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -21,6 +21,30 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 
 import java.util.StringJoiner;
 
+@Name("Event Spawner Data")
+@Description("""
+	Returns the event spawner data from the current event. This is only available in the spawner data sections.
+	'trial spawner data' must strictly be used in the trial spawner data sections, while 'mob spawner data' in \
+	the mob spawner data sections.
+	""")
+@Example("""
+	modify the mob spawner data of event-block:
+		broadcast the mob spawner data
+
+	set {_data} to the mob spawner data:
+		broadcast the mob spawner data
+	""")
+@Example("""
+	modify the trial spawner data of event-block:
+		broadcast the trial spawner data
+
+	set {_data} to the trial spawner data:
+		broadcast the trial spawner data
+	""")
+@Example("""
+	modify the spawner data of event-block:
+		broadcast the spawner data
+	""")
 @RequiredPlugins("Minecraft 1.21+ (for trial spawner data)")
 public class ExprEventSpawnerData extends SimpleExpression<SkriptSpawnerData> implements EventRestrictedSyntax {
 
@@ -44,10 +68,10 @@ public class ExprEventSpawnerData extends SimpleExpression<SkriptSpawnerData> im
 		dataType = SpawnerDataType.fromTags(parseResult.tags);
 
 		if (dataType.isTrial() && !getParser().isCurrentEvent(TrialSpawnerDataEvent.class)) {
-			Skript.error("'trial spawner data' can only be used in the trial spawner data events.");
+			Skript.error("'trial spawner data' can only be used in the trial spawner data sections.");
 			return false;
 		} else if (dataType.isMob() && !getParser().isCurrentEvent(MobSpawnerDataEvent.class)) {
-			Skript.error("'mob spawner data' can only be used in the mob spawner data events.");
+			Skript.error("'mob spawner data' can only be used in the mob spawner data sections.");
 			return false;
 		}
 

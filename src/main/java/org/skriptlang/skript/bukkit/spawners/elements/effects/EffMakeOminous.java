@@ -14,14 +14,16 @@ import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Trial Spawner - Make Ominous")
-@Description("Make a trial spawner or its block data ominous or normal.")
-@Examples({
-	"if event-block is ominous:",
-		"\tmake the trial spawner state of event-block normal",
-	"else:",
-		"\tmake the trial spawner state of event-block ominous"
-})
+@Name("Trial Spawner State")
+@Description("Make a trial spawner or a trial spawner block data ominous or normal.")
+@Example("""
+	make event-block ominous
+	make event-block normal
+	""")
+@Example("""
+	force event-block to be ominous
+	force event-block to be regular
+	""")
 @Since("INSERT VERSION")
 @RequiredPlugins("Minecraft 1.21+")
 public class EffMakeOminous extends Effect {
@@ -32,7 +34,9 @@ public class EffMakeOminous extends Effect {
 		registry.register(SyntaxRegistry.EFFECT, SyntaxInfo.builder(EffMakeOminous.class)
 			.supplier(EffMakeOminous::new)
 			.priority(SyntaxInfo.COMBINED)
-			.addPatterns("make %blocks/blockdatas% (:ominous|regular|normal)")
+			.addPatterns(
+				"make %blocks/blockdatas% (:ominous|regular|normal)",
+				"force %blocks/blockdatas% to be (:ominous|regular|normal)")
 			.build()
 		);
 	}

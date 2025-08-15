@@ -14,9 +14,9 @@ import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Trial Spawner - Eject Reward")
-@Description("Make a trial spawner or a trial spawner configuration eject a reward out of it.")
-@Examples("eject the trial spawner rewards of target block")
+@Name("Eject Trial Spawner Rewards")
+@Description("Make a trial spawner eject its rewards.")
+@Example("spit out the trial rewards from event-block")
 @Since("INSERT VERSION")
 @RequiredPlugins("Minecraft 1.21+")
 public class EffEjectReward extends Effect {
@@ -27,9 +27,7 @@ public class EffEjectReward extends Effect {
 		registry.register(SyntaxRegistry.EFFECT, SyntaxInfo.builder(EffEjectReward.class)
 			.supplier(EffEjectReward::new)
 			.priority(SyntaxInfo.COMBINED)
-			.addPatterns(
-				"(spit out|eject) [the] trial reward[s] of %blocks%",
-				"(spit out|eject) %blocks%'[s] trial reward[s]")
+			.addPattern("(spit out|eject) [the] trial reward[s] from %blocks%")
 			.build()
 		);
 	}
@@ -60,7 +58,7 @@ public class EffEjectReward extends Effect {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "spit out the trial rewards of " + blocks.toString(event, debug);
+		return "spit out the trial rewards from " + blocks.toString(event, debug);
 	}
 
 }

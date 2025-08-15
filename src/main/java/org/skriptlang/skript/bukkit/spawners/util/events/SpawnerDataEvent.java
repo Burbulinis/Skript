@@ -6,6 +6,9 @@ import org.jetbrains.annotations.NotNull;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerDataType;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptSpawnerData;
 
+/**
+ * Event to allow retrieving the spawner datas in the spawner data sections.
+ */
 public class SpawnerDataEvent extends Event {
 
 	private final SkriptSpawnerData data;

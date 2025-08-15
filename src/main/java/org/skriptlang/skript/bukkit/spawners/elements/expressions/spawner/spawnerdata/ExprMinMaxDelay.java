@@ -1,39 +1,40 @@
 package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.spawnerdata;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Examples;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.Since;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.util.Timespan;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
+import org.bukkit.block.spawner.SpawnRule;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptSpawnerData;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Spawner - Min/Max Spawn Delay")
-@Description({
-	"Get, set the maximum or minimum spawn delay of a spawner.",
-	"Each reset of a spawner, the spawner chooses a new delay between its' "
-		+ "minimum and maximum delays to use for the delay.",
-	"By default, he maximum value is 40 seconds (800 ticks) and the minimum value is 10 seconds (200 ticks).",
-	"Setting the minimum delay higher than the maximum delay and so on does nothing.",
-	"",
-	"Spawners are creature spawners and spawner minecarts."
-})
-@Examples({
-	"set {_timespan} to minimum spawner delay of target block",
-	"set max spawner delay of target block to 500 ticks",
-	"add 100 ticks to min spawner delay of target block",
-	"remove 50 ticks from max spawner delay of target block",
-	"reset min spawner delay of target block"
-})
+@Name("Minimum/Maximum Spawn Delay")
+@Description("""
+	Returns the minimum or maximun spawn delay of a spawner.
+	Every spawning attempt of a spawner, the spawner chooses a delay until its next spawning attempt, which is \
+	explicitly between its minimum and maximum spawn delays.
+	The minimum delay cannot be greater than the maximum delay, and vice versa.
+
+	By default, the maximum spawn delay is 40 seconds (800 ticks) and the minimum spawn delay is 10 seconds (200 ticks).
+	""")
+@Example("""
+	set {_data} to spawner data of event-block
+	set maximum spawn delay of {_data} to 30 seconds
+	reset maximum spawn delay of {_data}
+	""")
+@Example("""
+	modify the spawner data of event-block:
+		set the minimum spawn delay to 2 seconds
+		add 1 second to the minimum spawn delay
+		remove 1.5 seconds from the minimum spawn delay
+	""")
 @Since("INSERT VERSION")
 public class ExprMinMaxDelay extends SimplePropertyExpression<SkriptSpawnerData, Timespan> {
 
@@ -73,12 +74,7 @@ public class ExprMinMaxDelay extends SimplePropertyExpression<SkriptSpawnerData,
 		Timespan timespan = delta != null ? (Timespan) delta[0] : null;
 
 		for (SkriptSpawnerData data : getExpr().getArray(event)) {
-			Timespan minMax;
-			if (max) {
-				minMax = data.getMaxSpawnDelay();
-			} else {
-				minMax = data.getMinSpawnDelay();
-			}
+			Timespan minMax = getSpawnDelay(data, max);
 
 			Timespan value = switch (mode) {
 				case SET -> timespan;
@@ -90,20 +86,34 @@ public class ExprMinMaxDelay extends SimplePropertyExpression<SkriptSpawnerData,
 
 			assert value != null;
 
+			String error = getErrorMessage(value, getSpawnDelay(data, !max));
+			if (error != null) {
+				error(error);
+				continue;
+			}
+
 			if (max) {
 				data.setMaxSpawnDelay(value);
 			} else {
 				data.setMinSpawnDelay(value);
 			}
-
-			if (max && value.compareTo(timespan) < 0) {
-				warning("The maximum spawn delay cannot be lower than the minimum spawn delay, "
-					+ "thus setting it to a value lower than the minimum spawn delay will do nothing.");
-			} else if (!max && value.compareTo(timespan) > 0) {
-				warning("The minimum spawn delay cannot be higher than the maximum spawn delay, "
-					+ "thus setting it to a value higher than the maximum spawn delay will do nothing.");
-			}
 		}
+	}
+
+	private String getErrorMessage(Timespan value, Timespan compare) {
+		if (max && value.compareTo(compare) < 0) {
+			return "The maximum spawn delay cannot be lower than the minimum spawn delay, "
+				+ "thus setting it to a value lower than the minimum spawn delay will do nothing.";
+		} else if (!max && value.compareTo(compare) > 0) {
+			return "The minimum spawn delay cannot be greater than the maximum spawn delay, "
+				+ "thus setting it to a value higher than the maximum spawn delay will do nothing.";
+		}
+
+		return null;
+	}
+
+	private Timespan getSpawnDelay(SkriptSpawnerData data, boolean max) {
+		return max ? data.getMaxSpawnDelay() : data.getMinSpawnDelay();
 	}
 
 	@Override

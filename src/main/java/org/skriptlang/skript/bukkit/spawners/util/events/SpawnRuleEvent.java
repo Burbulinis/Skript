@@ -4,6 +4,9 @@ import org.bukkit.block.spawner.SpawnRule;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
+/**
+ * Event to allow retrieving the spawn rule in the spawn rule sections.
+ */
 public class SpawnRuleEvent extends Event {
 
 	private final SpawnRule rule;

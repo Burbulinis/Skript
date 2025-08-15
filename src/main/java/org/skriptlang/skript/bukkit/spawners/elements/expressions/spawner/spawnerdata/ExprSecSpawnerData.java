@@ -1,6 +1,9 @@
 package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.spawnerdata;
 
 import ch.njol.skript.config.SectionNode;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Example;
+import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.RequiredPlugins;
 import ch.njol.skript.expressions.base.SectionExpression;
 import ch.njol.skript.lang.Expression;
@@ -24,6 +27,28 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 
 import java.util.List;
 
+@Name("Create Spawner Data")
+@Description("Returns a new trial or mob spawner data.")
+@Example("""
+	set spawner data of event-block to the mob spawner data:
+		set the spawn count to 2
+		add 2 to the maximum nearby entity cap
+		remove 5 from the activation range
+		add {_entry} to the spawner entries
+		set the spawn range to 16
+	""")
+@Example("""
+	set {_trial data} to the trial spawner data:
+		set the activation range to 32
+		set the spawn range to 8
+		add {_entries::*} to the spawner entries
+		set the base entity spawn count to 12
+
+		add loot table "minecraft:chests/simple_dungeon" to the reward entries
+		set the reward weight for loot table "minecraft:chests/simple_dungeon" to 12
+
+	set the ominous trial spawner data of event-block to {_trial data}
+	""")
 @RequiredPlugins("Minecraft 1.21+ (for trial spawner data)")
 public class ExprSecSpawnerData extends SectionExpression<SkriptSpawnerData> {
 
@@ -47,11 +72,7 @@ public class ExprSecSpawnerData extends SectionExpression<SkriptSpawnerData> {
 		Expression<?>[] exprs, int pattern, Kleenean delayed, ParseResult result,
 		@Nullable SectionNode node, @Nullable List<TriggerItem> triggerItems
 	) {
-		dataType = switch (pattern) {
-			case 0 -> SpawnerDataType.MOB;
-			case 1 -> SpawnerDataType.TRIAL;
-			default -> SpawnerDataType.ANY;
-		};
+		dataType = pattern == 0 ? SpawnerDataType.MOB : SpawnerDataType.TRIAL;
 		if (node != null) {
 			String name = dataType + " spawner data";
 			trigger = SectionUtils.loadLinkedCode(name, (beforeLoading, afterLoading) ->

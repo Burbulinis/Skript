@@ -7,16 +7,16 @@ import org.bukkit.block.data.type.TrialSpawner.State;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Spawner - Is Active")
-@Description(
-	"Check if a spawner is active. Inactive spawners have no player in the activation range of the spawner, "
-		+ "or the sky/block light spawn levels do not match the requirement, or, if there is no potential spawn "
-		+ "assigned to the spawner."
-)
-@Examples({
-	"if the block at player is an active spawner:",
-		"\tsend \"The spawner is activated!\""
-})
+@Name("Is Active Spawner")
+@Description("""
+	Checks whether a spawner is active. An active spawner must have a player in its activation range, the sky and \
+	block light spawn levels must match the requirements, and there must be an entity type, snapshot or spawner entry \
+	assigned to the spawner.
+	""")
+@Example("""
+	if the block at player is an active spawner:
+		send "The spawner is activated!" to player
+	""")
 @Since("INSERT VERSION")
 @RequiredPlugins("Minecraft 1.21+ (for trial spawners, spawner minecarts)")
 public class CondIsActivated extends PropertyCondition<Object> {

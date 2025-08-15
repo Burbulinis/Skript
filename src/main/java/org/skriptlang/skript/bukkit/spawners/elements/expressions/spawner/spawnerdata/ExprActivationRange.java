@@ -1,10 +1,7 @@
 package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.spawnerdata;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Examples;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.Since;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
@@ -14,21 +11,25 @@ import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptSpawnerData;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptTrialSpawnerData;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Base Spawner - Activation Range")
-@Description({
-	"Gets the activation range of the base spawner. By default, this is 16.",
-	"The activation range is the distance "
-		+ "from the spawner that players must be within for the spawner to be active.",
-	"Setting this value to less than or equal to 0, makes the spawner always active "
-		+ "(given that there are players online).",
-	"This expression allows trial spawners and trial spawner configurations.",
-	"",
-	"Base spawners are trial spawner configurations, spawner minecarts and creature spawners."
-})
-@Examples({
-	"set {_range} to spawner activation range of target block",
-	"set spawner activation range of target block to 32"
-})
+@Name("Activation Range")
+@Description("""
+	Returns the activation range of a spawner.
+	The activation range is the distance from the spawner that players must be within for the spawner to be active. \
+	Setting this value to less than or equal to 0, makes the spawner always active, given that there are players online.
+
+	By default, this is 16 for mob spawners, though it is 14 for trial spawners.
+	""")
+@Example("""
+	set {_data} to spawner data of event-block
+	set activation range of {_data} to 20
+	reset activation range of {_data}
+	""")
+@Example("""
+	modify the spawner data of event-block:
+		set the activation radius to 20
+		add 5 to the activation radius
+		remove 3 from the activation range
+	""")
 @Since("INSERT VERSION")
 public class ExprActivationRange extends SimplePropertyExpression<SkriptSpawnerData, Integer> {
 

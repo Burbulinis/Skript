@@ -35,8 +35,15 @@ public class EvtSpawnerSpawn extends SkriptEvent {
 			.supplier(EvtSpawnerSpawn::new)
 			.addEvents(events)
 			.addPattern(pattern)
-			.addDescription("Called when a spawner spawns an entity or is about to.")
-			.addExamples("todo")
+			.addDescription("""
+				This is called when a mob spawner or trial spawner spawns an entity.
+				Under versions 1.21, you can only use 'on mob spawner spawning of %entitydatas%'. Above versions 1.21, \
+				you can use 'on trial spawner spawning of %entitydatas%' for trial spawners and 'on spawner spawning \
+				of %entitydatas%' for both trial spawners and mob spawners.
+				""")
+			.addExamples(
+				"on trial spawner spawning of a zombie:",
+				"on mob spawner spawn:")
 			.addSince("INSERT VERSION")
 			.addRequiredPlugin("Minecraft 1.21+ (for trial spawners, spawner minecarts)")
 			.build()

@@ -16,12 +16,17 @@ import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Trial Spawner - Track")
-@Description("Make the trial spawner or a trial spawner configuration start or stop tracking entities.")
-@Examples({
-	"if target block is not tracking player:",
-		"\tmake the spawner target block start tracking player"
-})
+@Name("Trial Spawner Tracking")
+@Description("""
+	Make a trial spawner start or stop tracking an entity.
+	Tracked players are players that have joined the battle by stepping into the trial spawner's activation range. \
+	Meanwhile, tracked entities (non-players) are entities that were spawned by the trial spawner.
+	Note that the trial spawner may decide to start or stop tracking entities at any given time.
+	""")
+@Example("""
+	make event-block start tracking player
+	force event-block to stop tracking player
+	""")
 @Since("INSERT VERSION")
 @RequiredPlugins("Minecraft 1.21+")
 public class EffTrialSpawnerTrack extends Effect {
@@ -33,21 +38,19 @@ public class EffTrialSpawnerTrack extends Effect {
 			.supplier(EffTrialSpawnerTrack::new)
 			.priority(SyntaxInfo.COMBINED)
 			.addPatterns(
-				"make %blocks% (:start|stop) entity tracking %entities%",
-				"make %blocks% (:start|stop) player tracking %players%")
+				"make %blocks% (:start|stop) tracking %entities%",
+				"force %blocks% to (:start|stop) tracking %entities%")
 			.build()
 		);
 	}
 
 	private boolean start;
-	private boolean player;
 	private Expression<Block> blocks;
 	private Expression<Entity> entities;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		start = parseResult.hasTag("start");
-		player = matchedPattern == 1;
 		//noinspection unchecked
 		blocks = (Expression<Block>) exprs[0];
 		//noinspection unchecked
@@ -66,13 +69,13 @@ public class EffTrialSpawnerTrack extends Effect {
 			assert trialSpawner != null;
 
 			for (Entity entity : entities.getArray(event)) {
-				if (player && entity instanceof Player playerEntity) {
+				if (entity instanceof Player player) {
 					if (start) {
-						trialSpawner.startTrackingPlayer(playerEntity);
+						trialSpawner.startTrackingPlayer(player);
 					} else {
-						trialSpawner.stopTrackingPlayer(playerEntity);
+						trialSpawner.stopTrackingPlayer(player);
 					}
-				} else if (!player) {
+				} else {
 					if (start) {
 						trialSpawner.startTrackingEntity(entity);
 					} else {

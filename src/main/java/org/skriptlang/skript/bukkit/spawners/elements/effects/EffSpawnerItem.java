@@ -1,5 +1,8 @@
 package org.skriptlang.skript.bukkit.spawners.elements.effects;
 
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Example;
+import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.RequiredPlugins;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
@@ -14,6 +17,21 @@ import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
+@Name("Modify Spawner Item")
+@Description("""
+	Make a mob spawner spawn items rather than entities. In this case, the mob spawner's spawn count determines how many \
+	stacks are spawned, not how many items should be in each stack.
+	""")
+@Example("""
+	make event-block spawn 15 diamonds
+	modify the mob spawner data of event-block:
+		set the spawn count to 3
+	# This will now spawn 3 stacks of 15 diamonds each
+	""")
+@Example("""
+	force event-block to spawn 5 diamonds
+	force event-block to spawn a diamond sword
+	""")
 @RequiredPlugins("Minecraft 1.21+ (for spawner minecarts)")
 public class EffSpawnerItem extends Effect {
 

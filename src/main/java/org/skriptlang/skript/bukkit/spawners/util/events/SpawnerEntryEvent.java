@@ -5,6 +5,9 @@ import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 import org.skriptlang.skript.bukkit.spawners.util.SkriptSpawnerEntry;
 
+/**
+ * Event to allow retrieving the spawner entry in the spawner entry sections.
+ */
 public class SpawnerEntryEvent extends Event {
 
 	private final SkriptSpawnerEntry entry;

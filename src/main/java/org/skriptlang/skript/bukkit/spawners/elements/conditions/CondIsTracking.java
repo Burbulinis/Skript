@@ -16,17 +16,17 @@ import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Trial Spawner - Is Tracking")
-@Description({
-	"Check whether trial spawners or trial spawner configs are tracking players or entities.",
-	"A player being tracked means the player has entered the activation range, meanwhile an entity being tracked means "
-		+ "the entity was spawned by the trial spawner."
-})
-@Examples({
-	"make the event-block start tracking player",
-	"if the event-block is spawner player tracking player:",
-		"\tsend \"indeed! you are being tracked..\""
-})
+@Name("Trial Spawner Is Tracking")
+@Description("""
+	Checks whether a trial spawner is tracking the entity or player.
+	Tracked players are players that have joined the battle by stepping into the trial spawner's activation range. \
+	Meanwhile, tracked entities (non-players) are entities that were spawned by the trial spawner.
+	""")
+@Example("""
+	force the event-block to start tracking player
+	if the event-block is tracking player:
+		send "indeed! you are being tracked.."
+	""")
 @Since("INSERT VERSION")
 @RequiredPlugins("Minecraft 1.21+")
 public class CondIsTracking extends Condition {
@@ -38,17 +38,14 @@ public class CondIsTracking extends Condition {
 			.supplier(CondIsTracking::new)
 			.priority(SyntaxInfo.COMBINED)
 			.addPatterns(
-				"%blocks% (is|are) player tracking %players%",
-				"%blocks% (isn't|is not|aren't|are not) player tracking %players%",
-				"%blocks% (is|are) entity tracking %entities%",
-				"%blocks% (isn't|is not|aren't|are not) entity tracking %entities%")
+				"%blocks% (is|are) tracking %entities%",
+				"%blocks% (isn't|is not|aren't|are not) tracking %entities%")
 			.build()
 		);
 	}
 
 	private Expression<Block> spawners;
 	private Expression<Entity> entities;
-	private boolean player;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
@@ -56,8 +53,7 @@ public class CondIsTracking extends Condition {
 		spawners = (Expression<Block>) exprs[0];
 		//noinspection unchecked
 		entities = (Expression<Entity>) exprs[1];
-		player = matchedPattern < 2;
-		setNegated(matchedPattern == 1 || matchedPattern == 3);
+		setNegated(matchedPattern == 1);
 		return true;
 	}
 
@@ -70,8 +66,8 @@ public class CondIsTracking extends Condition {
 			TrialSpawner spawner = SpawnerUtils.getTrialSpawner(block);
 
 			return entities.check(event, entity -> {
-				if (player) {
-					return spawner.isTrackingPlayer((Player) entity);
+				if (entity instanceof Player player) {
+					return spawner.isTrackingPlayer(player);
 				} else {
 					return spawner.isTrackingEntity(entity);
 				}
@@ -90,13 +86,7 @@ public class CondIsTracking extends Condition {
 		} else {
 			builder.append("are");
 		}
-
-		if (player) {
-			builder.append("player tracking");
-		} else {
-			builder.append("entity tracking");
-		}
-		builder.append(entities);
+		builder.append("tracking", entities);
 
 		return builder.toString();
 	}
