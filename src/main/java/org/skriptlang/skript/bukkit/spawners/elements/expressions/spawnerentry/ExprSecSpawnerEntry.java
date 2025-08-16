@@ -5,6 +5,7 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
+import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.expressions.base.SectionExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -13,6 +14,7 @@ import ch.njol.skript.lang.TriggerItem;
 import ch.njol.skript.lang.util.SectionUtils;
 import ch.njol.skript.variables.Variables;
 import ch.njol.util.Kleenean;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntitySnapshot;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
@@ -54,21 +56,20 @@ public class ExprSecSpawnerEntry extends SectionExpression<SkriptSpawnerEntry> {
 		registry.register(SyntaxRegistry.EXPRESSION, SyntaxInfo.Expression.builder(ExprSecSpawnerEntry.class, SkriptSpawnerEntry.class)
 			.supplier(ExprSecSpawnerEntry::new)
 			.priority(SyntaxInfo.COMBINED)
-			.addPattern("[a|the] spawner entry (of|using) %entitysnapshot%")
+			.addPattern("[a|the] spawner entry (of|using) %entitydata/entitysnapshot%")
 			.build()
 		);
 	}
 
 	private Trigger trigger;
-	private Expression<EntitySnapshot> snapshot;
+	private Expression<?> entity;
 
 	@Override
 	public boolean init(
 		Expression<?>[] exprs, int pattern, Kleenean delayed, ParseResult result, @Nullable SectionNode node,
 		@Nullable List<TriggerItem> triggerItems
 	) {
-		//noinspection unchecked
-		snapshot = (Expression<EntitySnapshot>) exprs[0];
+		entity = exprs[0];
 		if (node != null) {
 			trigger = SectionUtils.loadLinkedCode("spawner entry create", (beforeLoading, afterLoading) ->
 				loadCode(node, "spawner entry create", beforeLoading, afterLoading, SpawnRuleEvent.class)
@@ -80,11 +81,29 @@ public class ExprSecSpawnerEntry extends SectionExpression<SkriptSpawnerEntry> {
 
 	@Override
 	protected SkriptSpawnerEntry @Nullable [] get(Event event) {
-		EntitySnapshot entitySnapshot = snapshot.getSingle(event);
-		if (entitySnapshot == null)
+		Object object = entity.getSingle(event);
+		if (object == null)
 			return null;
 
-		SkriptSpawnerEntry entry = new SkriptSpawnerEntry(entitySnapshot);
+		EntitySnapshot snapshot = null;
+
+		if (object instanceof EntityData<?> entityData) {
+			Entity entity = entityData.create();
+			if (entity == null)
+				return null;
+
+			snapshot = entity.createSnapshot();
+			if (snapshot == null)
+				return null;
+
+			entity.remove();
+		} else if (object instanceof EntitySnapshot entitySnapshot) {
+			snapshot = entitySnapshot;
+		}
+
+		assert snapshot != null;
+
+		SkriptSpawnerEntry entry = new SkriptSpawnerEntry(snapshot);
 		if (trigger != null) {
 			SpawnerEntryEvent entryEvent = new SpawnerEntryEvent(entry);
 			Variables.withLocalVariables(event, entryEvent, () ->
@@ -107,7 +126,7 @@ public class ExprSecSpawnerEntry extends SectionExpression<SkriptSpawnerEntry> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "spawner entry of " + snapshot.toString(event, debug);
+		return "a spawner entry of " + entity.toString(event, debug);
 	}
 
 }

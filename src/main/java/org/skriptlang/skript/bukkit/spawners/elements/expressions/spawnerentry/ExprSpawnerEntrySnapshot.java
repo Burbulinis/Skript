@@ -5,8 +5,10 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
+import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntitySnapshot;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.NotNull;
@@ -40,14 +42,30 @@ public class ExprSpawnerEntrySnapshot extends SimplePropertyExpression<SkriptSpa
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		if (mode == ChangeMode.SET)
-			return CollectionUtils.array(EntitySnapshot.class);
+			return CollectionUtils.array(EntitySnapshot.class, EntityData.class);
 		return null;
 	}
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		assert delta != null;
-		EntitySnapshot snapshot = (EntitySnapshot) delta[0];
+		Object object = delta[0];
+
+		EntitySnapshot snapshot = null;
+		if (object instanceof EntitySnapshot entitySnapshot) {
+			snapshot = entitySnapshot;
+		} else if (object instanceof EntityData<?> entityData) {
+			Entity entity = entityData.create();
+			if (entity == null)
+				return;
+
+			snapshot = entity.createSnapshot();
+			if (snapshot == null)
+				return;
+			entity.remove();
+		}
+
+		assert snapshot != null;
 
 		for (SkriptSpawnerEntry entry : getExpr().getArray(event)) {
 			entry.setEntitySnapshot(snapshot);

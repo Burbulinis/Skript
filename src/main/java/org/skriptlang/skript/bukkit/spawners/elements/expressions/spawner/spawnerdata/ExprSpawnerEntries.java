@@ -1,10 +1,7 @@
 package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.spawnerdata;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Examples;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.Since;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -23,21 +20,28 @@ import java.util.List;
 import java.util.Set;
 
 @Name("Spawner Entries")
-@Description({
-	"Every spawn attempt, the spawner will pick a random entry "
-		+ "from the list of potential spawner entries and spawn it."
-		+ "The spawner entity will be overwritten to the "
-		+ "entity snapshot of the highest weighted spawner entry from the list of potential spawns.",
-	"",
-	"This expression gets the trial spawner configuration "
-		+ "with the current state (i.e. ominous, normal) of the trial spawner block, if one is provided.",
-	"",
-	"Base spawners are trial spawner configurations, spawner minecarts and creature spawners."
-})
-@Examples({
-	"set {_entry::*} to potential spawner spawns of target block",
-	"add a spawner entry with entity snapshot of a zombie to potential spawner spawns of target block",
-})
+@Description("""
+	Returns the spawner entries of the spawner data. \
+	On each spawn attempt, the spawner selects a random entry from the list (typically the highest weighted one) \
+	and spawns it. The spawner’s type and entity snapshot are then overwritten with the chosen entry.
+	""")
+@Example("""
+	set {_data} to spawner data of event-block
+	set {_entries::*} to spawner entries of {_data}
+	delete the spawner entries of {_data}
+	""")
+@Example("""
+	modify the spawner data of event-block:
+		set {_entry} to the spawner entry of a zombie:
+			set the weight to 2
+			set the spawner entry equipment to loot table "minecraft:equipment/trial_chamber"
+			set the drop chances for helmet, legs and boots to 100%
+			set the spawn rule to a spawn rule:
+				set the minimum block light spawn level to 10
+				set the maximum block light spawn level to 12
+				set the maximum sky light spawn level to 5
+		add {_entry} to the spawner entries
+	""")
 @Since("INSERT VERSION")
 public class ExprSpawnerEntries extends PropertyExpression<SkriptSpawnerData, SkriptSpawnerEntry> {
 

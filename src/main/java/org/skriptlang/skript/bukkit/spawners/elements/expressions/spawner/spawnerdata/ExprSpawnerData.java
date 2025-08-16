@@ -14,14 +14,16 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerDataType;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
+import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptMobSpawnerData;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptSpawnerData;
+import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptTrialSpawnerData;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
 import java.util.StringJoiner;
 
 @Name("Spawner Data")
 @Description("""
-	Returns the spawner data of a spawner. Setting this will modify the data of the spawner.
+	Returns the spawner data of a spawner.
 	Since trial spawners use different data in its ominous and regular states, you can specifically set the data of \
 	the ominous state using 'ominous trial spawner data'. Additionally, you can set the data of both states using \
 	'ominous and regular trial spawner data', which will apply the data to both states of the trial spawner.
@@ -94,8 +96,13 @@ public class ExprSpawnerData extends SimplePropertyExpression<Object, SkriptSpaw
 		SkriptSpawnerData data = delta != null ? (SkriptSpawnerData) delta[0] : null;
 
 		for (Object object : getExpr().getArray(event)) {
-			if (data == null)
-				data = SpawnerUtils.getDataFromObject(object, dataType);
+			if (data == null) {
+				if (SpawnerUtils.isCreatureSpawner(object) || SpawnerUtils.isSpawnerMinecart(object)) {
+					data = new SkriptMobSpawnerData();
+				} else if (SpawnerUtils.isTrialSpawner(object)) {
+					data = new SkriptTrialSpawnerData();
+				}
+			}
 
 			if (data == null)
 				continue;

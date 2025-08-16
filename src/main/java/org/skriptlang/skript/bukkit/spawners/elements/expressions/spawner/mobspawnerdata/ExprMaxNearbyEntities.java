@@ -15,7 +15,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Maximum Nearby Entity Cap")
 @Description("""
-	Returns the maximum nearby entity cap of similiar entities within the spawn range of a mob spawners. The mob \
+	Returns the maximum nearby entity cap of similar entities within the spawn range of the mob spawner data. The mob \
 	spawner will no longer spawn entities if the value was surpassed.
 
 	By default, the maximum nearby entity cap is 6.

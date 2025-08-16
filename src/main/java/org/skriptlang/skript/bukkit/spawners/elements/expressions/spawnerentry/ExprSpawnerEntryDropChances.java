@@ -65,7 +65,7 @@ public class ExprSpawnerEntryDropChances extends PropertyExpression<SkriptSpawne
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		return switch (mode) {
-			case SET, DELETE -> CollectionUtils.array(Float.class);
+			case SET, ADD, REMOVE, DELETE -> CollectionUtils.array(Float.class);
 			default -> null;
 		};
 	}
@@ -77,10 +77,17 @@ public class ExprSpawnerEntryDropChances extends PropertyExpression<SkriptSpawne
 
 		for (SkriptSpawnerEntry entry : getExpr().getArray(event)) {
 			for (EquipmentSlot slot : slots) {
-				switch (mode) {
-					case SET -> entry.setDropChance(slot, chance);
-					case DELETE -> entry.removeDropChance(slot);
-				}
+				float value = switch (mode) {
+					case SET -> chance;
+					case ADD -> entry.getDropChances().getOrDefault(slot, 0f) + chance;
+					case REMOVE -> entry.getDropChances().getOrDefault(slot, 0f) - chance;
+					default -> 0;
+				};
+
+				if (mode == ChangeMode.DELETE)
+					entry.removeDropChance(slot);
+
+				entry.setDropChance(slot, value);
 			}
 		}
 	}

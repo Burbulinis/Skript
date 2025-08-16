@@ -15,7 +15,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Spawn Count")
 @Description("""
-	Returns the spawn count of the mob spawner. This is the amount of entities the mob spawner will attempt to spawn \
+	Returns the spawn count of the mob spawner data. This is the amount of entities the mob spawner will attempt to spawn \
 	each spawn attempt. Though, if the spawner is spawning items, the spawn count is the \
 	amount of stacks of item to spawn.
 

@@ -1,10 +1,7 @@
 package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.spawnerdata;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Examples;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.Since;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
@@ -14,19 +11,24 @@ import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptSpawnerData;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Spawner Spawn Range")
-@Description({
-	"Get the radius of the area in which the spawner can spawn entities, by default 4.",
-	"This expression gets the trial spawner configuration "
-		+ "with the current state (i.e. ominous, normal) of the trial spawner block, if one is provided.",
-	"",
-	"Base spawners are trial spawner configurations, spawner minecarts and creature spawners."
-})
-@Examples({
-	"set the spawner spawn radius of the target block to 5",
-	"add 2 to the spawner spawn radius of the target block",
-	"remove 1 from the spawner spawn radius of the target block",
-	"reset the spawner spawn radius of the target block"
-})
+@Description("""
+	Returns the spawn range of the spawner data. The spawn range is the radius of the area in which the spawner \
+	can spawn entities.
+
+	By default, the spawn range is 4.
+	""")
+@Example("""
+	set {_data} to spawner data of event-block
+	set the spawn range of {_data} to 6
+	add 3 to the spawn range of {_data}
+	reset the spawn range of {_data}
+	""")
+@Example("""
+	modify the spawner data of event-block:
+		set the spawn range to 10
+		add 5 to the spawn range
+		remove 9 from the spawn range
+	""")
 @Since("INSERT VERSION")
 public class ExprSpawnRange extends SimplePropertyExpression<SkriptSpawnerData, Integer> {
 
