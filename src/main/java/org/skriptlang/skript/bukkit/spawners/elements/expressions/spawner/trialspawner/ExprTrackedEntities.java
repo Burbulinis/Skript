@@ -19,16 +19,21 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 import java.util.ArrayList;
 import java.util.List;
 
-@Name("Trial Spawner - Tracked Entities")
-@Description({
-	"Returns the tracked entities of the trial spawner.",
-	"Tracked entities are entities that were spawned by the trial spawner, "
-		+ "and the tracked players are players that were within the spawner's activation range.",
-})
-@Examples({
-	"loop all tracked players of event-block:",
-		"\tsend \"You're being tracked by %event-block%\" to loop-player"
-})
+@Name("Tracked Entities")
+@Description("""
+	Returns the entities (or players) tracked by the trial spawner. \
+	Tracked players are those who enter the battle by stepping into the trial spawner’s activation range, \
+	while tracked entities (non-players) are those spawned by the trial spawner. \
+	These tracked entities contribute to the incremental and base entity counts of the trial spawner data.
+	""")
+@Example("""
+	broadcast the tracked players of event-block
+	add player to the tracked players of event-block
+	""")
+@Example("""
+	set tracked entities of event-block to the chickens within radius 5 of player
+	remove the target entity from the tracked entities of event-block
+	""")
 @Since("INSERT VERSION")
 @RequiredPlugins("Minecraft 1.21+")
 public class ExprTrackedEntities extends PropertyExpression<Block, Entity> {

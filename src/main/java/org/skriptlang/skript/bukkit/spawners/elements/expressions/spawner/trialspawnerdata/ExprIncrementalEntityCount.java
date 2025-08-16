@@ -1,6 +1,8 @@
 package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.trialspawnerdata;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.RequiredPlugins;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
@@ -13,6 +15,31 @@ import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptTrialSpawnerData;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
+@Name("Incremental Mob Amount")
+@Description("""
+	Returns the incremental (concurrent) mob spawn amount of the trial spawner data.
+
+	The incremental mob spawn amount determines how many additional mobs are added to the total mob spawn amount \
+	for each tracked player beyond the first. For example, if the incremental mob spawn amount is 2 \
+	and there are 2 tracked players, 2 extra mobs are added (for the second player), resulting in 8 total mobs \
+	when combined with the base amount of 6. By default, the incremental mob spawn amount is 2.
+
+	The incremental simultaneous mob spawn amount works the same way, but applies to mobs that spawn at once. \
+	This value determines how many additional simultaneous spawns are added for each tracked player beyond the first. \
+	For example, if the incremental simultaneous mob spawn amount is 5 and there are 3 tracked players, \
+	10 extra mobs are added (for the second & third player), resulting in 12 simultaneous spawns when combined with \
+	the base amount of 2. By default, the incremental simultaneous mob spawn amount is 2.
+
+	The trial spawner will continue spawning mobs until the total mob spawn amount is reached, \
+	with the number of entities present at once capped by the total simultaneous spawn amount \
+	as seen in the formula below.
+
+	The formulas are:
+	```
+	total mob spawn amount = base mob spawn amount + (incremental mob spawn amount × (tracked player count - 1))
+	total simultaneous spawn amount = base simultaneous amount + (incremental simultaneous amount × (tracked player count - 1))
+	```
+	""")
 @RequiredPlugins("Minecraft 1.21+")
 public class ExprIncrementalEntityCount extends SimplePropertyExpression<SkriptTrialSpawnerData, Integer> {
 

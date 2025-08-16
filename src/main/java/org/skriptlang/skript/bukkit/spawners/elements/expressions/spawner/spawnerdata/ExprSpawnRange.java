@@ -10,7 +10,7 @@ import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptSpawnerData;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Spawner Spawn Range")
+@Name("Spawn Range")
 @Description("""
 	Returns the spawn range of the spawner data. The spawn range is the radius of the area in which the spawner \
 	can spawn entities.

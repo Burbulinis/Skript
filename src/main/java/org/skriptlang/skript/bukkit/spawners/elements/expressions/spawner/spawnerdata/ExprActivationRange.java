@@ -16,9 +16,9 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Activation Range")
 @Description("""
-	Returns the activation range of the spawner data.
-	The activation range is the distance from the spawner that players must be within for the spawner to be active. \
-	Setting this value to less than or equal to 0, makes the spawner always active, given that there are players online.
+	Returns the activation range of the spawner data. The activation range is the distance from the spawner that \
+	players must be within for the spawner to be active. Setting this value to less than or equal to 0, \
+	makes the spawner always active, given that there are players online.
 
 	By default, this is 16 for mob spawners, though it is 14 for trial spawners.
 	""")

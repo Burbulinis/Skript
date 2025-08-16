@@ -19,9 +19,8 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Minimum/Maximum Spawn Delay")
 @Description("""
-	Returns the minimum or maximum spawn delay of the spawner data.
-	Every spawning attempt of a spawner, the spawner chooses a delay until its next spawning attempt, which is \
-	explicitly between its minimum and maximum spawn delays.
+	Returns the minimum or maximum spawn delay of the spawner data. Every spawning attempt of a spawner, the spawner \
+	chooses a delay until its next spawning attempt, which is explicitly between its minimum and maximum spawn delays. \
 	The minimum delay cannot be greater than the maximum delay, and vice versa.
 
 	By default, the maximum spawn delay is 40 seconds (800 ticks) and the minimum spawn delay is 10 seconds (200 ticks).

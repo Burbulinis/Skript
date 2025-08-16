@@ -13,16 +13,19 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Trial Spawner - Cooldown Length")
-@Description({
-	"Returns the cooldown length of a trial spawner.",
-	"Once all the mobs have been killed, the trial spawner will wait for this amount of time before spawning more mobs.",
-	"Default value is 30 minutes (36000 ticks)."
-})
-@Examples({
-	"set {_cooldown} to trial spawner cooldown length of event-block",
-	"broadcast \"The trial spawner will wait for %{_cooldown}% before spawning more mobs.\""
-})
+@Name("Trial Cooldown Length")
+@Description("""
+	Returns the cooldown length of a trial spawner. After spawning all entities, the trial spawner enters cooldown \
+	and does not spawn entities again until it ends.
+
+	By default, the cooldown length is 30 minutes (36,000 ticks).
+	""")
+@Example("""
+	broadcast the trial cooldown length of event-block
+	add 1 hour to the trial cooldown length of event-block
+	set the trial cooldown length of event-block to 25 minutes
+	reset the trial cooldown length of event-block
+	""")
 @Since("INSERT VERSION")
 @RequiredPlugins("Minecraft 1.21+")
 public class ExprCooldownLength extends SimplePropertyExpression<Block, Timespan> {

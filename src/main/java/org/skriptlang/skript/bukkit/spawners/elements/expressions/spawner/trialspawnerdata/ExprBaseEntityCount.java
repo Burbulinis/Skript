@@ -13,27 +13,34 @@ import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptTrialSpawnerData;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Trial Spawner Configuration - Mob Count")
-@Description({
-	"Returns the total or simultaneous mob count of the trial spawner configuration.",
-	"Both the simultaneous and total mob count "
-		+ "increases once another player comes within the spawner's range. "
-		+ "For each additional player present, the simultaneous mob count "
-		+ "increases by the simultaneous mob count per player, "
-		+ "and the total mob count increases by the total mob count per player. "
-		+ "Assuming you are using the default values, with 2 players,"
-		+ "8 mobs spawn in total with 3 at once, "
-		+ "and with 3 players, 10 mobs spawn in total with 4 at once.",
-	"The default value for the total mob count is 2, and the default value for the simultaneous mob count is 6.",
-	"The trial spawner will stop spawning mobs if the number of living mobs spawned by it reached the total mob count."
-})
-@Examples({
-	"send \"The trial spawner is spawning %the total trial spawner mob count of {_spawner}% mobs in total.\"",
-	"send \"The trial spawner is spawning %the simultaneous trial spawner mob count of {_spawner}% mobs at once.\"",
-	"",
-	"set the total trial spawner mob count of {_spawner} to 10",
-	"set the simultaneous trial spawner mob count of {_spawner} to 4",
-})
+@Name("Base Mob Amount")
+@Description("""
+	Returns the base (simultaneous) mob spawn amount of the trial spawner data.
+
+	The base mob spawn amount is the total number of mobs spawned (by default, 6) when there is one tracked player.
+
+	The base simultaneous mob spawn amount is the number of mobs spawned at once (by default, 2) when there is \
+	one tracked player.
+
+	For tracked players beyond the first one, the total simultaneous and not simultaneous mob spawn amounts \
+	will be increased by the incremental mob spawn amounts.
+
+	Once the total mob amount has been spawned, the trial spawner enters cooldown \
+	and will not spawn entities again until it ends.
+	""")
+@Example("""
+	set {_data} to trial spawner data of event-block
+	set base mob spawn amount of {_data} to 10
+	add 2 to base simultaneous entity spawn amount of {_data}
+	broadcast "The base mob spawn amount of the trial spawner is %the base trial spawner mob count of {_data}%!"
+	""")
+@Example("""
+	modify the trial spawner data of event-block:
+		add 5 to base mob spawn amount
+		remove 3 from base simultaneous mob spawn amount
+		reset base mob spawn amount
+		add 10 to base concurrent entity spawn amount
+	""")
 @Since("INSERT VERSION")
 @RequiredPlugins("Minecraft 1.21+")
 public class ExprBaseEntityCount extends SimplePropertyExpression<SkriptTrialSpawnerData, Integer> {

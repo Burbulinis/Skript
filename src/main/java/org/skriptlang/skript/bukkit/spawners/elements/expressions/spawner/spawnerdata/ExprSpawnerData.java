@@ -23,10 +23,10 @@ import java.util.StringJoiner;
 
 @Name("Spawner Data")
 @Description("""
-	Returns the spawner data of a spawner.
-	Since trial spawners use different data in its ominous and regular states, you can specifically set the data of \
-	the ominous state using 'ominous trial spawner data'. Additionally, you can set the data of both states using \
-	'ominous and regular trial spawner data', which will apply the data to both states of the trial spawner.
+	Returns the spawner data of a spawner. Since trial spawners use different data in its ominous and regular states, \
+	you can specifically set the data of the ominous state using 'ominous trial spawner data'. Additionally, \
+	you can set the data of both states using 'ominous and regular trial spawner data', which will apply the data to \
+	both states of the trial spawner.
 	""")
 @Example("""
 	set the spawner data of event-block to the mob spawner data:
