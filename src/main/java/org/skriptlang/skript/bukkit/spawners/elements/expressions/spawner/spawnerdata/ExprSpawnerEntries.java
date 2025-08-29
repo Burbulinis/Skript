@@ -23,7 +23,7 @@ import java.util.Set;
 @Description("""
 	Returns the spawner entries of the spawner data. \
 	On each spawn attempt, the spawner selects a random entry from the list (typically the highest weighted one) \
-	and spawns it. The spawner’s type and entity snapshot are then overwritten with the chosen entry.
+	and spawns it. The spawner's type and entity snapshot are then overwritten with the chosen entry.
 	""")
 @Example("""
 	set {_data} to spawner data of event-block

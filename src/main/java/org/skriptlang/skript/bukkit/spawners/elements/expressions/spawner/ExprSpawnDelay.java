@@ -15,22 +15,13 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Base Spawner - Spawn Delay")
-@Description({
-	"The spawn delay of a base spawner is the time until the spawner will "
-		+ "attempt to spawn its potential spawns.",
-	"If the spawner is inactive during the spawn attempt, the delay will remain as 0 seconds, "
-		+ "and the spawner will attempt to spawn the potential spawns every tick until it is successful.",
-	"After such successful attempt, the delay will be reset to a random value between the minimum and maximum "
-		+ "spawn delays of the spawner.",
-	"Keep in mind that this is not the case for trial spawner configurations. Their spawn delay will remain as 2 seconds "
-		+ "instead of the time until the next spawn attempt.",
-	"",
-	"This expression gets the trial spawner configuration "
-		+ "with the current state (i.e. ominous, normal) of the trial spawner block, if one is provided.",
-	"",
-	"Base spawners are trial spawner configurations, spawner minecarts and creature spawners."
-})
+@Name("Spawn Delay")
+@Description("""
+    Returns the spawn delay of the spawner. The spawn delay is the time before the spawner attempts to \
+    spawn its entries. If the spawner is inactive at the time of the attempt, the delay remains 0 and \
+    the spawner will try to spawn every tick until successful. After a successful spawn, the delay is \
+    reset to a random value between the spawner’s minimum and maximum spawn delays.
+    """)
 @Examples({
 	"set the spawner delay of the target block to 5 seconds",
 	"add 2 seconds to the spawner delay of the target block",

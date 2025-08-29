@@ -26,10 +26,10 @@ import java.util.StringJoiner;
 
 @Name("Event Spawner Data")
 @Description("""
-	Returns the event spawner data from the current event. This is only available in the spawner data sections.
-	'trial spawner data' must strictly be used in the trial spawner data sections, while 'mob spawner data' in \
-	the mob spawner data sections.
-	""")
+    Returns the spawner data associated with the current event. This is only available within spawner data sections.
+    Use 'trial spawner data' exclusively in trial spawner data sections, \
+    and 'mob spawner data' exclusively in mob spawner data sections.
+    """)
 @Example("""
 	modify the mob spawner data of event-block:
 		broadcast the mob spawner data

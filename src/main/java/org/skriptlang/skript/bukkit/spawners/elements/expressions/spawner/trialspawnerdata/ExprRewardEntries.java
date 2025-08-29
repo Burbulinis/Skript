@@ -19,19 +19,24 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-@Name("Trial Spawner Configuration with Weighted Loot Table")
-@Description({
-	"Returns the weighted loot tables of a trial spawner configuration.",
-	"Weighted loot tables are loot tables with a weight, which determines the chance of the loot table "
-		+ "being selected during the spawner's reward ejection state.",
-	"Adding just a regular loot table to this list will default the weight to 1."
-})
-@Examples({
-	"set {_loot tables::*} to weighted loot tables of {_trial config}",
-	"add loot table \"minecraft:equipment/trial_chamber\" with weight 1 to weighted loot tables of {_trial config}",
-	"add loot table \"minecraft:chests/simple_dungeon\" to weighted loot tables of {_trial config}",
-	"# loot table with weight 1 ^"
-})
+@Name("Reward Entries")
+@Description("""
+    Returns the reward entries of the trial spawner data. Reward entries are loot tables that the trial spawner \
+    can select from when ejecting rewards. Each entry has a weight that determines its chance of being chosen. \
+    By default, all reward entries have a weight of 1.
+    """)
+@Example("""
+	set {_data} to the trial spawner data of event-block
+	set reward entry of {_data} to loot table "minecraft:chests/simple_dungeon"
+	set the reward weight for loot table "minecraft:chests/simple_dungeon" of {_data} to 5
+	delete the reward entries of {_data}
+	""")
+@Example("""
+	modify the trial spawner data of event-block:
+		add loot table "minecraft:chests/simple_dungeon" to the reward entries
+		set the reward weight for loot table "minecraft:chests/simple_dungeon" to 5
+		remove loot table "minecraft:chests/simple_dungeon" from the reward entries
+	""")
 @Since("INSERT VERSION")
 @RequiredPlugins("Minecraft 1.21+")
 public class ExprRewardEntries extends PropertyExpression<SkriptTrialSpawnerData, LootTable> {

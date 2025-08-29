@@ -21,11 +21,11 @@ import java.util.List;
 
 @Name("Tracked Entities")
 @Description("""
-	Returns the entities (or players) tracked by the trial spawner. \
-	Tracked players are those who enter the battle by stepping into the trial spawner’s activation range, \
-	while tracked entities (non-players) are those spawned by the trial spawner. \
-	These tracked entities contribute to the incremental and base entity counts of the trial spawner data.
-	""")
+    Returns the entities (including players) tracked by the trial spawner. \
+    Tracked players are those who enter the battle by stepping into the spawner's activation range, \
+    while tracked entities (non-players) are those spawned by the trial spawner.
+    These entities contribute to the base and incremental entity counts of the trial spawner data.
+    """)
 @Example("""
 	broadcast the tracked players of event-block
 	add player to the tracked players of event-block

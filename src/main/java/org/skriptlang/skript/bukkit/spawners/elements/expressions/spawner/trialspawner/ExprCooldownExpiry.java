@@ -19,7 +19,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Trial Cooldown Expiry")
 @Description("""
-    Returns the time remaining until the trial spawner’s cooldown expires. After spawning all entities, \
+    Returns the time until the trial spawner's cooldown expires. After spawning all entities, \
     the trial spawner enters cooldown and does not not spawn entities again until it ends.
 
     By default, the cooldown lasts 30 minutes (36,000 ticks).

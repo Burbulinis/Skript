@@ -2,6 +2,7 @@ package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.trial
 
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Example;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.RequiredPlugins;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
@@ -37,8 +38,20 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 	The formulas are:
 	```
 	total mob spawn amount = base mob spawn amount + (incremental mob spawn amount × (tracked player count - 1))
-	total simultaneous spawn amount = base simultaneous amount + (incremental simultaneous amount × (tracked player count - 1))
+	total simultaneous mob spawn amount = base simultaneous mob spawn amount + (incremental simultaneous mob spawn amount × (tracked player count - 1))
 	```
+	""")
+@Example("""
+	set {_data} to trial spawner data of event-block
+	set incremental mob spawn amount of {_data} to 10
+	add 2 to incremental concurrent entity spawn amount of {_data}
+	""")
+@Example("""
+	modify the trial spawner data of event-block:
+		add 5 to incremental mob spawn amount
+		remove 3 from additional simultaneous mob spawn amount
+		reset additional mob spawn amount
+		add 10 to incremental concurrent entity spawn amount
 	""")
 @RequiredPlugins("Minecraft 1.21+")
 public class ExprIncrementalEntityCount extends SimplePropertyExpression<SkriptTrialSpawnerData, Integer> {

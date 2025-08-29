@@ -1,108 +1,128 @@
 package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner;
 
+import ch.njol.skript.bukkitutil.EntityUtils;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.*;
+import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
+import ch.njol.skript.lang.Expression;
+import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.TrialSpawner;
 import org.bukkit.entity.EntitySnapshot;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.minecart.SpawnerMinecart;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Base Spawner - Spawner Entity")
-@Description({
-	"Get the spawner entity of a base spawner.",
-	"This is the entity that the spawner will spawn and displays the small entity inside the spawner.",
-	"Setting this will override any previous entries that have been added to potential spawns of the spawner",
-	"You can set the spawner entity to an item, though that is paper-exclusive and only for spawners, not base spawners. "
-		+ "Spawners are spawner minecarts and creature spawners.",
-	"",
-	"This expression gets the trial spawner configuration "
-		+ "with the current state (i.e. ominous, normal) of the trial spawner block, if one is provided.",
-	"",
-	"Base spawners are trial spawner configurations, spawner minecarts and creature spawners."
-})
-@Examples({
-	"set {_entry} to a spawner entry with entity snapshot of a zombie:",
-		"\tset weight to 5",
-	"set spawner entity of event-block to {_entry}",
-	"set spawner entity of event-block to entity snapshot of a zombie",
-	"set spawner entity of event-block to event-entity",
-	"set spawner entity of event-block to a pig",
-	"set spawner entity of event-block to 16 golden apples # paper exclusive and only for spawners",
-})
-@Since("INSERT VERSION")
+@Name("Spawner Entity")
+@Description("""
+    Returns the entity type or snapshot of a spawner. This represents the entity the spawner will spawn \
+    and is displayed inside the spawner. If the spawner has multiple entries, \
+    the type or snapshot corresponds to the entity that will spawn next.
+    """)
+@Example("""
+	on right click:
+		if event-block is spawner:
+			send "Spawner's type is %target block's entity type%"
+			send "Spawner's snapshot is %target block's entity snapshot%"
+	""")
+@Since("2.4, 2.9.2 (trial spawner), INSERT VERSION (spawner minecart)")
 @RequiredPlugins("Minecraft 1.21+ (for trial spawners, spawner minecarts)")
-public class ExprSpawnerEntity extends SimplePropertyExpression<Object, EntitySnapshot> {
+public class ExprSpawnerEntity extends SimplePropertyExpression<Object, Object> {
 
 	public static void register(SyntaxRegistry registry) {
-		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprSpawnerEntity.class, EntitySnapshot.class,
-			"spawner entity snapshot[s]", SpawnerUtils.spawnerPropertyType, false)
+		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprSpawnerEntity.class, Object.class,
+			"spawner [entity] (type|:snapshot)[s]", SpawnerUtils.spawnerPropertyType, false)
 				.supplier(ExprSpawnerEntity::new)
 				.build()
 		);
 	}
 
+	private boolean snapshot;
+
 	@Override
-	public @Nullable EntitySnapshot convert(Object object) {
-		EntitySnapshot snapshot = null;
+	public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
+		snapshot = parseResult.hasTag("snapshot");
+		return super.init(expressions, matchedPattern, isDelayed, parseResult);
+	}
+
+	@Override
+	public @Nullable Object convert(Object object) {
+		Object entity = null;
 
 		if (SpawnerUtils.isCreatureSpawner(object)) {
-			snapshot = SpawnerUtils.getCreatureSpawner(object).getSpawnedEntity();
+			CreatureSpawner spawner = SpawnerUtils.getCreatureSpawner(object);
+			entity = snapshot ? spawner.getSpawnedEntity() : spawner.getSpawnedType();
 		} else if (SpawnerUtils.isTrialSpawner(object)) {
-			TrialSpawner trialSpawner = SpawnerUtils.getTrialSpawner(object);
-			snapshot = SpawnerUtils.getTrialSpawnerConfiguration(
-				trialSpawner,
-				trialSpawner.isOminous()
-			).getSpawnedEntity();
+			var spawner = SpawnerUtils.getTrialSpawnerConfiguration(SpawnerUtils.getTrialSpawner(object));
+			entity = snapshot ? spawner.getSpawnedEntity() : spawner.getSpawnedType();
 		} else if (SpawnerUtils.isSpawnerMinecart(object)) {
-			snapshot = SpawnerUtils.getSpawnerMinecart(object).getSpawnedEntity();
+			SpawnerMinecart spawner = SpawnerUtils.getSpawnerMinecart(object);
+			entity = snapshot ? spawner.getSpawnedEntity() : spawner.getSpawnedType();
 		}
 
-		return snapshot;
+		if (!snapshot && entity != null)
+			entity = EntityUtils.toSkriptEntityData((EntityType) entity);
+
+		return entity;
 	}
 
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		return switch (mode) {
-			case SET, RESET, DELETE -> CollectionUtils.array(EntitySnapshot.class);
+			case SET, DELETE, RESET -> CollectionUtils.array(EntityData.class);
 			default -> null;
 		};
 	}
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-		EntitySnapshot entitySnapshot = delta != null ? (EntitySnapshot) delta[0] : null;
+		Object value = (delta != null) ? delta[0] : null;
 
 		for (Object object : getExpr().getArray(event)) {
 			if (SpawnerUtils.isCreatureSpawner(object)) {
-				CreatureSpawner creatureSpawner = SpawnerUtils.getCreatureSpawner(object);
-				creatureSpawner.setSpawnedEntity(entitySnapshot);
-				creatureSpawner.update(true, false);
+				CreatureSpawner spawner = SpawnerUtils.getCreatureSpawner(object);
+				if (snapshot) {
+					spawner.setSpawnedEntity((EntitySnapshot) value);
+				} else {
+					spawner.setSpawnedType(EntityUtils.toBukkitEntityType((EntityData<?>) value));
+				}
+				spawner.update(true, false);
 			} else if (SpawnerUtils.isTrialSpawner(object)) {
-				TrialSpawner trialSpawner = SpawnerUtils.getTrialSpawner(object);
-				var config = SpawnerUtils.getTrialSpawnerConfiguration(trialSpawner);
-				config.setSpawnedEntity(entitySnapshot);
-				trialSpawner.update(true, false);
+				TrialSpawner trial = SpawnerUtils.getTrialSpawner(object);
+				var config = SpawnerUtils.getTrialSpawnerConfiguration(trial);
+				if (snapshot) {
+					config.setSpawnedEntity((EntitySnapshot) value);
+				} else {
+					config.setSpawnedType(EntityUtils.toBukkitEntityType((EntityData<?>) value));
+				}
+				trial.update(true, false);
 			} else if (SpawnerUtils.isSpawnerMinecart(object)) {
-				SpawnerMinecart spawnerMinecart = SpawnerUtils.getSpawnerMinecart(object);
-				spawnerMinecart.setSpawnedEntity(entitySnapshot);
+				SpawnerMinecart minecart = SpawnerUtils.getSpawnerMinecart(object);
+				if (snapshot) {
+					minecart.setSpawnedEntity((EntitySnapshot) value);
+				} else {
+					minecart.setSpawnedType(EntityUtils.toBukkitEntityType((EntityData<?>) value));
+				}
 			}
 		}
 	}
 
 	@Override
-	public Class<? extends EntitySnapshot> getReturnType() {
-		return EntitySnapshot.class;
+	public Class<?> getReturnType() {
+		if (snapshot)
+			return EntitySnapshot.class;
+		return EntityData.class;
 	}
 
 	@Override
 	protected String getPropertyName() {
-		return "spawner entity snapshot";
+		return "spawner type";
 	}
 
 }

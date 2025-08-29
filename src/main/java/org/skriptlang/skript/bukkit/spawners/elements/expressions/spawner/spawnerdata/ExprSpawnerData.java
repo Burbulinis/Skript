@@ -26,10 +26,10 @@ import java.util.List;
 
 @Name("Spawner Data")
 @Description("""
-	Returns the spawner data of a spawner. Since trial spawners use different data in its ominous and regular states, \
-	you can specifically set the data of the ominous state using 'ominous trial spawner data'. Additionally, \
-	you can set the data of both states using 'ominous and regular trial spawner data'.
-	""")
+    Returns the spawner data of a spawner. Trial spawners use different data in their regular and ominous states.
+    Use 'ominous trial spawner data' to set data for the ominous state only, \
+    or 'ominous and regular trial spawner data' to set data for both states at once.
+    """)
 @Example("""
 	set the spawner data of event-block to the mob spawner data:
 		set the spawn count to 5
