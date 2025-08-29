@@ -1,6 +1,7 @@
 package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawnerentry;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -18,6 +19,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Name("Equipment Drop Chances")
+@Description("""
+    Returns the drop chance for the specified equipment slot(s) in a spawner entry. \
+    The drop chance is a float between 0 and 1, where 0 means the item will never drop \
+    and 1 means it will always drop.
+
+    Setting drop chances without an equipment loot table defined will have no effect.
+    """)
+@Example("""
+	set {_entry} to the spawner entry of a zombie:
+		set the spawner entry equipment to loot table "minecraft:equipment/trial_chamber"
+		set the drop chances for helmet, legs and boots to 100%
+		remove 50% from the drop chance for legs
+		clear the drop chances for all equipment slots
+	""")
+@Since("INSERT VERSION")
 public class ExprSpawnerEntryDropChances extends PropertyExpression<SkriptSpawnerEntry, Float> {
 
 	public static void register(SyntaxRegistry registry) {
@@ -77,17 +94,15 @@ public class ExprSpawnerEntryDropChances extends PropertyExpression<SkriptSpawne
 
 		for (SkriptSpawnerEntry entry : getExpr().getArray(event)) {
 			for (EquipmentSlot slot : slots) {
-				float value = switch (mode) {
+				if (mode == ChangeMode.DELETE)
+					entry.removeDropChance(slot);
+
+				entry.setDropChance(slot, switch (mode) {
 					case SET -> chance;
 					case ADD -> entry.getDropChances().getOrDefault(slot, 0f) + chance;
 					case REMOVE -> entry.getDropChances().getOrDefault(slot, 0f) - chance;
 					default -> 0;
-				};
-
-				if (mode == ChangeMode.DELETE)
-					entry.removeDropChance(slot);
-
-				entry.setDropChance(slot, value);
+				});
 			}
 		}
 	}

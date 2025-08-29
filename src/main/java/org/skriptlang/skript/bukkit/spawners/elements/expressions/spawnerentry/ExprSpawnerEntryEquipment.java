@@ -1,6 +1,8 @@
 package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawnerentry;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Name;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
@@ -9,6 +11,12 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.spawners.util.SkriptSpawnerEntry;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
+@Name("Spawner Entry Equipment")
+@Description("""
+    Returns the equipment loot table of a spawner entry. This loot table determines the equipment \
+    (armor, weapons, tools, etc.) that the spawned entity will have.
+    Only loot tables specifically defined as equipment loot tables will have effect.
+    """)
 public class ExprSpawnerEntryEquipment extends SimplePropertyExpression<SkriptSpawnerEntry, LootTable> {
 
 	public static void register(SyntaxRegistry registry) {

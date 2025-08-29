@@ -29,6 +29,7 @@ import java.util.Map;
 	set {_data} to the trial spawner data of event-block
 	set reward entry of {_data} to loot table "minecraft:chests/simple_dungeon"
 	set the reward weight for loot table "minecraft:chests/simple_dungeon" of {_data} to 5
+	add loot table "minecraft:spawners/trial_chamber/items_to_drop_when_ominous" to the reward entries of {_data}
 	delete the reward entries of {_data}
 	""")
 @Example("""

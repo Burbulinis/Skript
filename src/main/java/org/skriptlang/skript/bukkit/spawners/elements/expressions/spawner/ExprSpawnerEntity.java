@@ -28,8 +28,8 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 @Example("""
 	on right click:
 		if event-block is spawner:
-			send "Spawner's type is %target block's entity type%"
-			send "Spawner's snapshot is %target block's entity snapshot%"
+			send "Spawner's type is %target block's spawner entity type%"
+			send "Spawner's snapshot is %target block's spawner entity snapshot%"
 	""")
 @Since("2.4, 2.9.2 (trial spawner), INSERT VERSION (spawner minecart)")
 @RequiredPlugins("Minecraft 1.21+ (for trial spawners, spawner minecarts)")

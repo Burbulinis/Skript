@@ -22,12 +22,12 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
     the spawner will try to spawn every tick until successful. After a successful spawn, the delay is \
     reset to a random value between the spawner’s minimum and maximum spawn delays.
     """)
-@Examples({
-	"set the spawner delay of the target block to 5 seconds",
-	"add 2 seconds to the spawner delay of the target block",
-	"remove 1 second from the spawner delay of the target block",
-	"reset the spawner delay of the target block"
-})
+@Example("""
+	set the spawn delay of target block to 50 seconds
+	add 10 seconds to the spawn delay of target block
+	remove 5 seconds from the spawn delay of target block
+	reset the spawn delay of target block
+	""")
 @Since("INSERT VERSION")
 @RequiredPlugins({"Minecraft 1.21+ (spawner minecarts)", "Minecraft 1.21.4+ (for trial spawners)"})
 public class ExprSpawnDelay extends SimplePropertyExpression<Object, Timespan> {

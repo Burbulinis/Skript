@@ -1,10 +1,7 @@
 package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawnerentry;
 
 import ch.njol.skript.config.SectionNode;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Examples;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.Since;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.expressions.base.SectionExpression;
 import ch.njol.skript.lang.Expression;
@@ -27,28 +24,19 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 import java.util.List;
 
 @Name("Create Spawner Entry")
-@Description({
-	"Creates a spawner entry from the given entity snapshot. "
-		+ "Spawner entries are used to modify what type of entity the spawner will spawn, "
-		+ "with what equipment, rules, etc."
-})
-@Examples({
-	"set {_entry} to a spawner entry using entity snapshot of a zombie:",
-		"\tset the weight to 5",
-		"\tset the spawn rule to a spawn rule:",
-			"\t\tset the minimum block light spawn level to 10",
-			"\t\tset the maximum block light spawn level to 15",
-			"\t\tset the maximum sky light spawn level to 15",
-	"add {_entry} to potential spawns of target block",
-	"",
-	"set {_entry} to a spawner entry with event-entity:",
-		"\tset the weight to 10",
-		"\tset the spawn rule to a spawn rule:",
-			"\t\tset the minimum block light spawn level to 12",
-			"\t\tset the maximum block light spawn level to 12",
-			"\t\tset the maximum sky light spawn level to 5",
-	"add {_entry} to potential spawns of target block"
-})
+@Description("Returns a new spawner entry from the given entity snapshot or data.")
+@Example("""
+	set {_entry} to the spawner entry of a zombie:
+		set the weight to 5
+		set the spawn rule to a spawn rule:
+			set the maximum block light spawn level to 15
+			set the minimum block light spawn level to 10
+			set the maximum sky light spawn level to 15
+
+		set the spawner entry equipment to loot table "minecraft:equipment/trial_chamber"
+		set the drop chances for helmet, legs and boots to 100%
+	add {_entry} to the spawner entries of event-block
+	""")
 @Since("INSERT VERSION")
 public class ExprSecSpawnerEntry extends SectionExpression<SkriptSpawnerEntry> {
 
@@ -126,7 +114,7 @@ public class ExprSecSpawnerEntry extends SectionExpression<SkriptSpawnerEntry> {
 
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
-		return "a spawner entry of " + entity.toString(event, debug);
+		return "the spawner entry of " + entity.toString(event, debug);
 	}
 
 }
