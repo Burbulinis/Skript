@@ -19,8 +19,8 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Modify Spawner Item")
 @Description("""
-	Make a mob spawner spawn items rather than entities. In this case, the mob spawner's spawn count determines how many \
-	stacks are spawned, not how many items should be in each stack.
+	Make a mob spawner spawn items rather than entities. In this case, the mob spawner's spawn count determines \
+	how many stacks are spawned, not how many items should be in each stack.
 	""")
 @Example("""
 	make event-block spawn 15 diamonds

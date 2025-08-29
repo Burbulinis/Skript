@@ -108,6 +108,10 @@ public class SpawnerUtils {
 		return IS_RUNNING_1_21 && object instanceof SpawnerMinecart;
 	}
 
+	public static boolean isMobSpawner(Object object) {
+		return isCreatureSpawner(object) || isSpawnerMinecart(object);
+	}
+
 	/**
 	 * Retrieves the spawner minecart from the given object.
 	 *
@@ -116,8 +120,6 @@ public class SpawnerUtils {
 	 * @see #isSpawnerMinecart(Object)
 	 */
 	public static @UnknownNullability SpawnerMinecart getSpawnerMinecart(Object object) {
-		if (!IS_RUNNING_1_21)
-			return null;
 		return (SpawnerMinecart) object;
 	}
 
@@ -145,8 +147,6 @@ public class SpawnerUtils {
 	 * @see #isTrialSpawner(Object)
 	 */
 	public static @UnknownNullability TrialSpawner getTrialSpawner(Object object) {
-		if (!IS_RUNNING_1_21)
-			return null;
 		if (object instanceof Block block)
 			return (TrialSpawner) block.getState();
 		return (TrialSpawner) object;
@@ -154,51 +154,14 @@ public class SpawnerUtils {
 
 	/**
 	 * Applies the given SkriptMobSpawnerData to the specified object.
-	 * @param object the spawner object to apply the data to
+	 * @param object the mob spawner or spawner minecart to apply the data to
 	 * @param data the SkriptMobSpawnerData to apply
 	 */
 	public static void applyToMobSpawner(Object object, SkriptMobSpawnerData data) {
 		if (isCreatureSpawner(object)) {
-			data.applyDataToSpawner(getCreatureSpawner(object));
+			data.applyData(getCreatureSpawner(object));
 		} else if (isSpawnerMinecart(object)) {
-			data.applyDataToSpawner(getSpawnerMinecart(object));
-		}
-	}
-
-	/**
-	 * Retrieves the SkriptSpawnerData from the given object based on the specified data type.
-	 * This method makes sure that the data type and type of spawner match. Meaning it will return null if they don't match.
-	 * @param object the spawner object
-	 * @param dataType the spawner data type to retrieve
-	 * @return the SkriptSpawnerData if the object is a valid spawner for the given data type, null otherwise
-	 */
-	public static SkriptSpawnerData getDataFromObject(Object object, SpawnerDataType dataType) {
-		if ((dataType.isMob() || dataType.isAny()) && isCreatureSpawner(object)) {
-			return SkriptMobSpawnerData.fromSpawner(getCreatureSpawner(object));
-		} else if ((dataType.isMob() || dataType.isAny()) && isSpawnerMinecart(object)) {
-			return SkriptMobSpawnerData.fromSpawner(getSpawnerMinecart(object));
-		} else if ((dataType.isTrial() || dataType.isAny()) && isTrialSpawner(object)) {
-			return SkriptTrialSpawnerData.fromTrialSpawner(getTrialSpawner(object));
-		}
-		return null;
-	}
-
-	/**
-	 * Applies the given SkriptSpawnerData to the specified object based on the data type.
-	 * @param data the SkriptSpawnerData to apply
-	 * @param object the spawner object to apply the data to
-	 * @param dataType the type of data to apply (mob or trial)
-	 * @param ominous whether to apply the ominous trial spawner data
-	 * @param regular whether to also apply the regular trial spawner data
-	 */
-	public static void applyData(SkriptSpawnerData data, Object object, SpawnerDataType dataType, boolean ominous, boolean regular) {
-		if (!dataType.isTrial() && data instanceof SkriptMobSpawnerData mobData) {
-			SpawnerUtils.applyToMobSpawner(object, mobData);
-		} else if (dataType.isTrial() && data instanceof SkriptTrialSpawnerData trialData) {
-			TrialSpawner trialSpawner = SpawnerUtils.getTrialSpawner(object);
-			trialData.applyDataToTrialSpawner(trialSpawner, ominous);
-			if (regular)
-				trialData.applyDataToTrialSpawner(trialSpawner, false);
+			data.applyData(getSpawnerMinecart(object));
 		}
 	}
 

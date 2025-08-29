@@ -39,17 +39,6 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 
 	/**
 	 * Creates a new {@code SkriptTrialSpawnerData} instance from the given Bukkit {@link TrialSpawner}.
-	 * <p>
-	 * This is by default not ominous, meaning it will create a normal trial spawner data.
-	 * @param trialSpawner the Bukkit trial spawner to convert
-	 * @return a new {@code SkriptTrialSpawnerData} containing the data from the given {@link TrialSpawner}
-	 */
-	public static SkriptTrialSpawnerData fromTrialSpawner(@NotNull TrialSpawner trialSpawner) {
-		return fromTrialSpawner(trialSpawner, false);
-	}
-
-	/**
-	 * Creates a new {@code SkriptTrialSpawnerData} instance from the given Bukkit {@link TrialSpawner}.
 	 * @param trialSpawner the Bukkit trial spawner to convert
 	 * @param ominous whether the trial spawner is ominous
 	 * @return a new {@code SkriptTrialSpawnerData} instance containing the data from the Bukkit trial spawner
@@ -71,21 +60,10 @@ public class SkriptTrialSpawnerData extends SkriptSpawnerData implements Yggdras
 	}
 
 	/**
-	 * Applies this SkriptTrialSpawnerData to the given Bukkit trial spawners.
-	 * @param trialSpawners the array of Bukkit trial spawners to apply the data to
-	 */
-	public void applyDataToTrialSpawners(@NotNull TrialSpawner @NotNull [] trialSpawners, boolean ominous) {
-		Preconditions.checkNotNull(trialSpawners, "trialSpawners cannot be null");
-		for (TrialSpawner trialSpawner : trialSpawners) {
-			applyDataToTrialSpawner(trialSpawner, ominous);
-		}
-	}
-
-	/**
 	 * Applies this SkriptTrialSpawnerData to the given Bukkit trial spawner.
 	 * @param trialSpawner the Bukkit trial spawner to apply the data to
 	 */
-	public void applyDataToTrialSpawner(@NotNull TrialSpawner trialSpawner, boolean ominous) {
+	public void applyData(@NotNull TrialSpawner trialSpawner, boolean ominous) {
 		Preconditions.checkNotNull(trialSpawner, "trialSpawner cannot be null");
 
 		var config = SpawnerUtils.getTrialSpawnerConfiguration(trialSpawner, ominous);

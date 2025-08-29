@@ -65,6 +65,21 @@ public enum SpawnerDataType {
 		return this == ANY;
 	}
 
+	/**
+	 * Checks if the given spawner object matches this spawner data type.
+	 * @param spawnerObject the spawner object to check
+	 * @return true if the spawner object matches the type, false otherwise
+	 */
+	public boolean matches(Object spawnerObject) {
+		if (isTrial()) {
+			return SpawnerUtils.isTrialSpawner(spawnerObject);
+		} else if (isMob()) {
+			return SpawnerUtils.isMobSpawner(spawnerObject);
+		}
+
+		return SpawnerUtils.isMobSpawner(spawnerObject) || SpawnerUtils.isTrialSpawner(spawnerObject);
+	}
+
 	@Override
 	public String toString() {
 		if (isAny())

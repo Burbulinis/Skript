@@ -5,11 +5,13 @@ import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Example;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.RequiredPlugins;
-import ch.njol.skript.expressions.base.SimplePropertyExpression;
+import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.SyntaxStringBuilder;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
+import org.bukkit.block.TrialSpawner;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerDataType;
@@ -19,14 +21,14 @@ import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptSpawnerData;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptTrialSpawnerData;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-import java.util.StringJoiner;
+import java.util.ArrayList;
+import java.util.List;
 
 @Name("Spawner Data")
 @Description("""
 	Returns the spawner data of a spawner. Since trial spawners use different data in its ominous and regular states, \
 	you can specifically set the data of the ominous state using 'ominous trial spawner data'. Additionally, \
-	you can set the data of both states using 'ominous and regular trial spawner data', which will apply the data to \
-	both states of the trial spawner.
+	you can set the data of both states using 'ominous and regular trial spawner data'.
 	""")
 @Example("""
 	set the spawner data of event-block to the mob spawner data:
@@ -48,39 +50,79 @@ import java.util.StringJoiner;
 		add {_entries::*} to the spawner entries
 		set the base entity spawn count to 12
 
-	set the trial spawner data of event-block to {_trial data} # regular data
-	set the ominous trial spawner data of event-block to {_trial data} # ominous data
+	set the trial spawner data of event-block to {_trial data} # regular state
+	set the ominous trial spawner data of event-block to {_trial data} # ominous state
 	set the ominous and regular trial spawner datas of event-block to {_trial data} # both states
 	""")
 @RequiredPlugins("Minecraft 1.21+ (for trial spawner data)")
-public class ExprSpawnerData extends SimplePropertyExpression<Object, SkriptSpawnerData> {
+public class ExprSpawnerData extends PropertyExpression<Object, SkriptSpawnerData> {
 
 	public static void register(SyntaxRegistry registry) {
 		String property = "[:mob] spawner data[s]";
 		if (SpawnerUtils.IS_RUNNING_1_21)
-			property = "[trial:[:ominous [regular:and (regular|normal]] trial|:mob] spawner data[s]";
+			property = "[trial:[:ominous|:regular|:ominous and regular] trial|:mob] spawner data[s]";
 
 		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprSpawnerData.class, SkriptSpawnerData.class,
 			property, SpawnerUtils.spawnerPropertyType, false)
-				.supplier(ExprSpawnerData::new)
-				.build()
+			.supplier(ExprSpawnerData::new)
+			.build()
 		);
 	}
 
+	private enum TrialSpawnerState {
+		OMINOUS, REGULAR, BOTH;
+
+		public static TrialSpawnerState fromTags(List<String> tags) {
+			if (tags.contains("ominous")) {
+				return OMINOUS;
+			} else if (tags.contains("ominous and regular")) {
+				return BOTH;
+			} else {
+				return REGULAR;
+			}
+		}
+	}
+
 	private SpawnerDataType dataType;
-	private boolean ominous, regular;
+	private TrialSpawnerState state;
 
 	@Override
 	public boolean init(Expression<?>[] expressions, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		dataType = SpawnerDataType.fromTags(parseResult.tags);
-		ominous = parseResult.hasTag("ominous");
-		regular = parseResult.hasTag("regular");
-		return super.init(expressions, matchedPattern, isDelayed, parseResult);
+		state = TrialSpawnerState.fromTags(parseResult.tags);
+		return true;
 	}
 
 	@Override
-	public @Nullable SkriptSpawnerData convert(Object object) {
-		return SpawnerUtils.getDataFromObject(object, dataType);
+	protected SkriptSpawnerData[] get(Event event, Object[] source) {
+		List<SkriptSpawnerData> datas = new ArrayList<>();
+
+		for (Object spawnerObject : source) {
+			if (!dataType.matches(spawnerObject))
+				continue;
+
+			if (SpawnerUtils.isMobSpawner(spawnerObject)) {
+				if (SpawnerUtils.isSpawnerMinecart(spawnerObject)) {
+					datas.add(SkriptMobSpawnerData.fromSpawner(SpawnerUtils.getSpawnerMinecart(spawnerObject)));
+				} else {
+					datas.add(SkriptMobSpawnerData.fromSpawner(SpawnerUtils.getCreatureSpawner(spawnerObject)));
+				}
+
+				continue;
+			}
+
+			TrialSpawner trialSpawner = SpawnerUtils.getTrialSpawner(spawnerObject);
+			datas.addAll(switch (state) {
+				case OMINOUS -> List.of(SkriptTrialSpawnerData.fromTrialSpawner(trialSpawner, true));
+				case REGULAR -> List.of(SkriptTrialSpawnerData.fromTrialSpawner(trialSpawner, false));
+				case BOTH -> List.of(
+					SkriptTrialSpawnerData.fromTrialSpawner(trialSpawner, true),
+					SkriptTrialSpawnerData.fromTrialSpawner(trialSpawner, false)
+				);
+			});
+		}
+
+		return datas.toArray(SkriptSpawnerData[]::new);
 	}
 
 	@Override
@@ -95,11 +137,14 @@ public class ExprSpawnerData extends SimplePropertyExpression<Object, SkriptSpaw
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
 		SkriptSpawnerData data = delta != null ? (SkriptSpawnerData) delta[0] : null;
 
-		for (Object object : getExpr().getArray(event)) {
+		for (Object spawnerObject : getExpr().getArray(event)) {
+			if (!dataType.matches(spawnerObject))
+				continue;
+
 			if (data == null) {
-				if (SpawnerUtils.isCreatureSpawner(object) || SpawnerUtils.isSpawnerMinecart(object)) {
+				if (SpawnerUtils.isMobSpawner(spawnerObject)) {
 					data = new SkriptMobSpawnerData();
-				} else if (SpawnerUtils.isTrialSpawner(object)) {
+				} else if (SpawnerUtils.isTrialSpawner(spawnerObject)) {
 					data = new SkriptTrialSpawnerData();
 				}
 			}
@@ -107,8 +152,29 @@ public class ExprSpawnerData extends SimplePropertyExpression<Object, SkriptSpaw
 			if (data == null)
 				continue;
 
-			SpawnerUtils.applyData(data, object, dataType, ominous, regular);
+			if (data instanceof SkriptMobSpawnerData mobData) {
+				SpawnerUtils.applyToMobSpawner(spawnerObject, mobData);
+				continue;
+			}
+
+			assert data instanceof SkriptTrialSpawnerData;
+
+			SkriptTrialSpawnerData trialData = (SkriptTrialSpawnerData) data;
+			TrialSpawner trialSpawner = SpawnerUtils.getTrialSpawner(spawnerObject);
+			switch (state) {
+				case OMINOUS -> trialData.applyData(trialSpawner, true);
+				case REGULAR -> trialData.applyData(trialSpawner, false);
+				case BOTH -> {
+					trialData.applyData(trialSpawner, true);
+					trialData.applyData(trialSpawner, false);
+				}
+			}
 		}
+	}
+
+	@Override
+	public boolean isSingle() {
+		return getExpr().isSingle() && state != TrialSpawnerState.BOTH;
 	}
 
 	@Override
@@ -117,12 +183,23 @@ public class ExprSpawnerData extends SimplePropertyExpression<Object, SkriptSpaw
 	}
 
 	@Override
-	protected String getPropertyName() {
-		StringJoiner joiner = new StringJoiner(" ", "", "spawner data");
-		if (ominous)
-			joiner.add("ominous");
-		joiner.add(dataType.toString());
-		return joiner.toString();
+	public String toString(@Nullable Event event, boolean debug) {
+		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
+
+		builder.append("the");
+		if (dataType.isTrial()) {
+			if (state == TrialSpawnerState.REGULAR) {
+				builder.append("regular");
+			} else if (state == TrialSpawnerState.OMINOUS) {
+				builder.append("ominous");
+			} else {
+				builder.append("ominous and regular");
+			}
+		}
+
+		builder.append(dataType.toString() + " spawner data of", getExpr());
+
+		return builder.toString();
 	}
 
 }
