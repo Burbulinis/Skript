@@ -8,6 +8,7 @@ import ch.njol.skript.variables.Variables;
 import ch.njol.util.Kleenean;
 import org.bukkit.block.TrialSpawner;
 import org.bukkit.event.Event;
+import org.bukkit.spawner.Spawner;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerDataType;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
@@ -15,7 +16,6 @@ import org.skriptlang.skript.bukkit.spawners.util.events.MobSpawnerDataEvent;
 import org.skriptlang.skript.bukkit.spawners.util.events.SpawnerDataEvent;
 import org.skriptlang.skript.bukkit.spawners.util.events.TrialSpawnerDataEvent;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptMobSpawnerData;
-import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptSpawnerData;
 import org.skriptlang.skript.bukkit.spawners.util.spawnerdata.SkriptTrialSpawnerData;
 import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
@@ -25,15 +25,13 @@ import java.util.List;
 public class SecModifySpawnerData extends Section {
 
 	public static void register(SyntaxRegistry registry) {
-		var info = SyntaxInfo.builder(SecModifySpawnerData.class)
+		registry.register(SyntaxRegistry.SECTION, SyntaxInfo.builder(SecModifySpawnerData.class)
 			.supplier(SecModifySpawnerData::new)
 			.priority(SyntaxInfo.COMBINED)
-			.addPattern("modify [the] [:mob] spawner data of %" + SpawnerUtils.spawnerPropertyType + '%');
-
-		if (SpawnerUtils.IS_RUNNING_1_21)
-			info.addPattern("modify [the] [:ominous|:regular|:ominous and regular] trial:trial spawner data of %blocks%");
-
-		registry.register(SyntaxRegistry.SECTION, info.build());
+			.addPatterns(
+				"modify [the] [:mob] spawner data of %" + SpawnerUtils.SPAWNER_PROPERTY_TYPE + '%',
+				"modify [the] [:ominous|:regular|:ominous and regular] trial:trial spawner data of %blocks%")
+			.build());
 	}
 
 	private enum TrialSpawnerState {
@@ -73,23 +71,18 @@ public class SecModifySpawnerData extends Section {
 			if (!dataType.matches(spawnerObject))
 				continue;
 
-			SkriptSpawnerData data;
+			if (SpawnerUtils.isMobSpawner(spawnerObject)) {
+				Spawner mobSpawner = SpawnerUtils.getMobSpawner(spawnerObject);
+				SkriptMobSpawnerData mobData = SkriptMobSpawnerData.fromSpawner(mobSpawner);
 
-			if (SpawnerUtils.isCreatureSpawner(spawnerObject)) {
-				data = SkriptMobSpawnerData.fromSpawner(SpawnerUtils.getCreatureSpawner(spawnerObject));
-			} else if (SpawnerUtils.isSpawnerMinecart(spawnerObject)) {
-				data = SkriptMobSpawnerData.fromSpawner(SpawnerUtils.getSpawnerMinecart(spawnerObject));
-			} else {
-				data = SkriptTrialSpawnerData.fromTrialSpawner(SpawnerUtils.getTrialSpawner(spawnerObject),
-					state == TrialSpawnerState.OMINOUS);
-			}
-
-			if (data instanceof SkriptMobSpawnerData mobData) {
 				MobSpawnerDataEvent mobEvent = new MobSpawnerDataEvent(mobData);
 				Variables.withLocalVariables(event, mobEvent, () -> TriggerItem.walk(trigger, mobEvent));
-				SpawnerUtils.applyToMobSpawner(spawnerObject, mobData);
-			} else if (data instanceof SkriptTrialSpawnerData trialData) {
+
+				mobData.applyData(mobSpawner);
+			} else {
 				TrialSpawner trialSpawner = SpawnerUtils.getTrialSpawner(spawnerObject);
+				SkriptTrialSpawnerData trialData = SkriptTrialSpawnerData.fromTrialSpawner(trialSpawner,
+					state == TrialSpawnerState.OMINOUS);
 
 				TrialSpawnerDataEvent regularEvent = new TrialSpawnerDataEvent(trialData);
 				Variables.withLocalVariables(event, regularEvent, () -> TriggerItem.walk(trigger, regularEvent));

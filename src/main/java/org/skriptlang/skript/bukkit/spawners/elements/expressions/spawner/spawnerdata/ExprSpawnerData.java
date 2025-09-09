@@ -1,10 +1,7 @@
 package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.spawnerdata;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Example;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.RequiredPlugins;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -54,16 +51,12 @@ import java.util.List;
 	set the ominous trial spawner data of event-block to {_trial data} # ominous state
 	set the ominous and regular trial spawner datas of event-block to {_trial data} # both states
 	""")
-@RequiredPlugins("Minecraft 1.21+ (for trial spawner data)")
+@Since("INSERT VERSION")
 public class ExprSpawnerData extends PropertyExpression<Object, SkriptSpawnerData> {
 
 	public static void register(SyntaxRegistry registry) {
-		String property = "[:mob] spawner data[s]";
-		if (SpawnerUtils.IS_RUNNING_1_21)
-			property = "[trial:[:ominous|:regular|:ominous and regular] trial|:mob] spawner data[s]";
-
 		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprSpawnerData.class, SkriptSpawnerData.class,
-			property, SpawnerUtils.spawnerPropertyType, false)
+			"[trial:[:ominous|:regular|:ominous and regular] trial|:mob] spawner data[s]", SpawnerUtils.SPAWNER_PROPERTY_TYPE, false)
 			.supplier(ExprSpawnerData::new)
 			.build()
 		);
@@ -102,12 +95,7 @@ public class ExprSpawnerData extends PropertyExpression<Object, SkriptSpawnerDat
 				continue;
 
 			if (SpawnerUtils.isMobSpawner(spawnerObject)) {
-				if (SpawnerUtils.isSpawnerMinecart(spawnerObject)) {
-					datas.add(SkriptMobSpawnerData.fromSpawner(SpawnerUtils.getSpawnerMinecart(spawnerObject)));
-				} else {
-					datas.add(SkriptMobSpawnerData.fromSpawner(SpawnerUtils.getCreatureSpawner(spawnerObject)));
-				}
-
+				datas.add(SkriptMobSpawnerData.fromSpawner(SpawnerUtils.getMobSpawner(spawnerObject)));
 				continue;
 			}
 
@@ -138,8 +126,9 @@ public class ExprSpawnerData extends PropertyExpression<Object, SkriptSpawnerDat
 		SkriptSpawnerData data = delta != null ? (SkriptSpawnerData) delta[0] : null;
 
 		for (Object spawnerObject : getExpr().getArray(event)) {
-			if (!dataType.matches(spawnerObject))
+			if (!dataType.matches(spawnerObject)) {
 				continue;
+			}
 
 			if (data == null) {
 				if (SpawnerUtils.isMobSpawner(spawnerObject)) {
@@ -149,24 +138,21 @@ public class ExprSpawnerData extends PropertyExpression<Object, SkriptSpawnerDat
 				}
 			}
 
-			if (data == null)
-				continue;
-
-			if (data instanceof SkriptMobSpawnerData mobData) {
-				SpawnerUtils.applyToMobSpawner(spawnerObject, mobData);
+			if (data == null) {
 				continue;
 			}
 
-			assert data instanceof SkriptTrialSpawnerData;
-
-			SkriptTrialSpawnerData trialData = (SkriptTrialSpawnerData) data;
-			TrialSpawner trialSpawner = SpawnerUtils.getTrialSpawner(spawnerObject);
-			switch (state) {
-				case OMINOUS -> trialData.applyData(trialSpawner, true);
-				case REGULAR -> trialData.applyData(trialSpawner, false);
-				case BOTH -> {
-					trialData.applyData(trialSpawner, true);
-					trialData.applyData(trialSpawner, false);
+			if (data instanceof SkriptMobSpawnerData mobData) {
+				mobData.applyData(SpawnerUtils.getMobSpawner(spawnerObject));
+			} else if (data instanceof SkriptTrialSpawnerData trialData) {
+				TrialSpawner trialSpawner = SpawnerUtils.getTrialSpawner(spawnerObject);
+				switch (state) {
+					case OMINOUS -> trialData.applyData(trialSpawner, true);
+					case REGULAR -> trialData.applyData(trialSpawner, false);
+					case BOTH -> {
+						trialData.applyData(trialSpawner, true);
+						trialData.applyData(trialSpawner, false);
+					}
 				}
 			}
 		}

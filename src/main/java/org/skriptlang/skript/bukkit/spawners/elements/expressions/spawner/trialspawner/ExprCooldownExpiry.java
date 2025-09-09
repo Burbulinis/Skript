@@ -1,10 +1,7 @@
 package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.trialspawner;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Example;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.RequiredPlugins;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.Timespan.TimePeriod;
@@ -31,6 +28,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 	remove 2 minutes from the trial cooldown expiry of event-block
 	reset the trial cooldown expiry of event-block
 	""")
+@Since("INSERT VERSION")
 @RequiredPlugins("Minecraft 1.21.4+")
 public class ExprCooldownExpiry extends SimplePropertyExpression<Block, Timespan> {
 

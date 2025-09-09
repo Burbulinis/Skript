@@ -7,6 +7,7 @@ import ch.njol.yggdrasil.YggdrasilSerializable.YggdrasilExtendedSerializable;
 import com.google.common.base.Preconditions;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.minecart.SpawnerMinecart;
+import org.bukkit.spawner.BaseSpawner;
 import org.bukkit.spawner.Spawner;
 import org.jetbrains.annotations.NotNull;
 import org.skriptlang.skript.bukkit.spawners.util.SkriptSpawnerEntry;
@@ -47,34 +48,6 @@ public class SkriptMobSpawnerData extends SkriptSpawnerData implements Yggdrasil
 		return data;
 	}
 
-	//<editor-fold desc="Legacy spawner handling" defaultstate="collapsed">
-	/**
-	 * Creates a new SkriptSpawnerData instance from the given creature spawner.
-	 * This is used for versions under 1.21 to allow legacy spawner support.
-	 * @param creatureSpawner the creature spawner to convert
-	 * @return a new SkriptSpawnerData instance containing the data from the legacy spawner
-	 */
-	public static SkriptMobSpawnerData fromSpawner(@NotNull CreatureSpawner creatureSpawner) {
-		Preconditions.checkNotNull(creatureSpawner, "creatureSpawner cannot be null");
-
-		SkriptMobSpawnerData data = new SkriptMobSpawnerData();
-
-		data.setActivationRange(creatureSpawner.getRequiredPlayerRange());
-		data.setSpawnRange(creatureSpawner.getSpawnRange());
-		data.setSpawnerEntries(creatureSpawner.getPotentialSpawns().stream()
-			.map(SkriptSpawnerEntry::fromSpawnerEntry)
-			.collect(Collectors.toSet())
-		);
-
-		data.setMaxNearbyEntityCap(creatureSpawner.getMaxNearbyEntities());
-		data.setSpawnCount(creatureSpawner.getSpawnCount());
-		data.setMaxSpawnDelay(new Timespan(TimePeriod.TICK, creatureSpawner.getMaxSpawnDelay()));
-		data.setMinSpawnDelay(new Timespan(TimePeriod.TICK, creatureSpawner.getMinSpawnDelay()));
-
-		return data;
-	}
-	//</editor-fold>
-
 	/**
 	 * Applies this SkriptSpawnerData to the given spawner.
 	 * @param spawner the spawner to apply the data to
@@ -91,46 +64,6 @@ public class SkriptMobSpawnerData extends SkriptSpawnerData implements Yggdrasil
 		if (spawner instanceof CreatureSpawner creatureSpawner)
 			creatureSpawner.update(true, false);
 	}
-
-	//<editor-fold desc="Legacy spawner handling" defaultstate="collapsed">
-	/**
-	 * Applies this SkriptSpawnerData to the given creature spawners.
-	 * This is used for versions under 1.21 to allow legacy spawner support.
-	 * @param creatureSpawners the creature spawners to apply the data to
-	 */
-	public void applyData(@NotNull CreatureSpawner @NotNull [] creatureSpawners) {
-		Preconditions.checkNotNull(creatureSpawners, "creatureSpawners cannot be null");
-		for (CreatureSpawner creatureSpawner : creatureSpawners) {
-			applyData(creatureSpawner);
-		}
-	}
-
-	/**
-	 * Applies this SkriptSpawnerData to the given creature spawner.
-	 * * This is used for versions under 1.21 to allow legacy spawner support.
-	 * @param creatureSpawner the creature spawner to apply the data to
-	 */
-	public void applyData(@NotNull CreatureSpawner creatureSpawner) {
-		Preconditions.checkNotNull(creatureSpawner, "creatureSpawner cannot be null");
-
-		creatureSpawner.setRequiredPlayerRange(getActivationRange());
-		creatureSpawner.setSpawnRange(getSpawnRange());
-
-		if (!getSpawnerEntries().isEmpty()) {
-			creatureSpawner.setPotentialSpawns(getSpawnerEntries().stream()
-				.map(SkriptSpawnerEntry::toSpawnerEntry)
-				.collect(Collectors.toSet())
-			);
-		}
-
-		creatureSpawner.setMaxNearbyEntities(getMaxNearbyEntityCap());
-		creatureSpawner.setSpawnCount(getSpawnCount());
-		creatureSpawner.setMaxSpawnDelay(Math.clamp(getMaxSpawnDelay().getAs(TimePeriod.TICK), 0, Integer.MAX_VALUE));
-		creatureSpawner.setMinSpawnDelay(Math.clamp(getMinSpawnDelay().getAs(TimePeriod.TICK), 0, Integer.MAX_VALUE));
-
-		creatureSpawner.update(true, false);
-	}
-	//</editor-fold>
 
 	/**
 	 * Returns the maximum number of nearby similar entities that can be spawned by this spawner.

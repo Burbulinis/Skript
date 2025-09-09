@@ -2,6 +2,7 @@ package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawnerentry;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Example;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.util.coll.CollectionUtils;
@@ -17,6 +18,11 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
     (armor, weapons, tools, etc.) that the spawned entity will have.
     Only loot tables specifically defined as equipment loot tables will have effect.
     """)
+@Example("""
+	set {_entry} to the spawner entry of a pig:
+		set the spawner entry equipment to loot table "minecraft:equipment/trial_chamber"
+		set the drop chances for helmet and boots to 100%
+	""")
 public class ExprSpawnerEntryEquipment extends SimplePropertyExpression<SkriptSpawnerEntry, LootTable> {
 
 	public static void register(SyntaxRegistry registry) {

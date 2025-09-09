@@ -28,12 +28,9 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 	force event-block to stop tracking player
 	""")
 @Since("INSERT VERSION")
-@RequiredPlugins("Minecraft 1.21+")
 public class EffTrialSpawnerTrack extends Effect {
 
 	public static void register(SyntaxRegistry registry) {
-		if (!SpawnerUtils.IS_RUNNING_1_21)
-			return;
 		registry.register(SyntaxRegistry.EFFECT, SyntaxInfo.builder(EffTrialSpawnerTrack.class)
 			.supplier(EffTrialSpawnerTrack::new)
 			.priority(SyntaxInfo.COMBINED)

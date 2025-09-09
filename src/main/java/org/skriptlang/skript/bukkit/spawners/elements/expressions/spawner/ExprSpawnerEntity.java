@@ -9,12 +9,10 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
-import org.bukkit.block.CreatureSpawner;
-import org.bukkit.block.TrialSpawner;
 import org.bukkit.entity.EntitySnapshot;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.minecart.SpawnerMinecart;
 import org.bukkit.event.Event;
+import org.bukkit.spawner.BaseSpawner;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.registration.SyntaxRegistry;
@@ -32,12 +30,11 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 			send "Spawner's snapshot is %target block's spawner entity snapshot%"
 	""")
 @Since("2.4, 2.9.2 (trial spawner), INSERT VERSION (spawner minecart)")
-@RequiredPlugins("Minecraft 1.21+ (for trial spawners, spawner minecarts)")
 public class ExprSpawnerEntity extends SimplePropertyExpression<Object, Object> {
 
 	public static void register(SyntaxRegistry registry) {
 		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprSpawnerEntity.class, Object.class,
-			"spawner [entity] (type|:snapshot)[s]", SpawnerUtils.spawnerPropertyType, false)
+			"spawner [entity] (type|:snapshot)[s]", SpawnerUtils.SPAWNER_PROPERTY_TYPE, false)
 				.supplier(ExprSpawnerEntity::new)
 				.build()
 		);
@@ -53,23 +50,19 @@ public class ExprSpawnerEntity extends SimplePropertyExpression<Object, Object> 
 
 	@Override
 	public @Nullable Object convert(Object object) {
-		Object entity = null;
+		if (!SpawnerUtils.isSpawner(object))
+			return null;
 
-		if (SpawnerUtils.isCreatureSpawner(object)) {
-			CreatureSpawner spawner = SpawnerUtils.getCreatureSpawner(object);
-			entity = snapshot ? spawner.getSpawnedEntity() : spawner.getSpawnedType();
-		} else if (SpawnerUtils.isTrialSpawner(object)) {
-			var spawner = SpawnerUtils.getTrialSpawnerConfiguration(SpawnerUtils.getTrialSpawner(object));
-			entity = snapshot ? spawner.getSpawnedEntity() : spawner.getSpawnedType();
-		} else if (SpawnerUtils.isSpawnerMinecart(object)) {
-			SpawnerMinecart spawner = SpawnerUtils.getSpawnerMinecart(object);
-			entity = snapshot ? spawner.getSpawnedEntity() : spawner.getSpawnedType();
-		}
+		BaseSpawner spawner = SpawnerUtils.getSpawner(object);
+		Object entity = snapshot ? spawner.getSpawnedEntity() : spawner.getSpawnedType();
 
-		if (!snapshot && entity != null)
-			entity = EntityUtils.toSkriptEntityData((EntityType) entity);
+		if (entity == null)
+			return null;
 
-		return entity;
+		if (snapshot)
+			return entity;
+
+		return EntityUtils.toSkriptEntityData((EntityType) entity);
 	}
 
 	@Override
@@ -85,31 +78,18 @@ public class ExprSpawnerEntity extends SimplePropertyExpression<Object, Object> 
 		Object value = (delta != null) ? delta[0] : null;
 
 		for (Object object : getExpr().getArray(event)) {
-			if (SpawnerUtils.isCreatureSpawner(object)) {
-				CreatureSpawner spawner = SpawnerUtils.getCreatureSpawner(object);
-				if (snapshot) {
-					spawner.setSpawnedEntity((EntitySnapshot) value);
-				} else {
-					spawner.setSpawnedType(EntityUtils.toBukkitEntityType((EntityData<?>) value));
-				}
-				spawner.update(true, false);
-			} else if (SpawnerUtils.isTrialSpawner(object)) {
-				TrialSpawner trial = SpawnerUtils.getTrialSpawner(object);
-				var config = SpawnerUtils.getTrialSpawnerConfiguration(trial);
-				if (snapshot) {
-					config.setSpawnedEntity((EntitySnapshot) value);
-				} else {
-					config.setSpawnedType(EntityUtils.toBukkitEntityType((EntityData<?>) value));
-				}
-				trial.update(true, false);
-			} else if (SpawnerUtils.isSpawnerMinecart(object)) {
-				SpawnerMinecart minecart = SpawnerUtils.getSpawnerMinecart(object);
-				if (snapshot) {
-					minecart.setSpawnedEntity((EntitySnapshot) value);
-				} else {
-					minecart.setSpawnedType(EntityUtils.toBukkitEntityType((EntityData<?>) value));
-				}
+			if (!SpawnerUtils.isSpawner(object))
+				continue;
+
+			BaseSpawner spawner = SpawnerUtils.getSpawner(object);
+
+			if (snapshot) {
+				spawner.setSpawnedEntity((EntitySnapshot) value);
+			} else {
+				spawner.setSpawnedType((EntityType) value);
 			}
+
+			SpawnerUtils.update(spawner);
 		}
 	}
 

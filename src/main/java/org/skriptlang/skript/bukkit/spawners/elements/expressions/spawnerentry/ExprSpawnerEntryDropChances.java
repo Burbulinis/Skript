@@ -2,10 +2,10 @@ package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawnerentry;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.*;
-import ch.njol.skript.expressions.base.PropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.SyntaxStringBuilder;
+import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import org.bukkit.event.Event;
@@ -35,12 +35,12 @@ import java.util.Map;
 		clear the drop chances for all equipment slots
 	""")
 @Since("INSERT VERSION")
-public class ExprSpawnerEntryDropChances extends PropertyExpression<SkriptSpawnerEntry, Float> {
+public class ExprSpawnerEntryDropChances extends SimpleExpression<Float> {
 
 	public static void register(SyntaxRegistry registry) {
 		registry.register(SyntaxRegistry.EXPRESSION, SyntaxInfo.Expression.builder(ExprSpawnerEntryDropChances.class, Float.class)
 			.supplier(ExprSpawnerEntryDropChances::new)
-			.priority(DEFAULT_PRIORITY)
+			.priority(SyntaxInfo.COMBINED)
 			.addPatterns(
 				"[the] drop chance[s] [of %spawnerentries%] for %equipmentslots%",
 				"%spawnerentries%'[s] drop chance[s] for %equipmentslots%")
@@ -48,24 +48,26 @@ public class ExprSpawnerEntryDropChances extends PropertyExpression<SkriptSpawne
 		);
 	}
 
+	private Expression<SkriptSpawnerEntry> entries;
 	private Expression<EquipmentSlot> slots;
 
 	@Override
 	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
 		//noinspection unchecked
-		setExpr((Expression<SkriptSpawnerEntry>) exprs[0]);
+		entries = (Expression<SkriptSpawnerEntry>) exprs[0];
 		//noinspection unchecked
 		slots = (Expression<EquipmentSlot>) exprs[1];
 		return true;
 	}
 
 	@Override
-	protected Float[] get(Event event, SkriptSpawnerEntry[] source) {
+	protected Float @Nullable [] get(Event event) {
+		SkriptSpawnerEntry[] entries = this.entries.getArray(event);
 		EquipmentSlot[] slots = this.slots.getArray(event);
 
-		List<Float> dropChances = new ArrayList<>(slots.length * source.length);
+		List<Float> dropChances = new ArrayList<>(slots.length * entries.length);
 
-		for (SkriptSpawnerEntry entry : source) {
+		for (SkriptSpawnerEntry entry : entries) {
 			Map<EquipmentSlot, Float> dropChanceMap = entry.getDropChances();
 			for (EquipmentSlot slot : slots) {
 				Float chance = dropChanceMap.get(slot);
@@ -89,11 +91,10 @@ public class ExprSpawnerEntryDropChances extends PropertyExpression<SkriptSpawne
 
 	@Override
 	public void change(Event event, Object @Nullable [] delta, ChangeMode mode) {
-		EquipmentSlot[] slots = this.slots.getArray(event);
 		float chance = delta != null ? (float) delta[0] : 0;
 
-		for (SkriptSpawnerEntry entry : getExpr().getArray(event)) {
-			for (EquipmentSlot slot : slots) {
+		for (SkriptSpawnerEntry entry : this.entries.getArray(event)) {
+			for (EquipmentSlot slot : this.slots.getArray(event)) {
 				if (mode == ChangeMode.DELETE)
 					entry.removeDropChance(slot);
 
@@ -108,6 +109,11 @@ public class ExprSpawnerEntryDropChances extends PropertyExpression<SkriptSpawne
 	}
 
 	@Override
+	public boolean isSingle() {
+		return entries.isSingle() && slots.isSingle();
+	}
+
+	@Override
 	public Class<? extends Float> getReturnType() {
 		return Float.class;
 	}
@@ -115,7 +121,7 @@ public class ExprSpawnerEntryDropChances extends PropertyExpression<SkriptSpawne
 	@Override
 	public String toString(@Nullable Event event, boolean debug) {
 		SyntaxStringBuilder builder = new SyntaxStringBuilder(event, debug);
-		builder.append("the drop chances of", getExpr(), "for", slots);
+		builder.append("the drop chances of", entries, "for", slots);
 		return builder.toString();
 	}
 

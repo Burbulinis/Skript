@@ -1,10 +1,7 @@
 package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.spawnerdata;
 
 import ch.njol.skript.config.SectionNode;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Example;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.RequiredPlugins;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.SectionExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -49,19 +46,15 @@ import java.util.List;
 
 	set the ominous trial spawner data of event-block to {_trial data}
 	""")
-@RequiredPlugins("Minecraft 1.21+ (for trial spawner data)")
+@Since("INSERT VERSION")
 public class ExprSecSpawnerData extends SectionExpression<SkriptSpawnerData> {
 
 	public static void register(SyntaxRegistry registry) {
-		var info = SyntaxInfo.Expression.builder(ExprSecSpawnerData.class, SkriptSpawnerData.class)
+		registry.register(SyntaxRegistry.EXPRESSION, SyntaxInfo.Expression.builder(ExprSecSpawnerData.class, SkriptSpawnerData.class)
 			.supplier(ExprSecSpawnerData::new)
 			.priority(SyntaxInfo.SIMPLE)
-			.addPattern("[the] mob spawner data");
-
-		if (SpawnerUtils.IS_RUNNING_1_21)
-			info.addPattern("[the] trial spawner data");
-
-		registry.register(SyntaxRegistry.EXPRESSION, info.build());
+			.addPatterns("[the] mob spawner data", "[the] trial spawner data")
+			.build());
 	}
 
 	private SpawnerDataType dataType;

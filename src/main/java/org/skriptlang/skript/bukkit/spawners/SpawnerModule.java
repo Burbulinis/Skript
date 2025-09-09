@@ -98,7 +98,6 @@ public class SpawnerModule implements AddonModule {
 				<a href='https://minecraft.wiki/w/Trial_Spawner'>the Minecraft wiki page about trial spawners</a>.
 				""")
 			.since("INSERT VERSION")
-			.requiredPlugins("Minecraft 1.21+")
 			.defaultExpression(new EventValueExpression<>(SkriptTrialSpawnerData.class))
 			.parser(new Parser<>() {
 				@Override

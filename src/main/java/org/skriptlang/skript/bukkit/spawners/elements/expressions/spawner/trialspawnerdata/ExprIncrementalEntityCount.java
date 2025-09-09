@@ -1,10 +1,7 @@
 package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.trialspawnerdata;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Example;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.RequiredPlugins;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -53,12 +50,10 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 		reset additional mob spawn amount
 		add 10 to incremental concurrent entity spawn amount
 	""")
-@RequiredPlugins("Minecraft 1.21+")
+@Since("INSERT VERSION")
 public class ExprIncrementalEntityCount extends SimplePropertyExpression<SkriptTrialSpawnerData, Integer> {
 
 	public static void register(SyntaxRegistry registry) {
-		if (!SpawnerUtils.IS_RUNNING_1_21)
-			return;
 		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprIncrementalEntityCount.class, Integer.class,
 			"(incremental|additional) [concurrent:(concurrent|simultaneous)] (mob|entity) [spawn] (count|amount)[s]", "trialspawnerdatas", true)
 				.supplier(ExprIncrementalEntityCount::new)

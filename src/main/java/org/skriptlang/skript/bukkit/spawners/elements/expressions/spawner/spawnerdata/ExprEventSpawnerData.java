@@ -1,10 +1,7 @@
 package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawner.spawnerdata;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Example;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.RequiredPlugins;
+import ch.njol.skript.doc.*;
 import ch.njol.skript.lang.EventRestrictedSyntax;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -48,18 +45,14 @@ import java.util.StringJoiner;
 	modify the spawner data of event-block:
 		broadcast the spawner data
 	""")
-@RequiredPlugins("Minecraft 1.21+ (for trial spawner data)")
+@Since("INSERT VERSION")
 public class ExprEventSpawnerData extends SimpleExpression<SkriptSpawnerData> implements EventRestrictedSyntax {
 
 	public static void register(SyntaxRegistry registry) {
-		String pattern = "[the] [:mob] spawner data";
-		if (SpawnerUtils.IS_RUNNING_1_21)
-			pattern = "[the] [:mob|:trial] spawner data";
-
 		registry.register(SyntaxRegistry.EXPRESSION, SyntaxInfo.Expression.builder(ExprEventSpawnerData.class, SkriptSpawnerData.class)
 			.supplier(ExprEventSpawnerData::new)
 			.priority(SyntaxInfo.SIMPLE)
-			.addPattern(pattern)
+			.addPattern("[the] [:mob|:trial] spawner data")
 			.build()
 		);
 	}

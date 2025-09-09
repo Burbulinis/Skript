@@ -18,12 +18,11 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 		send "The spawner is activated!" to player
 	""")
 @Since("INSERT VERSION")
-@RequiredPlugins("Minecraft 1.21+ (for trial spawners, spawner minecarts)")
 public class CondIsActivated extends PropertyCondition<Object> {
 
 	public static void register(SyntaxRegistry registry) {
 		registry.register(SyntaxRegistry.CONDITION, infoBuilder(CondIsActivated.class, PropertyType.BE,
-			"[an] (activated|active) spawner", SpawnerUtils.spawnerPropertyType)
+			"[an] (activated|active) spawner", SpawnerUtils.SPAWNER_PROPERTY_TYPE)
 				.supplier(CondIsActivated::new)
 				.build()
 		);
@@ -31,10 +30,8 @@ public class CondIsActivated extends PropertyCondition<Object> {
 
 	@Override
 	public boolean check(Object object) {
-		if (SpawnerUtils.isCreatureSpawner(object)) {
-			return SpawnerUtils.getCreatureSpawner(object).isActivated();
-		} else if (SpawnerUtils.isSpawnerMinecart(object)) {
-			return SpawnerUtils.getSpawnerMinecart(object).isActivated();
+		if (SpawnerUtils.isMobSpawner(object)) {
+			return SpawnerUtils.getMobSpawner(object).isActivated();
 		} else if (SpawnerUtils.isTrialSpawner(object)) {
 			TrialSpawner trialSpawner = (TrialSpawner) SpawnerUtils.getTrialSpawner(object).getBlockData();
 			return trialSpawner.getTrialSpawnerState() == State.ACTIVE;

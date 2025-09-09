@@ -7,10 +7,9 @@ import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.Timespan.TimePeriod;
 import ch.njol.util.Math2;
 import ch.njol.util.coll.CollectionUtils;
-import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.TrialSpawner;
-import org.bukkit.entity.minecart.SpawnerMinecart;
 import org.bukkit.event.Event;
+import org.bukkit.spawner.Spawner;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.registration.SyntaxRegistry;
@@ -29,12 +28,12 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 	reset the spawn delay of target block
 	""")
 @Since("INSERT VERSION")
-@RequiredPlugins({"Minecraft 1.21+ (spawner minecarts)", "Minecraft 1.21.4+ (for trial spawners)"})
+@RequiredPlugins("Minecraft 1.21.4+ (for trial spawners)")
 public class ExprSpawnDelay extends SimplePropertyExpression<Object, Timespan> {
 
 	public static void register(SyntaxRegistry registry) {
 		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprSpawnDelay.class, Timespan.class,
-			"spawn delay[s]", SpawnerUtils.spawnerPropertyType, false)
+			"spawn delay[s]", SpawnerUtils.SPAWNER_PROPERTY_TYPE, false)
 				.supplier(ExprSpawnDelay::new)
 				.build()
 		);
@@ -44,14 +43,12 @@ public class ExprSpawnDelay extends SimplePropertyExpression<Object, Timespan> {
 	public @Nullable Timespan convert(Object object) {
 		Timespan timespan = null;
 
-		if (SpawnerUtils.isCreatureSpawner(object)) {
-			timespan = new Timespan(TimePeriod.TICK, SpawnerUtils.getCreatureSpawner(object).getDelay());
+		if (SpawnerUtils.isMobSpawner(object)) {
+			timespan = new Timespan(TimePeriod.TICK, SpawnerUtils.getMobSpawner(object).getDelay());
 		} else if (SpawnerUtils.IS_RUNNING_1_21_4 && SpawnerUtils.isTrialSpawner(object)) {
 			TrialSpawner spawner = SpawnerUtils.getTrialSpawner(object);
 			long ticks = Math.max(0, spawner.getNextSpawnAttempt() - spawner.getWorld().getGameTime());
 			timespan = new Timespan(TimePeriod.TICK, ticks);
-		} else if (SpawnerUtils.isSpawnerMinecart(object)) {
-			timespan = new Timespan(TimePeriod.TICK, SpawnerUtils.getSpawnerMinecart(object).getDelay());
 		}
 
 		return timespan;
@@ -74,12 +71,11 @@ public class ExprSpawnDelay extends SimplePropertyExpression<Object, Timespan> {
 			ticks = (int) Math.min(timespan.getAs(TimePeriod.TICK), Integer.MAX_VALUE);
 
 		for (Object object : getExpr().getArray(event)) {
-			if (SpawnerUtils.isCreatureSpawner(object)) {
-				CreatureSpawner creatureSpawner = SpawnerUtils.getCreatureSpawner(object);
-				creatureSpawner.setDelay(getNewDelay(mode, creatureSpawner.getDelay(), ticks));
-
-				creatureSpawner.update(true, false);
-			} else if (SpawnerUtils.isTrialSpawner(object) && SpawnerUtils.IS_RUNNING_1_21_4) {
+			if (SpawnerUtils.isMobSpawner(object)) {
+				Spawner mobSpawner = SpawnerUtils.getMobSpawner(object);
+				mobSpawner.setDelay(getNewDelay(mode, mobSpawner.getDelay(), ticks));
+				SpawnerUtils.update(mobSpawner);
+			} else if (SpawnerUtils.isTrialSpawner(object)) {
 				TrialSpawner trialSpawner = SpawnerUtils.getTrialSpawner(object);
 				long gameTime = trialSpawner.getWorld().getGameTime();
 
@@ -92,9 +88,6 @@ public class ExprSpawnDelay extends SimplePropertyExpression<Object, Timespan> {
 				}
 
 				trialSpawner.update(true, false);
-			} else if (SpawnerUtils.isSpawnerMinecart(object)) {
-				SpawnerMinecart spawnerMinecart = SpawnerUtils.getSpawnerMinecart(object);
-				spawnerMinecart.setDelay(getNewDelay(mode, spawnerMinecart.getDelay(), ticks));
 			}
 		}
 	}

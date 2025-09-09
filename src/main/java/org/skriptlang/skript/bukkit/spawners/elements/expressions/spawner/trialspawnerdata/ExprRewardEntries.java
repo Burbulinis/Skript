@@ -39,12 +39,9 @@ import java.util.Map;
 		remove loot table "minecraft:chests/simple_dungeon" from the reward entries
 	""")
 @Since("INSERT VERSION")
-@RequiredPlugins("Minecraft 1.21+")
 public class ExprRewardEntries extends PropertyExpression<SkriptTrialSpawnerData, LootTable> {
 
 	public static void register(SyntaxRegistry syntaxRegistry) {
-		if (!SpawnerUtils.IS_RUNNING_1_21)
-			return;
 		syntaxRegistry.register(SyntaxRegistry.EXPRESSION, SyntaxInfo.Expression.builder(ExprRewardEntries.class, LootTable.class)
 			.supplier(ExprRewardEntries::new)
 			.priority(DEFAULT_PRIORITY)

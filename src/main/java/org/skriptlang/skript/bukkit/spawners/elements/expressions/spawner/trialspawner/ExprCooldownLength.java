@@ -27,12 +27,9 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 	reset the trial cooldown length of event-block
 	""")
 @Since("INSERT VERSION")
-@RequiredPlugins("Minecraft 1.21+")
 public class ExprCooldownLength extends SimplePropertyExpression<Block, Timespan> {
 
 	public static void register(SyntaxRegistry registry) {
-		if (!SpawnerUtils.IS_RUNNING_1_21)
-			return;
 		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprCooldownLength.class, Timespan.class,
 			"trial [spawner] cool[ ]down length[s]", "blocks", false)
 				.supplier(ExprCooldownLength::new)

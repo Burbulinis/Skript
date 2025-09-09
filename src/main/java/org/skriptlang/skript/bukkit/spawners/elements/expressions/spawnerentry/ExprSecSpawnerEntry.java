@@ -35,7 +35,7 @@ import java.util.List;
 
 		set the spawner entry equipment to loot table "minecraft:equipment/trial_chamber"
 		set the drop chances for helmet, legs and boots to 100%
-	add {_entry} to the spawner entries of event-block
+	add {_entry} to the spawner entries of {_data}
 	""")
 @Since("INSERT VERSION")
 public class ExprSecSpawnerEntry extends SectionExpression<SkriptSpawnerEntry> {

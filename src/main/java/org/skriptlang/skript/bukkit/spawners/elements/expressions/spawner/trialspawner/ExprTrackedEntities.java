@@ -35,12 +35,9 @@ import java.util.List;
 	remove the target entity from the tracked entities of event-block
 	""")
 @Since("INSERT VERSION")
-@RequiredPlugins("Minecraft 1.21+")
 public class ExprTrackedEntities extends PropertyExpression<Block, Entity> {
 
 	public static void register(SyntaxRegistry registry) {
-		if (!SpawnerUtils.IS_RUNNING_1_21)
-			return;
 		registry.register(SyntaxRegistry.EXPRESSION, SyntaxInfo.Expression.builder(ExprTrackedEntities.class, Entity.class)
 			.supplier(ExprTrackedEntities::new)
 			.priority(DEFAULT_PRIORITY)

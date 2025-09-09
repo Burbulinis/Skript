@@ -3,15 +3,13 @@ package org.skriptlang.skript.bukkit.spawners.elements.effects;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Example;
 import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.RequiredPlugins;
 import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
-import org.bukkit.block.CreatureSpawner;
-import org.bukkit.entity.minecart.SpawnerMinecart;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.spawner.Spawner;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.registration.SyntaxInfo;
@@ -32,7 +30,6 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 	force event-block to spawn 5 diamonds
 	force event-block to spawn a diamond sword
 	""")
-@RequiredPlugins("Minecraft 1.21+ (for spawner minecarts)")
 public class EffSpawnerItem extends Effect {
 
 	public static void register(SyntaxRegistry registry) {
@@ -40,8 +37,8 @@ public class EffSpawnerItem extends Effect {
 			.supplier(EffSpawnerItem::new)
 			.priority(SyntaxInfo.COMBINED)
 			.addPatterns(
-				"make " + SpawnerUtils.spawnerPropertyType + " spawn %itemstack%",
-				"force " + SpawnerUtils.spawnerPropertyType + " to spawn %itemstack%")
+				"make " + SpawnerUtils.SPAWNER_PROPERTY_TYPE + " spawn %itemstack%",
+				"force " + SpawnerUtils.SPAWNER_PROPERTY_TYPE + " to spawn %itemstack%")
 			.build()
 		);
 	}
@@ -64,14 +61,12 @@ public class EffSpawnerItem extends Effect {
 			return;
 
 		for (Object object : spawners.getArray(event)) {
-			if (SpawnerUtils.isCreatureSpawner(object)) {
-				CreatureSpawner spawner = SpawnerUtils.getCreatureSpawner(object);
-				spawner.setSpawnedItem(item);
-				spawner.update(true, false);
-			} else if (SpawnerUtils.isSpawnerMinecart(object)) {
-				SpawnerMinecart minecart = SpawnerUtils.getSpawnerMinecart(object);
-				minecart.setSpawnedItem(item);
-			}
+			if (!SpawnerUtils.isMobSpawner(object))
+				continue;
+
+			Spawner mobSpawner = SpawnerUtils.getMobSpawner(object);
+			mobSpawner.setSpawnedItem(item);
+			SpawnerUtils.update(mobSpawner);
 		}
 	}
 

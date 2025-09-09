@@ -16,12 +16,9 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 	send whether {_data} is ominous to player
 	""")
 @Since("INSERT VERSION")
-@RequiredPlugins("Minecraft 1.21+")
 public class CondIsOminous extends PropertyCondition<Object> {
 
 	public static void register(SyntaxRegistry registry) {
-		if (!SpawnerUtils.IS_RUNNING_1_21)
-			return;
 		registry.register(SyntaxRegistry.CONDITION, infoBuilder(CondIsOminous.class, PropertyType.BE,
 			"ominous", "blocks/blockdatas")
 				.supplier(CondIsOminous::new)

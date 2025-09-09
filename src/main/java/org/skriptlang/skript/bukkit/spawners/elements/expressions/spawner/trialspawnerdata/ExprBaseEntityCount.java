@@ -42,12 +42,9 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 		add 10 to base concurrent entity spawn amount
 	""")
 @Since("INSERT VERSION")
-@RequiredPlugins("Minecraft 1.21+")
 public class ExprBaseEntityCount extends SimplePropertyExpression<SkriptTrialSpawnerData, Integer> {
 
 	public static void register(SyntaxRegistry registry) {
-		if (!SpawnerUtils.IS_RUNNING_1_21)
-			return;
 		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprBaseEntityCount.class, Integer.class,
 			"base [concurrent:(concurrent|simultaneous)] (mob|entity) [spawn] (count|amount)[s]", "trialspawnerdatas", true)
 				.supplier(ExprBaseEntityCount::new)
