@@ -17,7 +17,6 @@ import org.jetbrains.annotations.UnknownNullability;
 @SuppressWarnings("UnstableApiUsage")
 public class SpawnerUtils {
 
-	public static boolean IS_RUNNING_1_21 = Skript.isRunningMinecraft(1, 21);
 	public static boolean IS_RUNNING_1_21_4 = Skript.isRunningMinecraft(1, 21, 4);
 
 	public static final int DEFAULT_ACTIVATION_RANGE = 16;
