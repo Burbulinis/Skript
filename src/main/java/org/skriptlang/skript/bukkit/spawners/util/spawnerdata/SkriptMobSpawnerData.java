@@ -7,14 +7,11 @@ import ch.njol.yggdrasil.YggdrasilSerializable.YggdrasilExtendedSerializable;
 import com.google.common.base.Preconditions;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.minecart.SpawnerMinecart;
-import org.bukkit.spawner.BaseSpawner;
 import org.bukkit.spawner.Spawner;
 import org.jetbrains.annotations.NotNull;
-import org.skriptlang.skript.bukkit.spawners.util.SkriptSpawnerEntry;
 import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 
 import java.io.StreamCorruptedException;
-import java.util.stream.Collectors;
 
 /**
  * Represents the data of a {@link Spawner}, which may be a {@link CreatureSpawner} or a {@link SpawnerMinecart}
