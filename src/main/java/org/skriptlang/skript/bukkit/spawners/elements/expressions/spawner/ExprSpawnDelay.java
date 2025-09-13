@@ -17,8 +17,8 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 @Name("Spawn Delay")
 @Description("""
     Returns the spawn delay of the spawner. The spawn delay is the time before the spawner attempts to \
-    spawn its entries. If the spawner is inactive at the time of the attempt, the delay remains 0 and \
-    the spawner will try to spawn every tick until successful. After a successful spawn, the delay is \
+    spawn its entries. If the spawner is inactive at the time of the attempt, the delay remains as 0 seconds and \
+    the spawner will try to spawn every tick until it's successful. After a successful spawn, the delay is \
     reset to a random value between the spawner’s minimum and maximum spawn delays.
     """)
 @Example("""
@@ -33,7 +33,7 @@ public class ExprSpawnDelay extends SimplePropertyExpression<Object, Timespan> {
 
 	public static void register(SyntaxRegistry registry) {
 		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprSpawnDelay.class, Timespan.class,
-			"spawn delay[s]", SpawnerUtils.SPAWNER_PROPERTY_TYPE, false)
+			"spawn delay[s]", "blocks/entities", false)
 				.supplier(ExprSpawnDelay::new)
 				.build()
 		);
@@ -41,17 +41,19 @@ public class ExprSpawnDelay extends SimplePropertyExpression<Object, Timespan> {
 
 	@Override
 	public @Nullable Timespan convert(Object object) {
-		Timespan timespan = null;
-
 		if (SpawnerUtils.isMobSpawner(object)) {
-			timespan = new Timespan(TimePeriod.TICK, SpawnerUtils.getMobSpawner(object).getDelay());
-		} else if (SpawnerUtils.IS_RUNNING_1_21_4 && SpawnerUtils.isTrialSpawner(object)) {
+			return new Timespan(TimePeriod.TICK, SpawnerUtils.getMobSpawner(object).getDelay());
+		} else if (SpawnerUtils.isTrialSpawner(object)) {
+			if (!SpawnerUtils.IS_RUNNING_1_21_4) {
+				error("Getting the spawn delay of a trial spawner requires Minecraft 1.21.4 or newer.");
+				return null;
+			}
 			TrialSpawner spawner = SpawnerUtils.getTrialSpawner(object);
 			long ticks = Math.max(0, spawner.getNextSpawnAttempt() - spawner.getWorld().getGameTime());
-			timespan = new Timespan(TimePeriod.TICK, ticks);
+			return new Timespan(TimePeriod.TICK, ticks);
 		}
 
-		return timespan;
+		return null;
 	}
 
 	@Override

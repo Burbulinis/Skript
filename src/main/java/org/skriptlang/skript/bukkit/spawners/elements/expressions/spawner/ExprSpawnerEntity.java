@@ -37,7 +37,7 @@ public class ExprSpawnerEntity extends SimplePropertyExpression<Object, Object> 
 
 	public static void register(SyntaxRegistry registry) {
 		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprSpawnerEntity.class, Object.class,
-			"spawner [entity] (type|:snapshot)[s]", SpawnerUtils.SPAWNER_PROPERTY_TYPE, false)
+			"spawner [entity] (type|:snapshot)[s]", "blocks/entities", false)
 				.supplier(ExprSpawnerEntity::new)
 				.build()
 		);
@@ -71,7 +71,11 @@ public class ExprSpawnerEntity extends SimplePropertyExpression<Object, Object> 
 	@Override
 	public Class<?> @Nullable [] acceptChange(ChangeMode mode) {
 		return switch (mode) {
-			case SET, DELETE, RESET -> CollectionUtils.array(EntityData.class);
+			case SET, DELETE, RESET -> {
+				if (snapshot)
+					yield CollectionUtils.array(EntitySnapshot.class);
+				yield CollectionUtils.array(EntityData.class);
+			}
 			default -> null;
 		};
 	}

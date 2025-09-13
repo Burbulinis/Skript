@@ -9,8 +9,12 @@ import org.skriptlang.skript.bukkit.spawners.util.SkriptSpawnerEntry;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Spawner Entry")
-@Description("The spawner entry used in the spawner entry section.")
-@Examples("the spawner entry")
+@Description("""
+	The spawner entry used in the spawner entry section.
+	""")
+@Examples("""
+	the spawner entry
+	""")
 @Since("INSERT VERSION")
 public class ExprSpawnerEntry extends EventValueExpression<SkriptSpawnerEntry> {
 

@@ -26,8 +26,8 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 	The minimum delay cannot exceed the maximum delay, and vice versa.
 
 	Default values for mob spawners:
-	  • Minimum spawn delay: 10 seconds (200 ticks)
-	  • Maximum spawn delay: 40 seconds (800 ticks)
+	  - Minimum spawn delay: 10 seconds (200 ticks)
+	  - Maximum spawn delay: 40 seconds (800 ticks)
 
 	Though, trial spawners behave differently. Their minimum and maximum spawn delays are fixed to the same value. \
 	By default, both are set to 2 seconds (40 ticks).

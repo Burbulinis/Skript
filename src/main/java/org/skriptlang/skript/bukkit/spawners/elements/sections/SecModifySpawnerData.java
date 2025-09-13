@@ -1,6 +1,10 @@
 package org.skriptlang.skript.bukkit.spawners.elements.sections;
 
 import ch.njol.skript.config.SectionNode;
+import ch.njol.skript.doc.Description;
+import ch.njol.skript.doc.Example;
+import ch.njol.skript.doc.Name;
+import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.*;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SectionUtils;
@@ -22,6 +26,31 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 
 import java.util.List;
 
+@Name("Modify Spawner Data")
+@Description("""
+    Directly modifies the mob, trial, or spawner data of the given spawners. \
+    For example, 'modify the ominous and regular trial spawner data of {_trial spawner}' \
+    updates both trial spawner's states.
+""")
+@Example("""
+	modify the spawner data of event-block:
+		set the activation range to 14
+		add 2 to the maximum spawn delay
+		delete the spawner entries
+	""")
+@Example("""
+	modify the mob spawner data of event-block:
+		set the spawn count to 4
+		add 5 to the minimum spawn delay
+		add 3 to the maximum nearby entity cap
+	""")
+@Example("""
+	modify the trial spawner data of event-block:
+		set the base entity spawn count to 10
+		add {_entry} to the spawner entries
+		set the reward entry weight for loot table "minecraft:chests/simple_dungeon" to 15
+	""")
+@Since("INSERT VERSION")
 public class SecModifySpawnerData extends Section {
 
 	public static void register(SyntaxRegistry registry) {
@@ -29,7 +58,7 @@ public class SecModifySpawnerData extends Section {
 			.supplier(SecModifySpawnerData::new)
 			.priority(SyntaxInfo.COMBINED)
 			.addPatterns(
-				"modify [the] [:mob] spawner data of %" + SpawnerUtils.SPAWNER_PROPERTY_TYPE + '%',
+				"modify [the] [:mob] spawner data of %blocks/entities%",
 				"modify [the] [:ominous|:regular|:ominous and regular] trial:trial spawner data of %blocks%")
 			.build());
 	}

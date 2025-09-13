@@ -63,7 +63,7 @@ public class SpawnerModule implements AddonModule {
 			.user("mob ?spawner ?datas?")
 			.name("Mob Spawner Data")
 			.description("""
-				Represents mob spawner data that can be contained in a monster spawner or a spawner minecart. \
+				Represents the mob spawner data that can be contained in a monster spawner or a spawner minecart. \
 				Additional information can be found on \
 				<a href='https://minecraft.wiki/w/Monster_Spawner'>the Minecraft wiki page about mob spawners</a>.
 				""")

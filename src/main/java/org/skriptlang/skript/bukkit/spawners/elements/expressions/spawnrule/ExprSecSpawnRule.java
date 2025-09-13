@@ -2,7 +2,7 @@ package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawnrule;
 
 import ch.njol.skript.config.SectionNode;
 import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Example;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SectionExpression;
@@ -22,22 +22,26 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 
 import java.util.List;
 
-@Name("Create Spawn Rule")
-@Description({
-	"Create a spawn rule. Spawn rules are used to determine the conditions under "
-		+ "which the spawner entry will spawn entities. That is, the min/max block light spawn level, "
-		+ "min/max sky light spawn level."
-})
-@Examples({
-	"set {_entry} to a spawner entry using entity snapshot of a zombie:",
-		"\tset the weight to 5",
-		"\tset the spawn rule to a spawn rule:",
-			"\t\tset the minimum block light spawn level to 10",
-			"\t\tset the maximum block light spawn level to 15",
-			"\t\tset the minimum sky light spawn level to 5",
-			"\t\tset the maximum sky light spawn level to 15",
-	"add {_entry} to potential spawns of target block"
-})
+@Name("New Spawn Rule")
+@Description("""
+	Returns a new spawn rule.
+	""")
+@Example("""
+	set {_rule} to the spawn rule:
+		set the maximum block light spawn level to 12
+		set the minimum block light spawn level to 8
+		set the maximum sky light spawn level to 15
+		set the minimum sky light spawn level to 4
+	""")
+@Example("""
+	modify the spawner data of {_spawner}:
+		loop the spawner entries:
+			set the spawn rule to a spawn rule:
+				set the maximum block light spawn level to 15
+				set the minimum block light spawn level to 10
+				set the maximum sky light spawn level to 15
+				set the minimum sky light spawn level to 5
+	""")
 @Since("INSERT VERSION")
 public class ExprSecSpawnRule extends SectionExpression<SpawnRule> {
 

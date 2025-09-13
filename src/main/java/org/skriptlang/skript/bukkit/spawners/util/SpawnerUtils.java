@@ -35,8 +35,6 @@ public class SpawnerUtils {
 	public static final int DEFAULT_CONCURRENT_MOB_AMOUNT = 2;
 	public static final int DEFAULT_CONCURRENT_PER_PLAYER_INCREMENT = 1;
 
-	public static final String SPAWNER_PROPERTY_TYPE = "blocks/entities";
-
 	/**
 	 * Checks if the given object is a spawner (mob spawner or trial spawner).
 	 * @param object the object to check

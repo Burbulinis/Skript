@@ -2,7 +2,7 @@ package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawnerentry;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Example;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.entity.EntityData;
@@ -16,13 +16,14 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.spawners.util.SkriptSpawnerEntry;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Spawner Entry - Entity Snapshot")
-@Description("The entity snapshot of the spawner entry. Entity snapshots determines what entity the spawner will spawn.")
-@Examples({
-	"set {_entry} to a spawner entry using entity snapshot of a pig",
-	"add {_entry} to potential spawns of target block",
-	"# the spawner will now spawn pigs"
-})
+@Name("Spawner Entry Entity")
+@Description("""
+	Returns the entity snapshot of the spawner entry. The snapshot defines what entity the spawner entry represents.
+	""")
+@Example("""
+	set {_entry} to a spawner entry of a pig
+	broadcast "The entry is a %spawner entry snapshot of {_entry}%" # broadcasts "The entry is a pig"
+	""")
 @Since("INSERT VERSION")
 public class ExprSpawnerEntrySnapshot extends SimplePropertyExpression<SkriptSpawnerEntry, EntitySnapshot> {
 

@@ -9,7 +9,9 @@ import org.skriptlang.skript.bukkit.spawners.util.SpawnerUtils;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Trial Spawner Is Ominous")
-@Description("Checks whether a trial spawner is ominous. This can also be used with trial spawner block datas.")
+@Description("""
+	Checks whether a trial spawner is ominous. This can also be used with trial spawner block datas.
+	""")
 @Example("""
 	if the block at player is ominous:
 		send "The trial spawner is ominous!" to player

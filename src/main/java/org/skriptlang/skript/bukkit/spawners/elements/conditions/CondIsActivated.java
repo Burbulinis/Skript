@@ -25,7 +25,7 @@ public class CondIsActivated extends PropertyCondition<Object> {
 
 	public static void register(SyntaxRegistry registry) {
 		registry.register(SyntaxRegistry.CONDITION, infoBuilder(CondIsActivated.class, PropertyType.BE,
-			"[an] (activated|active) spawner", SpawnerUtils.SPAWNER_PROPERTY_TYPE)
+			"[an] (activated|active) spawner", "blocks/entities")
 				.supplier(CondIsActivated::new)
 				.build()
 		);

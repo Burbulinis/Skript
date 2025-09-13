@@ -26,7 +26,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 
 import java.util.List;
 
-@Name("Create Spawner Entry")
+@Name("New Spawner Entry")
 @Description("Returns a new spawner entry from the given entity snapshot or data.")
 @Example("""
 	set {_entry} to the spawner entry of a zombie:

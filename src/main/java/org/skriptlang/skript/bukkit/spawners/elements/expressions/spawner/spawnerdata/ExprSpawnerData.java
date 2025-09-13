@@ -59,7 +59,7 @@ public class ExprSpawnerData extends PropertyExpression<Object, SkriptSpawnerDat
 
 	public static void register(SyntaxRegistry registry) {
 		registry.register(SyntaxRegistry.EXPRESSION, infoBuilder(ExprSpawnerData.class, SkriptSpawnerData.class,
-			"[trial:[:ominous|:regular|:ominous and regular] trial|:mob] spawner data[s]", SpawnerUtils.SPAWNER_PROPERTY_TYPE, false)
+			"[trial:[:ominous|:regular|:ominous and regular] trial|:mob] spawner data[s]", "blocks/entities", false)
 			.supplier(ExprSpawnerData::new)
 			.build()
 		);

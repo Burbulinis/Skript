@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@Name("Equipment Drop Chances")
+@Name("Equipment Drop Chance")
 @Description("""
     Returns the drop chance for the specified equipment slot(s) in a spawner entry. \
     The drop chance is a float between 0 and 1, where 0 means the item will never drop \

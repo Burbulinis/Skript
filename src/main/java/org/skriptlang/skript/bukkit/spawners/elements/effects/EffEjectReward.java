@@ -18,8 +18,12 @@ import org.skriptlang.skript.registration.SyntaxInfo;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
 @Name("Eject Trial Spawner Rewards")
-@Description("Make a trial spawner eject its rewards.")
-@Example("spit out the trial rewards from event-block")
+@Description("""
+	Make a trial spawner eject its rewards.
+	""")
+@Example("""
+	spit out the trial rewards from event-block
+	""")
 @Since("INSERT VERSION")
 public class EffEjectReward extends Effect {
 

@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.bukkit.spawners.util.SkriptSpawnerEntry;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Spawn Rule")
+@Name("Spawner Entry Rule")
 @Description("""
 	Returns the spawn rule of the spawner entry. Spawn rules determine the conditions under which the entry will be \
 	spawned.

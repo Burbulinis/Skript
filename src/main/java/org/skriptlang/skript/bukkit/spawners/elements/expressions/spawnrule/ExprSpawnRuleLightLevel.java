@@ -2,7 +2,7 @@ package org.skriptlang.skript.bukkit.spawners.elements.expressions.spawnrule;
 
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Examples;
+import ch.njol.skript.doc.Example;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
@@ -16,25 +16,21 @@ import org.bukkit.event.Event;
 import org.jetbrains.annotations.Nullable;
 import org.skriptlang.skript.registration.SyntaxRegistry;
 
-@Name("Spawn Rule - Block Light Spawn Level")
-@Description({
-	"Returns the minimum/maximum block light spawn levels of a spawn rule. "
-		+ "The block light spawn levels determine the light level of the block "
-		+ "that the spawner entry will spawn entities.",
-	"Note that the block light spawn levels must be between 0 and 15 "
-		+ ", the minimum block light spawn level must be less than or equal to "
-		+ "the maximum block light spawn level and vice versa."
-})
-@Examples({
-	"set {_entry} to a spawner entry using entity snapshot of a zombie:",
-		"\tset the weight to 5",
-		"\tset the spawn rule to a spawn rule:",
-			"\t\tset the minimum block light spawn level to 10",
-			"\t\tset the maximum block light spawn level to 15",
-			"\t\tset the minimum sky light spawn level to 5",
-			"\t\tset the maximum sky light spawn level to 15",
-	"set spawner entity of event-block to {_entry}"
-})
+@Name("Spawn Rule Light Level")
+@Description("""
+    Returns the minimum or maximum block or sky light levels of a spawn rule. \
+    Block light refers to the light level emitted by blocks, while sky light refers to sunlight.
+
+    Valid values range from 0 to 15. The minimum value must be less than or equal to the maximum value.
+    """)
+@Example("""
+	set {_entry} to a spawner entry of a zombie:
+		set the spawn rule to a spawn rule:
+			set the maximum block light spawn level to 15
+			set the minimum block light spawn level to 10
+			set the maximum sky light spawn level to 15
+			set the minimum sky light spawn level to 5
+	""")
 @Since("INSERT VERSION")
 public class ExprSpawnRuleLightLevel extends SimplePropertyExpression<SpawnRule, Integer> {
 

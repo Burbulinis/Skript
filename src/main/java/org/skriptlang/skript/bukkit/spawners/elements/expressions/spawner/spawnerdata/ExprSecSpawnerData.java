@@ -26,7 +26,7 @@ import org.skriptlang.skript.registration.SyntaxRegistry;
 
 import java.util.List;
 
-@Name("Create Spawner Data")
+@Name("New Spawner Data")
 @Description("Returns a new trial or mob spawner data.")
 @Example("""
 	set spawner data of event-block to the mob spawner data:

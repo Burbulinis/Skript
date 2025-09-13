@@ -37,8 +37,8 @@ public class EffSpawnerItem extends Effect {
 			.supplier(EffSpawnerItem::new)
 			.priority(SyntaxInfo.COMBINED)
 			.addPatterns(
-				"make " + SpawnerUtils.SPAWNER_PROPERTY_TYPE + " spawn %itemstack%",
-				"force " + SpawnerUtils.SPAWNER_PROPERTY_TYPE + " to spawn %itemstack%")
+				"make %blocks/entities% spawn %itemstack%",
+				"force %blocks/entities% to spawn %itemstack%")
 			.build()
 		);
 	}
