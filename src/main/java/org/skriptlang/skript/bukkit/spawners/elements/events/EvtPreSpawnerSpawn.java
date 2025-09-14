@@ -46,13 +46,7 @@ public class EvtPreSpawnerSpawn extends SkriptEvent {
 	public boolean check(Event event) {
 		if (entityDatas != null && event instanceof PreSpawnerSpawnEvent preEvent) {
 			EntityData<?> currentData = EntityUtils.toSkriptEntityData(preEvent.getType());
-
-			for (EntityData<?> specifiedData : entityDatas.getArray()) {
-				if (specifiedData.isSupertypeOf(currentData))
-					return true;
-			}
-
-			return false;
+			return entityDatas.stream(event).anyMatch(entityData -> entityData.isSupertypeOf(currentData));
 		}
 
 		return true;
