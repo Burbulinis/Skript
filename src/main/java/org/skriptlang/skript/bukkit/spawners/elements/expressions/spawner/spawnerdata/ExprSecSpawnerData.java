@@ -84,6 +84,7 @@ public class ExprSecSpawnerData extends SectionExpression<SkriptSpawnerData> {
 			: new SkriptTrialSpawnerData();
 
 		if (trigger != null) {
+			//noinspection DataFlowIssue
 			Event dataEvent = (dataType.isMob())
 				? new MobSpawnerDataEvent((SkriptMobSpawnerData) data)
 				: new TrialSpawnerDataEvent((SkriptTrialSpawnerData) data);

@@ -83,6 +83,7 @@ public class ExprSecSpawnerEntry extends SectionExpression<SkriptSpawnerEntry> {
 			if (entity == null)
 				return null;
 
+			//noinspection UnstableApiUsage
 			snapshot = entity.createSnapshot();
 			if (snapshot == null)
 				return null;

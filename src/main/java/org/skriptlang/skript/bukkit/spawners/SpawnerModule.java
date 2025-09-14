@@ -172,6 +172,7 @@ public class SpawnerModule implements AddonModule {
 
 				@Override
 				protected SkriptSpawnerEntry deserialize(Fields fields) throws StreamCorruptedException {
+					//noinspection DataFlowIssue
 					SkriptSpawnerEntry entry = new SkriptSpawnerEntry(fields.getObject("entity_snapshot", EntitySnapshot.class));
 					entry.setWeight(fields.getPrimitive("weight", int.class));
 					entry.setSpawnRule(fields.getObject("spawn_rule", SpawnRule.class));

@@ -60,6 +60,7 @@ public class ExprSpawnerEntrySnapshot extends SimplePropertyExpression<SkriptSpa
 			if (entity == null)
 				return;
 
+			//noinspection UnstableApiUsage
 			snapshot = entity.createSnapshot();
 			if (snapshot == null)
 				return;

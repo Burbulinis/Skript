@@ -65,6 +65,7 @@ public class ExprSpawnerEntity extends SimplePropertyExpression<Object, Object> 
 		if (snapshot)
 			return entity;
 
+		//noinspection DataFlowIssue
 		return EntityUtils.toSkriptEntityData((EntityType) entity);
 	}
 
