@@ -12,6 +12,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
+import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntitySnapshot;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.Event;
@@ -97,7 +98,8 @@ public class ExprSpawnerEntity extends SimplePropertyExpression<Object, Object> 
 				spawner.setSpawnedType((EntityType) value);
 			}
 
-			SpawnerUtils.update(spawner);
+			if (spawner instanceof CreatureSpawner creatureSpawner)
+				creatureSpawner.update(true, false);
 		}
 	}
 

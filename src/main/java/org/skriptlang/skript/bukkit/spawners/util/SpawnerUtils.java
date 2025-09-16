@@ -4,7 +4,6 @@ import ch.njol.skript.Skript;
 import ch.njol.skript.util.Timespan;
 import ch.njol.skript.util.Timespan.TimePeriod;
 import org.bukkit.block.Block;
-import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.TrialSpawner;
 import org.bukkit.spawner.BaseSpawner;
 import org.bukkit.spawner.Spawner;
@@ -107,18 +106,6 @@ public class SpawnerUtils {
 		if (object instanceof Block block)
 			return (TrialSpawner) block.getState();
 		return (TrialSpawner) object;
-	}
-
-	/**
-	 * Updates the state of the given spawner.
-	 * @param spawner the spawner to update
-	 */
-	public static void update(BaseSpawner spawner) {
-		if (spawner instanceof CreatureSpawner creatureSpawner) {
-			creatureSpawner.update(true, false);
-		} else if (spawner instanceof TrialSpawner trialSpawner) {
-			trialSpawner.update(true, false);
-		}
 	}
 
 	/**

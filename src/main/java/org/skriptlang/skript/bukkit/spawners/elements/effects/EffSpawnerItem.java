@@ -7,6 +7,7 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
+import org.bukkit.block.CreatureSpawner;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.spawner.Spawner;
@@ -66,7 +67,9 @@ public class EffSpawnerItem extends Effect {
 
 			Spawner mobSpawner = SpawnerUtils.getMobSpawner(object);
 			mobSpawner.setSpawnedItem(item);
-			SpawnerUtils.update(mobSpawner);
+
+			if (mobSpawner instanceof CreatureSpawner creatureSpawner)
+				creatureSpawner.update(true, false);
 		}
 	}
 
